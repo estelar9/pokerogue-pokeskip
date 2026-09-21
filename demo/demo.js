@@ -4,6 +4,20 @@
 
   const STORAGE_KEY = 'pokeskip_species_rules_v1';
   const STATS_KEY = 'pokeskip_stats_v1';
+  const SETTINGS_KEY = 'pokeskip_settings_v1';
+
+  function getSettings() {
+    try {
+      return Object.assign({
+        enabled: true,
+        showToasts: true,
+        showQuickPrompt: true,
+        quickPromptDuration: 15
+      }, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+    } catch (e) {
+      return { enabled: true, showToasts: true, showQuickPrompt: true, quickPromptDuration: 15 };
+    }
+  }
 
   const POKEMON_TYPES = [
     { name: 'Normal', color: '#f8fafc', bg: '#64748b' },
@@ -266,15 +280,17 @@
     `;
     dialogActions.style.display = 'flex';
 
-    if (quickPrompt) {
+    const settings = getSettings();
+    if (quickPrompt && settings.showQuickPrompt !== false) {
       document.getElementById('quick-move-name').textContent = moveName;
       document.getElementById('quick-pkmn-name').textContent = pkmnName;
       quickPrompt.style.display = 'flex';
 
       clearTimeout(window._quickPromptTimer);
+      const durationSec = Math.max(3, settings.quickPromptDuration || 15);
       window._quickPromptTimer = setTimeout(() => {
         quickPrompt.style.display = 'none';
-      }, 15000);
+      }, durationSec * 1000);
     }
   }
 

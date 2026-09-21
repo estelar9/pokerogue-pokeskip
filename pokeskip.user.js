@@ -82,12 +82,14 @@
   // --- STATE & STORE ---
   const PokeSkip = {
     rules: Storage.get(STORAGE_KEY, {}),
-    settings: Storage.get(SETTINGS_KEY, {
+    settings: Object.assign({
       enabled: true,
       showToasts: true,
       toastDuration: 2800,
-      soundFeedback: false
-    }),
+      soundFeedback: false,
+      showQuickPrompt: true,
+      quickPromptDuration: 15
+    }, Storage.get(SETTINGS_KEY, {})),
     stats: Storage.get(STATS_KEY, {
       totalSkipped: 0
     }),
@@ -293,8 +295,10 @@
           return;
         }
 
-        // Si l'attaque n'est pas ignorée : proposer le bouton rapide en haut au milieu (5s)
-        UI.showQuickSkipPrompt(this, pokemon, move);
+        // Si l'attaque n'est pas ignorée et l'option activée : proposer le bouton rapide en haut au milieu
+        if (PokeSkip.settings.showQuickPrompt !== false) {
+          UI.showQuickSkipPrompt(this, pokemon, move);
+        }
       }
 
       return origReplaceMoveCheck.apply(this, arguments);
@@ -998,12 +1002,28 @@
 
           <div class="pokeskip-modal-body" id="pokeskip-body-settings" style="display: none;">
             <div style="max-width: 500px; display: flex; flex-direction: column; gap: 16px;">
-              <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-                <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #38bdf8;">Notifications & Alertes</h4>
+              <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 12px;">
+                <h4 style="margin: 0 0 2px 0; font-size: 14px; color: #38bdf8;">Notifications & Alertes</h4>
+                
                 <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
                   <input type="checkbox" id="pokeskip-opt-toasts" ${PokeSkip.settings.showToasts ? 'checked' : ''} style="accent-color: #38bdf8;">
                   Afficher les notifications toast lors d'un auto-skip
                 </label>
+
+                <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+                    <input type="checkbox" id="pokeskip-opt-quick-prompt" ${PokeSkip.settings.showQuickPrompt !== false ? 'checked' : ''} style="accent-color: #38bdf8;">
+                    Proposer d'ignorer pour toujours une nouvelle attaque en combat
+                  </label>
+                  
+                  <div id="pokeskip-opt-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.showQuickPrompt !== false ? '1' : '0.4'};">
+                    <span>Durée d'affichage du message rapide :</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <input type="number" id="pokeskip-opt-quick-duration" min="3" max="60" value="${PokeSkip.settings.quickPromptDuration || 15}" ${PokeSkip.settings.showQuickPrompt === false ? 'disabled' : ''} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
+                      <span>secondes</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
@@ -1056,6 +1076,41 @@
         PokeSkip.settings.showToasts = e.target.checked;
         PokeSkip.saveSettings();
       });
+
+      const optQuickPrompt = document.getElementById('pokeskip-opt-quick-prompt');
+      const optQuickDuration = document.getElementById('pokeskip-opt-quick-duration');
+      const optDurationContainer = document.getElementById('pokeskip-opt-duration-container');
+
+      if (optQuickPrompt) {
+        optQuickPrompt.addEventListener('change', (e) => {
+          PokeSkip.settings.showQuickPrompt = e.target.checked;
+          PokeSkip.saveSettings();
+          if (optDurationContainer) {
+            optDurationContainer.style.opacity = e.target.checked ? '1' : '0.4';
+          }
+          if (optQuickDuration) {
+            optQuickDuration.disabled = !e.target.checked;
+          }
+        });
+      }
+
+      if (optQuickDuration) {
+        optQuickDuration.addEventListener('input', (e) => {
+          const val = parseInt(e.target.value, 10);
+          if (!isNaN(val) && val >= 3 && val <= 120) {
+            PokeSkip.settings.quickPromptDuration = val;
+            PokeSkip.saveSettings();
+          }
+        });
+        optQuickDuration.addEventListener('change', (e) => {
+          let val = parseInt(e.target.value, 10);
+          if (isNaN(val) || val < 3) val = 3;
+          if (val > 120) val = 120;
+          e.target.value = val;
+          PokeSkip.settings.quickPromptDuration = val;
+          PokeSkip.saveSettings();
+        });
+      }
 
       document.getElementById('pokeskip-btn-export').addEventListener('click', () => {
         const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(PokeSkip.rules, null, 2));
@@ -1411,10 +1466,11 @@
         }
       });
 
-      // Reste 15 secondes pour laisser le temps de décider
+      // Reste selon la durée configurée (par défaut 15s) pour laisser le temps de décider
+      const durationSec = Math.max(3, PokeSkip.settings.quickPromptDuration || 15);
       setTimeout(() => {
         dismiss();
-      }, 15000);
+      }, durationSec * 1000);
     }
   };
 
