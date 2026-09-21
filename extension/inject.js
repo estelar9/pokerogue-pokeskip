@@ -247,6 +247,15 @@
     if (!proto || proto._pokeskipHooked) return;
     proto._pokeskipHooked = true;
 
+    // Fermeture automatique du prompt dès que LearnMovePhase se termine (évite tout débordement sur la phase de récompense)
+    const origEnd = proto.end;
+    if (typeof origEnd === 'function') {
+      proto.end = function () {
+        UI.dismissQuickSkipPrompt();
+        return origEnd.apply(this, arguments);
+      };
+    }
+
     const origReplaceMoveCheck = proto.replaceMoveCheck;
     proto.replaceMoveCheck = async function (move, pokemon) {
       if (move && move.id && move.name) {
@@ -1397,6 +1406,18 @@
       });
     },
 
+    dismissQuickSkipPrompt() {
+      const el = document.getElementById('pokeskip-quick-prompt');
+      if (el && el.parentNode) {
+        el.style.opacity = '0';
+        el.style.transform = 'translate(-50%, -15px)';
+        el.style.transition = 'all 0.2s ease';
+        setTimeout(() => {
+          if (el && el.parentNode) el.remove();
+        }, 200);
+      }
+    },
+
     showQuickSkipPrompt(phaseInstance, pokemon, move) {
       if (document.getElementById('pokeskip-quick-prompt')) {
         document.getElementById('pokeskip-quick-prompt').remove();
@@ -1417,14 +1438,7 @@
       document.body.appendChild(el);
 
       const dismiss = () => {
-        if (el && el.parentNode) {
-          el.style.opacity = '0';
-          el.style.transform = 'translate(-50%, -15px)';
-          el.style.transition = 'all 0.2s ease';
-          setTimeout(() => {
-            if (el && el.parentNode) el.remove();
-          }, 200);
-        }
+        this.dismissQuickSkipPrompt();
       };
 
       el.querySelector('#pokeskip-quick-close').addEventListener('click', (e) => {
@@ -1442,10 +1456,48 @@
         this.showToast(`✅ Règle enregistrée : <b>${speciesName}</b> ignorera <b>${moveName}</b> !`, 'success');
         dismiss();
 
-        try {
-          phaseInstance.end();
-        } catch (err) {
-          console.warn('[PokeSkip] Erreur clôture phase:', err);
+        const scene = phaseInstance.scene || PokeSkip.scene || window.globalScene;
+        const pm = scene?.phaseManager;
+        const currentPhase = pm ? (typeof pm.getCurrentPhase === 'function' ? pm.getCurrentPhase() : pm.currentPhase) : null;
+
+        // VÉRIFICATION DE SÉCURITÉ :
+        // Ne terminer la phase que si LearnMovePhase est encore la phase courante !
+        // Si le jeu est déjà passé à SelectModifierPhase (l'objet cadeau), on ne touche SURTOUT PAS à end()
+        if (currentPhase && (currentPhase === phaseInstance || currentPhase.phaseName === 'LearnMovePhase')) {
+          const targetMode = phaseInstance.messageMode ?? 0;
+          let ended = false;
+          const safeEnd = () => {
+            if (ended) return;
+            ended = true;
+            try {
+              phaseInstance.end();
+            } catch (err) {
+              console.warn('[PokeSkip] Erreur clôture phase:', err);
+            }
+          };
+
+          // Si le joueur était dans le menu des 4 attaques (UiMode.SUMMARY = 9) ou confirmation (14),
+          // on réinitialise l'UI pour quitter ce menu immédiatement et proprement
+          if (scene && scene.ui && typeof scene.ui.setMode === 'function') {
+            try {
+              scene.ui.setMode(targetMode).then(safeEnd).catch(safeEnd);
+              setTimeout(safeEnd, 200);
+            } catch (err) {
+              safeEnd();
+            }
+          } else {
+            safeEnd();
+          }
+        } else {
+          // Si LearnMovePhase est déjà passée mais que l'UI est restée coincée sur Summary (9) ou Confirm (14) :
+          if (scene && scene.ui && typeof scene.ui.setMode === 'function') {
+            try {
+              const currentMode = typeof scene.ui.getMode === 'function' ? scene.ui.getMode() : scene.ui.mode;
+              if (currentMode === 9 || currentMode === 14) {
+                scene.ui.setMode(phaseInstance.messageMode ?? 0);
+              }
+            } catch (err) {}
+          }
         }
       });
 
