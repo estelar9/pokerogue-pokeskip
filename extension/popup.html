@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>PokéSkip</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="header">
+      <div class="brand">
+        <svg viewBox="0 0 100 100" width="22" height="22" style="display:block; flex-shrink:0;">
+          <defs>
+            <linearGradient id="popBlue" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#0284c7"/>
+            </linearGradient>
+            <linearGradient id="popWhite" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#e2e8f0"/>
+            </linearGradient>
+          </defs>
+          <path d="M 5 50 A 45 45 0 0 1 95 50 Z" fill="url(#popBlue)"/>
+          <path d="M 5 50 A 45 45 0 0 0 95 50 Z" fill="url(#popWhite)"/>
+          <line x1="5" y1="50" x2="95" y2="50" stroke="#0f172a" stroke-width="8"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#0f172a" stroke-width="8"/>
+          <circle cx="50" cy="50" r="14" fill="#0f172a"/>
+          <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+          <circle cx="50" cy="50" r="3.5" fill="#cbd5e1"/>
+        </svg>
+        <h1>PokéSkip</h1>
+      </div>
+      <span class="version">v1.0.0</span>
+    </div>
+
+    <div class="card status-card">
+      <div class="status-indicator active" id="status-dot"></div>
+      <div class="status-info">
+        <div class="status-title" id="status-text">Prêt pour PokéRogue</div>
+        <div class="status-sub" id="status-sub">Rien n'est passé par défaut</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-number" id="stat-skipped">0</span>
+        <span class="stat-label">Attaques évitées</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number" id="stat-rules">0</span>
+        <span class="stat-label">Espèces configurées</span>
+      </div>
+    </div>
+
+    <div class="actions-list">
+      <a href="https://pokerogue.net/" target="_blank" class="btn btn-primary">
+        🚀 Lancer PokéRogue
+      </a>
+      <div class="hint">
+        💡 En jeu, cliquez sur la capsule <b>PokéSkip</b> ou appuyez sur <b>P</b> pour gérer les attaques de votre équipe !
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

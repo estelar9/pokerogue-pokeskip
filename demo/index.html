@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokéSkip — Simulateur & Présentation du Plugin PokéRogue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <!-- Barre de navigation -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <svg viewBox="0 0 100 100" width="24" height="24" style="display:block; flex-shrink:0;">
+        <defs>
+          <linearGradient id="navBlue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="100%" stop-color="#0284c7"/>
+          </linearGradient>
+          <linearGradient id="navWhite" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#e2e8f0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 5 50 A 45 45 0 0 1 95 50 Z" fill="url(#navBlue)"/>
+        <path d="M 5 50 A 45 45 0 0 0 95 50 Z" fill="url(#navWhite)"/>
+        <line x1="5" y1="50" x2="95" y2="50" stroke="#0f172a" stroke-width="8"/>
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#0f172a" stroke-width="8"/>
+        <circle cx="50" cy="50" r="14" fill="#0f172a"/>
+        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+        <circle cx="50" cy="50" r="3.5" fill="#cbd5e1"/>
+      </svg>
+      <span class="nav-title">PokéSkip</span>
+      <span class="badge badge-cyan">Pour PokéRogue</span>
+    </div>
+    <div class="nav-actions">
+      <a href="../pokeskip-extension.zip" download="pokeskip-extension.zip" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981, #059669);">📦 Télécharger l'Extension (.zip)</a>
+      <a href="../pokeskip.user.js" download="pokeskip.user.js" class="btn btn-outline">⚡ Userscript (.user.js)</a>
+      <button class="btn btn-outline" id="btn-copy-script">📋 Copier le code</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Hero / Présentation -->
+    <section class="hero-section">
+      <div class="hero-badge">⚡ Finie la corvée des refus d'attaques répétitifs</div>
+      <h1 class="hero-title">L'Auto-Skip intelligent et sélectif pour <span>PokéRogue</span></h1>
+      <p class="hero-subtitle">
+        Par défaut, <b>rien n'est ignoré</b>. Choisissez pour chaque Pokémon de votre équipe quelles capacités doivent être passées automatiquement. Vos choix sont <b>sauvegardés pour toujours par espèce</b> (même si vous changez d'équipe ou relancez une nouvelle partie).
+      </p>
+      <div class="compatibility-pills">
+        <span class="comp-tag">Chrome</span>
+        <span class="comp-tag">Firefox</span>
+        <span class="comp-tag">Vivaldi</span>
+        <span class="comp-tag">Edge</span>
+        <span class="comp-tag">Opera / Opera GX</span>
+        <span class="comp-tag">Brave</span>
+      </div>
+    </section>
+
+    <!-- Zone Démo & Simulateur Interactif -->
+    <section class="demo-grid">
+      <!-- Panneau de gauche : Simulateur de combat PokéRogue -->
+      <div class="card sim-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-icon">⚔️</span>
+            <div>
+              <h3>Simulateur de Montée de Niveau</h3>
+              <p>Testez le comportement de PokéSkip en conditions réelles de jeu</p>
+            </div>
+          </div>
+          <span class="badge badge-emerald" id="sim-status">En jeu</span>
+        </div>
+
+        <div class="sim-arena">
+          <div class="sim-pokemon-display">
+            <div class="pokemon-avatar" id="sim-active-avatar">⚡</div>
+            <div class="pokemon-details">
+              <h4 id="sim-active-name">Pikachu</h4>
+              <div class="level-tag" id="sim-active-level">Niveau 34 • 4/4 Attaques</div>
+            </div>
+          </div>
+
+          <!-- Zone de dialogue / popup PokéRogue simulée -->
+          <div class="sim-dialog-box" id="sim-dialog">
+            <p id="sim-dialog-text">En attente d'une montée de niveau...</p>
+            <div class="sim-dialog-buttons" id="sim-dialog-actions" style="display: none;">
+              <button class="sim-btn sim-btn-confirm" id="sim-btn-yes">Oui (Oublier)</button>
+              <button class="sim-btn sim-btn-cancel" id="sim-btn-no">Non (Refuser)</button>
+            </div>
+          </div>
+
+          <!-- Bannière discrète d'action rapide en haut au milieu (15s) -->
+          <div class="quick-prompt-top" id="sim-quick-prompt" style="display: none;">
+            <span>⚡ Ignorer <b id="quick-move-name">Mimi-Queue</b> pour <b id="quick-pkmn-name">Pikachu</b> ?</span>
+            <button class="btn-quick-skip" id="btn-trigger-quick-skip">Toujours ignorer</button>
+            <button class="btn-quick-close" id="btn-close-quick-prompt">&times;</button>
+          </div>
+        </div>
+
+        <div class="sim-controls">
+          <div class="sim-controls-label">Déclencher un test d'apprentissage :</div>
+          <div class="sim-actions-buttons">
+            <button class="btn btn-sim-action" data-pkmn="Pikachu" data-species-id="25" data-move="Mimi-Queue">
+              ⚡ Pikachu ➔ <b>Mimi-Queue</b>
+            </button>
+            <button class="btn btn-sim-action" data-pkmn="Pikachu" data-species-id="25" data-move="Tonnerre">
+              ⚡ Pikachu ➔ <b>Tonnerre</b>
+            </button>
+            <button class="btn btn-sim-action" data-pkmn="Dracaufeu" data-species-id="6" data-move="Groz'Yeux">
+              🔥 Dracaufeu ➔ <b>Groz'Yeux</b>
+            </button>
+            <button class="btn btn-sim-action" data-pkmn="Léviator" data-species-id="130" data-move="Trempette">
+              🌊 Léviator ➔ <b>Trempette</b>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau de droite : Interface PokéSkip In-Game -->
+      <div class="card hud-preview-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <svg viewBox="0 0 100 100" width="22" height="22" style="display:block; flex-shrink:0;">
+              <defs>
+                <linearGradient id="cardBlue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#38bdf8"/>
+                  <stop offset="100%" stop-color="#0284c7"/>
+                </linearGradient>
+                <linearGradient id="cardWhite" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="100%" stop-color="#e2e8f0"/>
+                </linearGradient>
+              </defs>
+              <path d="M 5 50 A 45 45 0 0 1 95 50 Z" fill="url(#cardBlue)"/>
+              <path d="M 5 50 A 45 45 0 0 0 95 50 Z" fill="url(#cardWhite)"/>
+              <line x1="5" y1="50" x2="95" y2="50" stroke="#0f172a" stroke-width="8"/>
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#0f172a" stroke-width="8"/>
+              <circle cx="50" cy="50" r="14" fill="#0f172a"/>
+              <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+              <circle cx="50" cy="50" r="3.5" fill="#cbd5e1"/>
+            </svg>
+            <div>
+              <h3>Interface PokéSkip (Aperçu In-Game)</h3>
+              <p>Accessible en jeu via le bouton flottant ou la touche <b>P</b></p>
+            </div>
+          </div>
+          <div class="hud-stats-pill" id="demo-stats-counter">0 passée(s)</div>
+        </div>
+
+        <!-- Onglets Équipe -->
+        <div class="team-tab-selector" id="demo-team-tabs">
+          <!-- Injecté par demo.js -->
+        </div>
+
+        <!-- Configuration de l'espèce sélectionnée -->
+        <div class="species-config-panel">
+          <div class="species-config-header">
+            <div>
+              <h4 id="demo-selected-pkmn-title">Pikachu (#25)</h4>
+              <p>🔵 <b>Coché en bleu = Attaque gardée</b> (par défaut). <b>Décochez</b> pour ignorer automatiquement.</p>
+            </div>
+            <div class="bulk-actions">
+              <button class="btn-bulk" id="demo-btn-check-all" style="background:#0369a1; color:#fff; border-color:#38bdf8;">🔵 Tout garder</button>
+              <button class="btn-bulk" id="demo-btn-uncheck-all">⬜ Tout ignorer</button>
+            </div>
+          </div>
+
+          <div class="moves-checklist" id="demo-moves-list">
+            <!-- Injecté par demo.js -->
+          </div>
+        </div>
+
+        <!-- Section de persistance -->
+        <div class="persistence-status">
+          <span class="status-dot"></span>
+          <span><b>Sauvegarde éternelle active</b> : toute case cochée reste enregistrée pour cette espèce même si vous recommencez une partie.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Guide d'installation étape par étape -->
+    <section class="install-guide-section">
+      <h2 class="section-title">Comment l'installer en 30 secondes ?</h2>
+      <div class="guide-cards">
+        <div class="guide-card">
+          <div class="step-num">Option 1 (Recommandé)</div>
+          <h3>Tampermonkey / Violentmonkey</h3>
+          <p>Fonctionne sur <b>tous les navigateurs</b> (Chrome, Firefox, Edge, Opera, Vivaldi, Brave, Safari, Android).</p>
+          <ol class="step-list">
+            <li>Installez l'extension <b>Tampermonkey</b> ou <b>Violentmonkey</b> depuis le store de votre navigateur.</li>
+            <li>Cliquez sur <b>« Télécharger (.user.js) »</b> ci-dessus ou importez <code>pokeskip.user.js</code>.</li>
+            <li>Cliquez sur <b>Installer</b> dans Tampermonkey. C'est tout ! Ouvrez PokéRogue et PokéSkip apparaît en haut à droite.</li>
+          </ol>
+        </div>
+
+        <div class="guide-card">
+          <div class="step-num">Option 2 (Extension Native Sans Outil Tiers)</div>
+          <h3>Extension Navigateur Directe (.zip)</h3>
+          <p>Pour Chrome, Edge, Brave, Vivaldi, Opera <b>sans passer par Tampermonkey</b>.</p>
+          <ol class="step-list">
+            <li>Téléchargez l'archive <a href="../pokeskip-extension.zip" download="pokeskip-extension.zip" style="color:#38bdf8; font-weight:700;">pokeskip-extension.zip</a> et décompressez-la dans un dossier.</li>
+            <li>Allez dans <code>chrome://extensions</code> (ou <code>edge://extensions</code>, <code>opera://extensions</code>).</li>
+            <li>Activez le <b>Mode Développeur</b> (interrupteur en haut à droite).</li>
+            <li>Cliquez sur <b>« Charger l'extension non empaquetée »</b> et sélectionnez le dossier décompressé. C'est tout !</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="demo.js"></script>
+</body>
+</html>
