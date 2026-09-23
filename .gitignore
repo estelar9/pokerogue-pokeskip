@@ -28,3 +28,6 @@ scratch/
 *.tmp
 *.temp
 test_*.html
+
+# Local demo & test environment
+demo/

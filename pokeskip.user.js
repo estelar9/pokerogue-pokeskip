@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
-// @namespace    https://github.com/pokeskip/pokeskip
-// @version      1.1.0
+// @namespace    https://github.com/estelar9/pokerogue-pokeskip
+// @version      1.5.0
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -79,6 +79,2768 @@
     }
   };
 
+
+  // --- GESTIONNAIRE DES LIGNÉES ÉVOLUTIVES (PROFILS PARTAGÉS PAR FAMILLE) ---
+  const LineageManager = {
+    families: {
+  "1": {
+    "name": "Bulbizarre → Herbizarre → Florizarre",
+    "members": [
+      1,
+      2,
+      3
+    ]
+  },
+  "4": {
+    "name": "Salamèche → Reptincel → Dracaufeu",
+    "members": [
+      4,
+      5,
+      6
+    ]
+  },
+  "7": {
+    "name": "Carapuce → Carabaffe → Tortank",
+    "members": [
+      7,
+      8,
+      9
+    ]
+  },
+  "10": {
+    "name": "Chenipan → Crisacier → Papilusion",
+    "members": [
+      10,
+      11,
+      12
+    ]
+  },
+  "13": {
+    "name": "Aspicot → Coconfort → Dardargnan",
+    "members": [
+      13,
+      14,
+      15
+    ]
+  },
+  "16": {
+    "name": "Roucool → Roucoups → Roucarnage",
+    "members": [
+      16,
+      17,
+      18
+    ]
+  },
+  "19": {
+    "name": "Rattata → Rattatac",
+    "members": [
+      19,
+      20
+    ]
+  },
+  "21": {
+    "name": "Piafabec → Rapasdepic",
+    "members": [
+      21,
+      22
+    ]
+  },
+  "23": {
+    "name": "Abo → Arbok",
+    "members": [
+      23,
+      24
+    ]
+  },
+  "27": {
+    "name": "Sabelette → Sablaireau",
+    "members": [
+      27,
+      28
+    ]
+  },
+  "29": {
+    "name": "Nidoran♀ → Nidorina → Nidoqueen",
+    "members": [
+      29,
+      30,
+      31
+    ]
+  },
+  "32": {
+    "name": "Nidoran♂ → Nidorino → Nidoking",
+    "members": [
+      32,
+      33,
+      34
+    ]
+  },
+  "37": {
+    "name": "Goupix → Feunard",
+    "members": [
+      37,
+      38
+    ]
+  },
+  "41": {
+    "name": "Nosferapti → Nosferalto → Nostenfer",
+    "members": [
+      41,
+      42,
+      169
+    ]
+  },
+  "43": {
+    "name": "Mystherbe → Ortide → Rafflesia / Joliflor",
+    "members": [
+      43,
+      44,
+      45,
+      182
+    ]
+  },
+  "46": {
+    "name": "Paras → Parasect",
+    "members": [
+      46,
+      47
+    ]
+  },
+  "48": {
+    "name": "Mimitoss → Aéromite",
+    "members": [
+      48,
+      49
+    ]
+  },
+  "50": {
+    "name": "Taupiqueur → Triopikeur",
+    "members": [
+      50,
+      51
+    ]
+  },
+  "52": {
+    "name": "Miaouss → Persian / Berserkatt",
+    "members": [
+      52,
+      53,
+      863
+    ]
+  },
+  "54": {
+    "name": "Psykokwak → Akwakwak",
+    "members": [
+      54,
+      55
+    ]
+  },
+  "56": {
+    "name": "Férosinge → Colossinge → Courrousinge",
+    "members": [
+      56,
+      57,
+      979
+    ]
+  },
+  "58": {
+    "name": "Caninos → Arcanin",
+    "members": [
+      58,
+      59
+    ]
+  },
+  "60": {
+    "name": "Ptitard → Têtarte → Tartard / Tarpaud",
+    "members": [
+      60,
+      61,
+      62,
+      186
+    ]
+  },
+  "63": {
+    "name": "Abra → Kadabra → Alakazam",
+    "members": [
+      63,
+      64,
+      65
+    ]
+  },
+  "66": {
+    "name": "Machoc → Machopeur → Mackogneur",
+    "members": [
+      66,
+      67,
+      68
+    ]
+  },
+  "69": {
+    "name": "Chétiflor → Boustiflor → Empiflor",
+    "members": [
+      69,
+      70,
+      71
+    ]
+  },
+  "72": {
+    "name": "Tentacool → Tentacruel",
+    "members": [
+      72,
+      73
+    ]
+  },
+  "74": {
+    "name": "Racaillou → Gravalanch → Grolem",
+    "members": [
+      74,
+      75,
+      76
+    ]
+  },
+  "77": {
+    "name": "Ponyta → Galopa",
+    "members": [
+      77,
+      78
+    ]
+  },
+  "79": {
+    "name": "Ramoloss → Flagadoss / Roigada",
+    "members": [
+      79,
+      80,
+      199
+    ]
+  },
+  "81": {
+    "name": "Magnéti → Magnéton → Magnézone",
+    "members": [
+      81,
+      82,
+      462
+    ]
+  },
+  "83": {
+    "name": "Canarticho → Palarticho",
+    "members": [
+      83,
+      865
+    ]
+  },
+  "84": {
+    "name": "Doduo → Dodrio",
+    "members": [
+      84,
+      85
+    ]
+  },
+  "86": {
+    "name": "Otaria → Lamantine",
+    "members": [
+      86,
+      87
+    ]
+  },
+  "88": {
+    "name": "Tadmorv → Grotadmorv",
+    "members": [
+      88,
+      89
+    ]
+  },
+  "90": {
+    "name": "Kokiyas → Crustabri",
+    "members": [
+      90,
+      91
+    ]
+  },
+  "92": {
+    "name": "Fantominus → Spectrum → Ectoplasma",
+    "members": [
+      92,
+      93,
+      94
+    ]
+  },
+  "95": {
+    "name": "Onix → Steelix",
+    "members": [
+      95,
+      208
+    ]
+  },
+  "96": {
+    "name": "Soporifik → Hypnomade",
+    "members": [
+      96,
+      97
+    ]
+  },
+  "98": {
+    "name": "Krabby → Krabboss",
+    "members": [
+      98,
+      99
+    ]
+  },
+  "100": {
+    "name": "Voltorbe → Électrode",
+    "members": [
+      100,
+      101
+    ]
+  },
+  "102": {
+    "name": "Nœunœuf → Noadkoko",
+    "members": [
+      102,
+      103
+    ]
+  },
+  "104": {
+    "name": "Osselait → Ossatueur",
+    "members": [
+      104,
+      105
+    ]
+  },
+  "108": {
+    "name": "Excelangue → Coudlangue",
+    "members": [
+      108,
+      463
+    ]
+  },
+  "109": {
+    "name": "Smogo → Smogogo",
+    "members": [
+      109,
+      110
+    ]
+  },
+  "111": {
+    "name": "Rhinocorne → Rhinoféros → Rhinastoc",
+    "members": [
+      111,
+      112,
+      464
+    ]
+  },
+  "114": {
+    "name": "Saquedeneu → Bouldeneu",
+    "members": [
+      114,
+      465
+    ]
+  },
+  "115": {
+    "name": "Kangourex",
+    "members": [
+      115
+    ]
+  },
+  "116": {
+    "name": "Hypotrempe → Hypocéan → Hyporoi",
+    "members": [
+      116,
+      117,
+      230
+    ]
+  },
+  "118": {
+    "name": "Poissirène → Poissoroy",
+    "members": [
+      118,
+      119
+    ]
+  },
+  "120": {
+    "name": "Stari → Staross",
+    "members": [
+      120,
+      121
+    ]
+  },
+  "123": {
+    "name": "Insécateur → Cizayox / Hachécateur",
+    "members": [
+      123,
+      212,
+      900
+    ]
+  },
+  "127": {
+    "name": "Scarabrute",
+    "members": [
+      127
+    ]
+  },
+  "128": {
+    "name": "Tauros",
+    "members": [
+      128
+    ]
+  },
+  "129": {
+    "name": "Magicarpe → Léviator",
+    "members": [
+      129,
+      130
+    ]
+  },
+  "131": {
+    "name": "Lokhlass",
+    "members": [
+      131
+    ]
+  },
+  "132": {
+    "name": "Métamorph",
+    "members": [
+      132
+    ]
+  },
+  "133": {
+    "name": "Évoli → Aquali / Voltali / Pyroli / Mentali / Noctali / Phyllali / Givrali / Nymphali",
+    "members": [
+      133,
+      134,
+      135,
+      136,
+      196,
+      197,
+      470,
+      471,
+      700
+    ]
+  },
+  "137": {
+    "name": "Porygon → Porygon2 → Porygon-Z",
+    "members": [
+      137,
+      233,
+      474
+    ]
+  },
+  "138": {
+    "name": "Amonita → Amonistar",
+    "members": [
+      138,
+      139
+    ]
+  },
+  "140": {
+    "name": "Kabuto → Kabutops",
+    "members": [
+      140,
+      141
+    ]
+  },
+  "142": {
+    "name": "Ptéra",
+    "members": [
+      142
+    ]
+  },
+  "144": {
+    "name": "Artikodin",
+    "members": [
+      144
+    ]
+  },
+  "145": {
+    "name": "Électhor",
+    "members": [
+      145
+    ]
+  },
+  "146": {
+    "name": "Sulfura",
+    "members": [
+      146
+    ]
+  },
+  "147": {
+    "name": "Minidraco → Draco → Dracolosse",
+    "members": [
+      147,
+      148,
+      149
+    ]
+  },
+  "150": {
+    "name": "Mewtwo",
+    "members": [
+      150
+    ]
+  },
+  "151": {
+    "name": "Mew",
+    "members": [
+      151
+    ]
+  },
+  "152": {
+    "name": "Germignon → Macronium → Méganium",
+    "members": [
+      152,
+      153,
+      154
+    ]
+  },
+  "155": {
+    "name": "Héricendre → Feurisson → Typhlosion",
+    "members": [
+      155,
+      156,
+      157
+    ]
+  },
+  "158": {
+    "name": "Kaiminus → Crocrodil → Aligatueur",
+    "members": [
+      158,
+      159,
+      160
+    ]
+  },
+  "161": {
+    "name": "Fouinette → Fouinar",
+    "members": [
+      161,
+      162
+    ]
+  },
+  "163": {
+    "name": "Hoothoot → Noarfang",
+    "members": [
+      163,
+      164
+    ]
+  },
+  "165": {
+    "name": "Coxy → Coxyclaque",
+    "members": [
+      165,
+      166
+    ]
+  },
+  "167": {
+    "name": "Mimigal → Migalos",
+    "members": [
+      167,
+      168
+    ]
+  },
+  "172": {
+    "name": "Pichu → Pikachu → Raichu",
+    "members": [
+      172,
+      25,
+      26
+    ]
+  },
+  "173": {
+    "name": "Mélo → Mélofée → Mélodelfe",
+    "members": [
+      173,
+      35,
+      36
+    ]
+  },
+  "174": {
+    "name": "Toudoudou → Rondoudou → Grodoudou",
+    "members": [
+      174,
+      39,
+      40
+    ]
+  },
+  "175": {
+    "name": "Togepi → Togetic → Togekiss",
+    "members": [
+      175,
+      176,
+      468
+    ]
+  },
+  "177": {
+    "name": "Natu → Xatu",
+    "members": [
+      177,
+      178
+    ]
+  },
+  "179": {
+    "name": "Wattouat → Lainergie → Pharamp",
+    "members": [
+      179,
+      180,
+      181
+    ]
+  },
+  "187": {
+    "name": "Granivol → Floravol → Cotovol",
+    "members": [
+      187,
+      188,
+      189
+    ]
+  },
+  "190": {
+    "name": "Capumain → Capidextre",
+    "members": [
+      190,
+      424
+    ]
+  },
+  "191": {
+    "name": "Tournegrin → Héliatronc",
+    "members": [
+      191,
+      192
+    ]
+  },
+  "193": {
+    "name": "Yanma → Yanméga",
+    "members": [
+      193,
+      469
+    ]
+  },
+  "194": {
+    "name": "Axoloto → Maraiste / Barbicha",
+    "members": [
+      194,
+      195,
+      980
+    ]
+  },
+  "198": {
+    "name": "Cornèbre → Corboss",
+    "members": [
+      198,
+      430
+    ]
+  },
+  "200": {
+    "name": "Feuforêve → Magirêve",
+    "members": [
+      200,
+      429
+    ]
+  },
+  "201": {
+    "name": "Zarbi",
+    "members": [
+      201
+    ]
+  },
+  "203": {
+    "name": "Girafarig → Farigiraf",
+    "members": [
+      203,
+      981
+    ]
+  },
+  "204": {
+    "name": "Pomdepik → Foretress",
+    "members": [
+      204,
+      205
+    ]
+  },
+  "206": {
+    "name": "Insolourdo → Deusolourdo",
+    "members": [
+      206,
+      982
+    ]
+  },
+  "207": {
+    "name": "Scorplane → Scorvol",
+    "members": [
+      207,
+      472
+    ]
+  },
+  "215": {
+    "name": "Farfuret → Dimoret / Farfurien",
+    "members": [
+      215,
+      461,
+      903
+    ]
+  },
+  "216": {
+    "name": "Teddiursa → Ursaring → Ursaking",
+    "members": [
+      216,
+      217,
+      901
+    ]
+  },
+  "218": {
+    "name": "Limagma → Volcaropod",
+    "members": [
+      218,
+      219
+    ]
+  },
+  "220": {
+    "name": "Marcacrin → Cochignon → Mammochon",
+    "members": [
+      220,
+      221,
+      473
+    ]
+  },
+  "222": {
+    "name": "Corayon → Corayôme",
+    "members": [
+      222,
+      864
+    ]
+  },
+  "223": {
+    "name": "Rémoraid → Octillery",
+    "members": [
+      223,
+      224
+    ]
+  },
+  "225": {
+    "name": "Cadoizo",
+    "members": [
+      225
+    ]
+  },
+  "227": {
+    "name": "Airmure",
+    "members": [
+      227
+    ]
+  },
+  "228": {
+    "name": "Malosse → Démolosse",
+    "members": [
+      228,
+      229
+    ]
+  },
+  "231": {
+    "name": "Phanpy → Donphan",
+    "members": [
+      231,
+      232
+    ]
+  },
+  "234": {
+    "name": "Cerfrousse → Cerbyllin",
+    "members": [
+      234,
+      899
+    ]
+  },
+  "235": {
+    "name": "Queulorior",
+    "members": [
+      235
+    ]
+  },
+  "236": {
+    "name": "Debugant → Kicklee / Tygnon / Kapoera",
+    "members": [
+      236,
+      106,
+      107,
+      237
+    ]
+  },
+  "238": {
+    "name": "Lippouti → Lippoutou",
+    "members": [
+      238,
+      124
+    ]
+  },
+  "239": {
+    "name": "Élekid → Élektek → Élekable",
+    "members": [
+      239,
+      125,
+      466
+    ]
+  },
+  "240": {
+    "name": "Magby → Magmar → Maganon",
+    "members": [
+      240,
+      126,
+      467
+    ]
+  },
+  "241": {
+    "name": "Écrémeuh",
+    "members": [
+      241
+    ]
+  },
+  "246": {
+    "name": "Embrylex → Ymphect → Tyranocif",
+    "members": [
+      246,
+      247,
+      248
+    ]
+  },
+  "252": {
+    "name": "Arcko → Massko → Jungko",
+    "members": [
+      252,
+      253,
+      254
+    ]
+  },
+  "255": {
+    "name": "Poussifeu → Galifeu → Braségali",
+    "members": [
+      255,
+      256,
+      257
+    ]
+  },
+  "258": {
+    "name": "Gobou → Flobio → Laggron",
+    "members": [
+      258,
+      259,
+      260
+    ]
+  },
+  "261": {
+    "name": "Medhyèna → Grahyèna",
+    "members": [
+      261,
+      262
+    ]
+  },
+  "263": {
+    "name": "Zigzaton → Linéon → Ixon",
+    "members": [
+      263,
+      264,
+      862
+    ]
+  },
+  "265": {
+    "name": "Chenipotte → Armulys / Blindalys → Charmillon / Papinox",
+    "members": [
+      265,
+      266,
+      267,
+      268,
+      269
+    ]
+  },
+  "270": {
+    "name": "Nénupiot → Lombre → Ludicolo",
+    "members": [
+      270,
+      271,
+      272
+    ]
+  },
+  "273": {
+    "name": "Grainipiot → Pifeuil → Tengalice",
+    "members": [
+      273,
+      274,
+      275
+    ]
+  },
+  "276": {
+    "name": "Nirondelle → Hélédelle",
+    "members": [
+      276,
+      277
+    ]
+  },
+  "278": {
+    "name": "Goélise → Bekipan",
+    "members": [
+      278,
+      279
+    ]
+  },
+  "280": {
+    "name": "Tarsal → Kirlia → Gardevoir / Gallame",
+    "members": [
+      280,
+      281,
+      282,
+      475
+    ]
+  },
+  "283": {
+    "name": "Arakdo → Maskadra",
+    "members": [
+      283,
+      284
+    ]
+  },
+  "285": {
+    "name": "Balignon → Chapignon",
+    "members": [
+      285,
+      286
+    ]
+  },
+  "287": {
+    "name": "Parecool → Vigoroth → Monaflèmit",
+    "members": [
+      287,
+      288,
+      289
+    ]
+  },
+  "290": {
+    "name": "Ningale → Ninjask / Munja",
+    "members": [
+      290,
+      291,
+      292
+    ]
+  },
+  "293": {
+    "name": "Chuchmur → Ramboum → Brouhabam",
+    "members": [
+      293,
+      294,
+      295
+    ]
+  },
+  "296": {
+    "name": "Makuhita → Hariyama",
+    "members": [
+      296,
+      297
+    ]
+  },
+  "298": {
+    "name": "Azurill → Marill → Azumarill",
+    "members": [
+      298,
+      183,
+      184
+    ]
+  },
+  "299": {
+    "name": "Tarinor → Tarinorme",
+    "members": [
+      299,
+      476
+    ]
+  },
+  "300": {
+    "name": "Skitty → Delcatty",
+    "members": [
+      300,
+      301
+    ]
+  },
+  "302": {
+    "name": "Ténéfix",
+    "members": [
+      302
+    ]
+  },
+  "303": {
+    "name": "Mysdibule",
+    "members": [
+      303
+    ]
+  },
+  "304": {
+    "name": "Galekid → Galegon → Galeking",
+    "members": [
+      304,
+      305,
+      306
+    ]
+  },
+  "307": {
+    "name": "Méditikka → Charmina",
+    "members": [
+      307,
+      308
+    ]
+  },
+  "309": {
+    "name": "Dynavolt → Élecsprint",
+    "members": [
+      309,
+      310
+    ]
+  },
+  "311": {
+    "name": "Posipi",
+    "members": [
+      311
+    ]
+  },
+  "312": {
+    "name": "Négapi",
+    "members": [
+      312
+    ]
+  },
+  "313": {
+    "name": "Muciole",
+    "members": [
+      313
+    ]
+  },
+  "314": {
+    "name": "Lumivole",
+    "members": [
+      314
+    ]
+  },
+  "316": {
+    "name": "Gloupti → Avaltout",
+    "members": [
+      316,
+      317
+    ]
+  },
+  "318": {
+    "name": "Carvanha → Sharpedo",
+    "members": [
+      318,
+      319
+    ]
+  },
+  "320": {
+    "name": "Wailmer → Wailord",
+    "members": [
+      320,
+      321
+    ]
+  },
+  "322": {
+    "name": "Chamallot → Camérupt",
+    "members": [
+      322,
+      323
+    ]
+  },
+  "324": {
+    "name": "Chartor",
+    "members": [
+      324
+    ]
+  },
+  "325": {
+    "name": "Spoink → Groret",
+    "members": [
+      325,
+      326
+    ]
+  },
+  "327": {
+    "name": "Spinda",
+    "members": [
+      327
+    ]
+  },
+  "328": {
+    "name": "Kraknoix → Vibraninf → Libégon",
+    "members": [
+      328,
+      329,
+      330
+    ]
+  },
+  "331": {
+    "name": "Cacnea → Cacturne",
+    "members": [
+      331,
+      332
+    ]
+  },
+  "333": {
+    "name": "Tylton → Altaria",
+    "members": [
+      333,
+      334
+    ]
+  },
+  "335": {
+    "name": "Mangriff",
+    "members": [
+      335
+    ]
+  },
+  "336": {
+    "name": "Séviper",
+    "members": [
+      336
+    ]
+  },
+  "337": {
+    "name": "Séléroc",
+    "members": [
+      337
+    ]
+  },
+  "338": {
+    "name": "Solaroc",
+    "members": [
+      338
+    ]
+  },
+  "339": {
+    "name": "Barloche → Barbicha",
+    "members": [
+      339,
+      340
+    ]
+  },
+  "341": {
+    "name": "Écrapince → Colhomard",
+    "members": [
+      341,
+      342
+    ]
+  },
+  "343": {
+    "name": "Balbuto → Kaorine",
+    "members": [
+      343,
+      344
+    ]
+  },
+  "345": {
+    "name": "Lilia → Vacillys",
+    "members": [
+      345,
+      346
+    ]
+  },
+  "347": {
+    "name": "Anorith → Armaldo",
+    "members": [
+      347,
+      348
+    ]
+  },
+  "349": {
+    "name": "Barpau → Milobellus",
+    "members": [
+      349,
+      350
+    ]
+  },
+  "351": {
+    "name": "Morphéo",
+    "members": [
+      351
+    ]
+  },
+  "352": {
+    "name": "Kecleon",
+    "members": [
+      352
+    ]
+  },
+  "353": {
+    "name": "Polichombr → Branette",
+    "members": [
+      353,
+      354
+    ]
+  },
+  "355": {
+    "name": "Skelénox → Téraclope → Noctunoir",
+    "members": [
+      355,
+      356,
+      477
+    ]
+  },
+  "357": {
+    "name": "Tropius",
+    "members": [
+      357
+    ]
+  },
+  "359": {
+    "name": "Absol",
+    "members": [
+      359
+    ]
+  },
+  "360": {
+    "name": "Okéoké → Qulbutoké",
+    "members": [
+      360,
+      202
+    ]
+  },
+  "361": {
+    "name": "Stalgamin → Oniglali / Momartik",
+    "members": [
+      361,
+      362,
+      478
+    ]
+  },
+  "363": {
+    "name": "Obalie → Phogleur → Kaimorse",
+    "members": [
+      363,
+      364,
+      365
+    ]
+  },
+  "366": {
+    "name": "Coquiperl → Serpang / Rosabyss",
+    "members": [
+      366,
+      367,
+      368
+    ]
+  },
+  "369": {
+    "name": "Relicanth",
+    "members": [
+      369
+    ]
+  },
+  "370": {
+    "name": "Lovdisc",
+    "members": [
+      370
+    ]
+  },
+  "371": {
+    "name": "Draby → Drackhaus → Drattak",
+    "members": [
+      371,
+      372,
+      373
+    ]
+  },
+  "374": {
+    "name": "Terhal → Métang → Métalosse",
+    "members": [
+      374,
+      375,
+      376
+    ]
+  },
+  "387": {
+    "name": "Tortipouss → Boskara → Torterra",
+    "members": [
+      387,
+      388,
+      389
+    ]
+  },
+  "390": {
+    "name": "Ouisticram → Chimpenfeu → Simiabraz",
+    "members": [
+      390,
+      391,
+      392
+    ]
+  },
+  "393": {
+    "name": "Tiplouf → Prinplouf → Pingoléon",
+    "members": [
+      393,
+      394,
+      395
+    ]
+  },
+  "396": {
+    "name": "Étourmi → Étourvol → Étouraptor",
+    "members": [
+      396,
+      397,
+      398
+    ]
+  },
+  "399": {
+    "name": "Keunotor → Castorno",
+    "members": [
+      399,
+      400
+    ]
+  },
+  "401": {
+    "name": "Crikzik → Mélokrik",
+    "members": [
+      401,
+      402
+    ]
+  },
+  "403": {
+    "name": "Lixy → Luxio → Luxray",
+    "members": [
+      403,
+      404,
+      405
+    ]
+  },
+  "406": {
+    "name": "Rozbouton → Rosélia → Roserade",
+    "members": [
+      406,
+      315,
+      407
+    ]
+  },
+  "408": {
+    "name": "Kranidos → Charkos",
+    "members": [
+      408,
+      409
+    ]
+  },
+  "410": {
+    "name": "Dinoclier → Bastiodon",
+    "members": [
+      410,
+      411
+    ]
+  },
+  "412": {
+    "name": "Cheniti → Cheniselle / Papilord",
+    "members": [
+      412,
+      413,
+      414
+    ]
+  },
+  "415": {
+    "name": "Apitrini → Apireine",
+    "members": [
+      415,
+      416
+    ]
+  },
+  "417": {
+    "name": "Pachirisu",
+    "members": [
+      417
+    ]
+  },
+  "418": {
+    "name": "Mustébouée → Mustéflott",
+    "members": [
+      418,
+      419
+    ]
+  },
+  "420": {
+    "name": "Ceribou → Ceriflor",
+    "members": [
+      420,
+      421
+    ]
+  },
+  "422": {
+    "name": "Sancoki → Tritosor",
+    "members": [
+      422,
+      423
+    ]
+  },
+  "425": {
+    "name": "Baudrive → Grodrive",
+    "members": [
+      425,
+      426
+    ]
+  },
+  "427": {
+    "name": "Laporeille → Lockpin",
+    "members": [
+      427,
+      428
+    ]
+  },
+  "431": {
+    "name": "Chaglam → Chaffreux",
+    "members": [
+      431,
+      432
+    ]
+  },
+  "433": {
+    "name": "Korillon → Éoko",
+    "members": [
+      433,
+      358
+    ]
+  },
+  "434": {
+    "name": "Moufouette → Mouflair",
+    "members": [
+      434,
+      435
+    ]
+  },
+  "436": {
+    "name": "Archéomire → Archéodong",
+    "members": [
+      436,
+      437
+    ]
+  },
+  "438": {
+    "name": "Manzaï → Simularbre",
+    "members": [
+      438,
+      185
+    ]
+  },
+  "439": {
+    "name": "Mime Jr. → M. Mime → M. Glaquette",
+    "members": [
+      439,
+      122,
+      866
+    ]
+  },
+  "440": {
+    "name": "Ptiravi → Leveinard → Leuphorie",
+    "members": [
+      440,
+      113,
+      242
+    ]
+  },
+  "441": {
+    "name": "Pijako",
+    "members": [
+      441
+    ]
+  },
+  "442": {
+    "name": "Spiritomb",
+    "members": [
+      442
+    ]
+  },
+  "443": {
+    "name": "Griknot → Carmache → Carchacrok",
+    "members": [
+      443,
+      444,
+      445
+    ]
+  },
+  "446": {
+    "name": "Goinfrex → Ronflex",
+    "members": [
+      446,
+      143
+    ]
+  },
+  "447": {
+    "name": "Riolu → Lucario",
+    "members": [
+      447,
+      448
+    ]
+  },
+  "449": {
+    "name": "Hippopotas → Hippodocus",
+    "members": [
+      449,
+      450
+    ]
+  },
+  "451": {
+    "name": "Rapion → Drascore",
+    "members": [
+      451,
+      452
+    ]
+  },
+  "453": {
+    "name": "Cradopaud → Coatox",
+    "members": [
+      453,
+      454
+    ]
+  },
+  "455": {
+    "name": "Vortente",
+    "members": [
+      455
+    ]
+  },
+  "456": {
+    "name": "Écayon → Luminéon",
+    "members": [
+      456,
+      457
+    ]
+  },
+  "458": {
+    "name": "Babimanta → Démanta",
+    "members": [
+      458,
+      226
+    ]
+  },
+  "459": {
+    "name": "Blizzi → Blizzaroi",
+    "members": [
+      459,
+      460
+    ]
+  },
+  "479": {
+    "name": "Motisma",
+    "members": [
+      479
+    ]
+  },
+  "495": {
+    "name": "Vipélierre → Lianaja → Majaspic",
+    "members": [
+      495,
+      496,
+      497
+    ]
+  },
+  "498": {
+    "name": "Gruikui → Grotichon → Roitiflam",
+    "members": [
+      498,
+      499,
+      500
+    ]
+  },
+  "501": {
+    "name": "Moustillon → Mateloutre → Clamiral",
+    "members": [
+      501,
+      502,
+      503
+    ]
+  },
+  "504": {
+    "name": "Ratentif → Miradar",
+    "members": [
+      504,
+      505
+    ]
+  },
+  "506": {
+    "name": "Ponchiot → Ponchien → Mastouffe",
+    "members": [
+      506,
+      507,
+      508
+    ]
+  },
+  "509": {
+    "name": "Chacripan → Léopardus",
+    "members": [
+      509,
+      510
+    ]
+  },
+  "511": {
+    "name": "Feuillajou → Feuiloutan",
+    "members": [
+      511,
+      512
+    ]
+  },
+  "513": {
+    "name": "Flamajou → Flamoutan",
+    "members": [
+      513,
+      514
+    ]
+  },
+  "515": {
+    "name": "Flotajou → Flotoutan",
+    "members": [
+      515,
+      516
+    ]
+  },
+  "517": {
+    "name": "Munna → Mushana",
+    "members": [
+      517,
+      518
+    ]
+  },
+  "519": {
+    "name": "Poichigeon → Colombeau → Déflaisan",
+    "members": [
+      519,
+      520,
+      521
+    ]
+  },
+  "522": {
+    "name": "Zébibron → Zéblitz",
+    "members": [
+      522,
+      523
+    ]
+  },
+  "524": {
+    "name": "Nodulithe → Géolithe → Gigalithe",
+    "members": [
+      524,
+      525,
+      526
+    ]
+  },
+  "527": {
+    "name": "Chovsourir → Rhinolove",
+    "members": [
+      527,
+      528
+    ]
+  },
+  "529": {
+    "name": "Rototaupe → Minotaupe",
+    "members": [
+      529,
+      530
+    ]
+  },
+  "532": {
+    "name": "Charpenti → Ouvifier → Bétochef",
+    "members": [
+      532,
+      533,
+      534
+    ]
+  },
+  "535": {
+    "name": "Tritonde → Batracné → Crapustule",
+    "members": [
+      535,
+      536,
+      537
+    ]
+  },
+  "540": {
+    "name": "Larveyette → Coupenotte → Manternel",
+    "members": [
+      540,
+      541,
+      542
+    ]
+  },
+  "543": {
+    "name": "Venipatte → Scobolide → Brutapode",
+    "members": [
+      543,
+      544,
+      545
+    ]
+  },
+  "546": {
+    "name": "Doudouvet → Farfaduvet",
+    "members": [
+      546,
+      547
+    ]
+  },
+  "548": {
+    "name": "Chlorobule → Fragilady",
+    "members": [
+      548,
+      549
+    ]
+  },
+  "550": {
+    "name": "Bargantua → Paragruel",
+    "members": [
+      550,
+      902
+    ]
+  },
+  "551": {
+    "name": "Mascaïman → Escroco → Crocorible",
+    "members": [
+      551,
+      552,
+      553
+    ]
+  },
+  "554": {
+    "name": "Darumarond → Darumacho",
+    "members": [
+      554,
+      555
+    ]
+  },
+  "557": {
+    "name": "Crabicoque → Crabaraque",
+    "members": [
+      557,
+      558
+    ]
+  },
+  "559": {
+    "name": "Baggiguane → Baggaïd",
+    "members": [
+      559,
+      560
+    ]
+  },
+  "562": {
+    "name": "Tutafeh → Tutankafer / Tutétékri",
+    "members": [
+      562,
+      563,
+      867
+    ]
+  },
+  "564": {
+    "name": "Carapagos → Mégapagos",
+    "members": [
+      564,
+      565
+    ]
+  },
+  "566": {
+    "name": "Arkéapti → Aéroptéryx",
+    "members": [
+      566,
+      567
+    ]
+  },
+  "568": {
+    "name": "Miamiasme → Miasmax",
+    "members": [
+      568,
+      569
+    ]
+  },
+  "570": {
+    "name": "Zorua → Zoroark",
+    "members": [
+      570,
+      571
+    ]
+  },
+  "572": {
+    "name": "Chinchidou → Pashmilla",
+    "members": [
+      572,
+      573
+    ]
+  },
+  "574": {
+    "name": "Nucléos → Méios → Symbios",
+    "members": [
+      574,
+      575,
+      576
+    ]
+  },
+  "577": {
+    "name": "Couaneton → Lakmécygne",
+    "members": [
+      577,
+      578
+    ]
+  },
+  "580": {
+    "name": "Sorbébé → Sorboul → Sorbouboul",
+    "members": [
+      580,
+      581,
+      582
+    ]
+  },
+  "585": {
+    "name": "Vivaldaim → Haydaim",
+    "members": [
+      585,
+      586
+    ]
+  },
+  "588": {
+    "name": "Carabing → Lançargot",
+    "members": [
+      588,
+      589
+    ]
+  },
+  "590": {
+    "name": "Trompignon → Gaulet",
+    "members": [
+      590,
+      591
+    ]
+  },
+  "592": {
+    "name": "Viscuse → Moyade",
+    "members": [
+      592,
+      593
+    ]
+  },
+  "595": {
+    "name": "Statitik → Mygavolt",
+    "members": [
+      595,
+      596
+    ]
+  },
+  "597": {
+    "name": "Grindur → Noacier",
+    "members": [
+      597,
+      598
+    ]
+  },
+  "599": {
+    "name": "Tic → Clic → Cliticlic",
+    "members": [
+      599,
+      600,
+      601
+    ]
+  },
+  "602": {
+    "name": "Anchwatt → Lampéroie → Ohmassacre",
+    "members": [
+      602,
+      603,
+      604
+    ]
+  },
+  "605": {
+    "name": "Lewsor → Neitram",
+    "members": [
+      605,
+      606
+    ]
+  },
+  "607": {
+    "name": "Funécire → Mélancolux → Lugulabre",
+    "members": [
+      607,
+      608,
+      609
+    ]
+  },
+  "610": {
+    "name": "Coupenotte → Incisache → Tranchodon",
+    "members": [
+      610,
+      611,
+      612
+    ]
+  },
+  "613": {
+    "name": "Polarhume → Polagriffe",
+    "members": [
+      613,
+      614
+    ]
+  },
+  "616": {
+    "name": "Escargaume → Limaspeed",
+    "members": [
+      616,
+      617
+    ]
+  },
+  "619": {
+    "name": "Kungfouine → Shaofouine",
+    "members": [
+      619,
+      620
+    ]
+  },
+  "622": {
+    "name": "Gringolem → Golemastoc",
+    "members": [
+      622,
+      623
+    ]
+  },
+  "624": {
+    "name": "Scalpion → Scalproie → Scalpereur",
+    "members": [
+      624,
+      625,
+      983
+    ]
+  },
+  "627": {
+    "name": "Furaiglon → Gueriaigle",
+    "members": [
+      627,
+      628
+    ]
+  },
+  "629": {
+    "name": "Vostourno → Vaututrice",
+    "members": [
+      629,
+      630
+    ]
+  },
+  "633": {
+    "name": "Solochi → Diamat → Trioxhydre",
+    "members": [
+      633,
+      634,
+      635
+    ]
+  },
+  "636": {
+    "name": "Pyronille → Pyrax",
+    "members": [
+      636,
+      637
+    ]
+  },
+  "650": {
+    "name": "Marisson → Boguenisse → Blindépique",
+    "members": [
+      650,
+      651,
+      652
+    ]
+  },
+  "653": {
+    "name": "Feunnec → Roussil → Goupelin",
+    "members": [
+      653,
+      654,
+      655
+    ]
+  },
+  "656": {
+    "name": "Grenousse → Croâporal → Amphinobi",
+    "members": [
+      656,
+      657,
+      658
+    ]
+  },
+  "659": {
+    "name": "Passerouge → Braisillon → Flambusard",
+    "members": [
+      659,
+      660,
+      661
+    ]
+  },
+  "662": {
+    "name": "Lépidonille → Pérégrain → Prismillon",
+    "members": [
+      662,
+      663,
+      664
+    ]
+  },
+  "665": {
+    "name": "Hélionceau → Némélios",
+    "members": [
+      665,
+      666
+    ]
+  },
+  "667": {
+    "name": "Flabébé → Floette → Florges",
+    "members": [
+      667,
+      668,
+      669
+    ]
+  },
+  "672": {
+    "name": "Cabriolaine → Chevroum",
+    "members": [
+      672,
+      673
+    ]
+  },
+  "674": {
+    "name": "Pandespiègle → Pandarbare",
+    "members": [
+      674,
+      675
+    ]
+  },
+  "677": {
+    "name": "Psystigri → Mistigrix",
+    "members": [
+      677,
+      678
+    ]
+  },
+  "679": {
+    "name": "Monorpale → Dimoclès → Exagide",
+    "members": [
+      679,
+      680,
+      681
+    ]
+  },
+  "682": {
+    "name": "Fluvetin → Cocotine",
+    "members": [
+      682,
+      683
+    ]
+  },
+  "684": {
+    "name": "Sucroquin → Cupcanaille",
+    "members": [
+      684,
+      685
+    ]
+  },
+  "686": {
+    "name": "Sepiatop → Sepiatroce",
+    "members": [
+      686,
+      687
+    ]
+  },
+  "688": {
+    "name": "Opermine → Golgopathe",
+    "members": [
+      688,
+      689
+    ]
+  },
+  "690": {
+    "name": "Venalgue → Kravarech",
+    "members": [
+      690,
+      691
+    ]
+  },
+  "692": {
+    "name": "Flingouste → Gamblast",
+    "members": [
+      692,
+      693
+    ]
+  },
+  "694": {
+    "name": "Galvaran → Iguolta",
+    "members": [
+      694,
+      695
+    ]
+  },
+  "696": {
+    "name": "Ptyranidur → Rexillius",
+    "members": [
+      696,
+      697
+    ]
+  },
+  "698": {
+    "name": "Amagara → Dragmara",
+    "members": [
+      698,
+      699
+    ]
+  },
+  "704": {
+    "name": "Mucuscule → Colimucus → Muplodocus",
+    "members": [
+      704,
+      705,
+      706
+    ]
+  },
+  "708": {
+    "name": "Brocélôme → Desséliande",
+    "members": [
+      708,
+      709
+    ]
+  },
+  "710": {
+    "name": "Pitrouille → Banshitrouye",
+    "members": [
+      710,
+      711
+    ]
+  },
+  "712": {
+    "name": "Grelaçon → Séracrawl",
+    "members": [
+      712,
+      713
+    ]
+  },
+  "714": {
+    "name": "Sonistrelle → Bruyverne",
+    "members": [
+      714,
+      715
+    ]
+  },
+  "722": {
+    "name": "Brindibou → Efflèche → Archéduc",
+    "members": [
+      722,
+      723,
+      724
+    ]
+  },
+  "725": {
+    "name": "Flamiaou → Matoufeu → Félinferno",
+    "members": [
+      725,
+      726,
+      727
+    ]
+  },
+  "728": {
+    "name": "Otaquin → Otarlette → Oratoria",
+    "members": [
+      728,
+      729,
+      730
+    ]
+  },
+  "731": {
+    "name": "Picassaut → Piclairon → Bazoucan",
+    "members": [
+      731,
+      732,
+      733
+    ]
+  },
+  "734": {
+    "name": "Manglouton → Argouste",
+    "members": [
+      734,
+      735
+    ]
+  },
+  "736": {
+    "name": "Larvibule → Chrysapile → Lucanon",
+    "members": [
+      736,
+      737,
+      738
+    ]
+  },
+  "739": {
+    "name": "Crabagarre → Crabominable",
+    "members": [
+      739,
+      740
+    ]
+  },
+  "742": {
+    "name": "Bombydou → Rubombelle",
+    "members": [
+      742,
+      743
+    ]
+  },
+  "744": {
+    "name": "Rocabot → Lougaroc",
+    "members": [
+      744,
+      745
+    ]
+  },
+  "747": {
+    "name": "Vorastérie → Prédastérie",
+    "members": [
+      747,
+      748
+    ]
+  },
+  "749": {
+    "name": "Tiboudet → Bourrinos",
+    "members": [
+      749,
+      750
+    ]
+  },
+  "751": {
+    "name": "Araqua → Tarenbulle",
+    "members": [
+      751,
+      752
+    ]
+  },
+  "753": {
+    "name": "Mimantis → Floramantis",
+    "members": [
+      753,
+      754
+    ]
+  },
+  "755": {
+    "name": "Spododo → Guérilande",
+    "members": [
+      755,
+      756
+    ]
+  },
+  "757": {
+    "name": "Tritox → Malamandre",
+    "members": [
+      757,
+      758
+    ]
+  },
+  "759": {
+    "name": "Nounourson → Chelours",
+    "members": [
+      759,
+      760
+    ]
+  },
+  "761": {
+    "name": "Croquine → Candine → Sucreine",
+    "members": [
+      761,
+      762,
+      763
+    ]
+  },
+  "767": {
+    "name": "Sovkipou → Sarmuraï",
+    "members": [
+      767,
+      768
+    ]
+  },
+  "769": {
+    "name": "Bacabouh → Trépassable",
+    "members": [
+      769,
+      770
+    ]
+  },
+  "772": {
+    "name": "Type:0 → Silvallié",
+    "members": [
+      772,
+      773
+    ]
+  },
+  "782": {
+    "name": "Bébécaille → Écaïd → Ékaïser",
+    "members": [
+      782,
+      783,
+      784
+    ]
+  },
+  "789": {
+    "name": "Cosmog → Cosmoem → Solgaleo / Lunala",
+    "members": [
+      789,
+      790,
+      791,
+      792
+    ]
+  },
+  "803": {
+    "name": "Vémini → Mandrillon",
+    "members": [
+      803,
+      804
+    ]
+  },
+  "808": {
+    "name": "Meltan → Melmetal",
+    "members": [
+      808,
+      809
+    ]
+  },
+  "810": {
+    "name": "Ouistempo → Badabouin → Gorythmic",
+    "members": [
+      810,
+      811,
+      812
+    ]
+  },
+  "813": {
+    "name": "Flambino → Lapyro → Pyrobut",
+    "members": [
+      813,
+      814,
+      815
+    ]
+  },
+  "816": {
+    "name": "Larméléon → Arrozard → Lézargus",
+    "members": [
+      816,
+      817,
+      818
+    ]
+  },
+  "819": {
+    "name": "Rongourmand → Rongrigou",
+    "members": [
+      819,
+      820
+    ]
+  },
+  "821": {
+    "name": "Minisange → Bleuseille → Corvaillus",
+    "members": [
+      821,
+      822,
+      823
+    ]
+  },
+  "824": {
+    "name": "Larvadar → Coléodôme → Astronelle",
+    "members": [
+      824,
+      825,
+      826
+    ]
+  },
+  "827": {
+    "name": "Goupilou → Roublenard",
+    "members": [
+      827,
+      828
+    ]
+  },
+  "829": {
+    "name": "Tournicoton → Blancoton",
+    "members": [
+      829,
+      830
+    ]
+  },
+  "831": {
+    "name": "Moumouton → Moumouflon",
+    "members": [
+      831,
+      832
+    ]
+  },
+  "833": {
+    "name": "Khélocrok → Torgamord",
+    "members": [
+      833,
+      834
+    ]
+  },
+  "835": {
+    "name": "Voltoutou → Fulgudog",
+    "members": [
+      835,
+      836
+    ]
+  },
+  "837": {
+    "name": "Charbi → Wagomine → Monthracite",
+    "members": [
+      837,
+      838,
+      839
+    ]
+  },
+  "840": {
+    "name": "Verpome → Pomdrapi / Dratatin / Pomdramour",
+    "members": [
+      840,
+      841,
+      842,
+      1011
+    ]
+  },
+  "843": {
+    "name": "Dunaja → Dunaconda",
+    "members": [
+      843,
+      844
+    ]
+  },
+  "846": {
+    "name": "Embrochet → Hastacuda",
+    "members": [
+      846,
+      847
+    ]
+  },
+  "848": {
+    "name": "Toxizap → Salarsen",
+    "members": [
+      848,
+      849
+    ]
+  },
+  "850": {
+    "name": "Grillepattes → Scolocendre",
+    "members": [
+      850,
+      851
+    ]
+  },
+  "852": {
+    "name": "Poulpaf → Krakos",
+    "members": [
+      852,
+      853
+    ]
+  },
+  "854": {
+    "name": "Théffroi → Polthégeist",
+    "members": [
+      854,
+      855
+    ]
+  },
+  "856": {
+    "name": "Bibichut → Chapotus → Sorcilence",
+    "members": [
+      856,
+      857,
+      858
+    ]
+  },
+  "859": {
+    "name": "Grimalin → Fourbelin → Angoliath",
+    "members": [
+      859,
+      860,
+      861
+    ]
+  },
+  "868": {
+    "name": "Crèmy → Charmilly",
+    "members": [
+      868,
+      869
+    ]
+  },
+  "872": {
+    "name": "Frissonille → Beldeneige",
+    "members": [
+      872,
+      873
+    ]
+  },
+  "878": {
+    "name": "Charibari → Pachyradjah",
+    "members": [
+      878,
+      879
+    ]
+  },
+  "884": {
+    "name": "Duralugon → Pondralugon",
+    "members": [
+      884,
+      1018
+    ]
+  },
+  "885": {
+    "name": "Fantyrm → Dispareptil → Lanssorien",
+    "members": [
+      885,
+      886,
+      887
+    ]
+  },
+  "891": {
+    "name": "Wushours → Shifours",
+    "members": [
+      891,
+      892
+    ]
+  },
+  "906": {
+    "name": "Poussacha → Matourgeon → Miascarade",
+    "members": [
+      906,
+      907,
+      908
+    ]
+  },
+  "909": {
+    "name": "Chochodile → Crocogril → Flâmigator",
+    "members": [
+      909,
+      910,
+      911
+    ]
+  },
+  "912": {
+    "name": "Coiffeton → Canarbello → Palmaval",
+    "members": [
+      912,
+      913,
+      914
+    ]
+  },
+  "915": {
+    "name": "Gourmelet → Fragroin",
+    "members": [
+      915,
+      916
+    ]
+  },
+  "917": {
+    "name": "Tissenboule → Filentrappe",
+    "members": [
+      917,
+      918
+    ]
+  },
+  "919": {
+    "name": "Lilliterre → Gambex",
+    "members": [
+      919,
+      920
+    ]
+  },
+  "921": {
+    "name": "Pohm → Pohmotte → Pohmarmotte",
+    "members": [
+      921,
+      922,
+      923
+    ]
+  },
+  "924": {
+    "name": "Compagnol → Famignol",
+    "members": [
+      924,
+      925
+    ]
+  },
+  "926": {
+    "name": "Pâtachiot → Briochien",
+    "members": [
+      926,
+      927
+    ]
+  },
+  "928": {
+    "name": "Olivini → Olivado → Arboliva",
+    "members": [
+      928,
+      929,
+      930
+    ]
+  },
+  "932": {
+    "name": "Selstin → Amonbiste → Gigansel",
+    "members": [
+      932,
+      933,
+      934
+    ]
+  },
+  "935": {
+    "name": "Charbambin → Carmadura / Malvalame",
+    "members": [
+      935,
+      936,
+      937
+    ]
+  },
+  "938": {
+    "name": "Têtampoule → Ampibidou",
+    "members": [
+      938,
+      939
+    ]
+  },
+  "940": {
+    "name": "Zapétrel → Fulgulairo",
+    "members": [
+      940,
+      941
+    ]
+  },
+  "942": {
+    "name": "Grondogue → Dogrino",
+    "members": [
+      942,
+      943
+    ]
+  },
+  "944": {
+    "name": "Gribouraigne → Tag-Tag",
+    "members": [
+      944,
+      945
+    ]
+  },
+  "946": {
+    "name": "Viroquin → Virevorreur",
+    "members": [
+      946,
+      947
+    ]
+  },
+  "948": {
+    "name": "Léboulérou → Bérasca",
+    "members": [
+      948,
+      949
+    ]
+  },
+  "951": {
+    "name": "Pimentin → Scovilain",
+    "members": [
+      951,
+      952
+    ]
+  },
+  "955": {
+    "name": "Flotillon → Cléopsytra",
+    "members": [
+      955,
+      956
+    ]
+  },
+  "957": {
+    "name": "Forgella → Forgeline → Forgelina",
+    "members": [
+      957,
+      958,
+      959
+    ]
+  },
+  "960": {
+    "name": "Taupikeur → Trioppikeur",
+    "members": [
+      960,
+      961
+    ]
+  },
+  "963": {
+    "name": "Dofin → Superdofin",
+    "members": [
+      963,
+      964
+    ]
+  },
+  "965": {
+    "name": "Vrombi → Vrombotor",
+    "members": [
+      965,
+      966
+    ]
+  },
+  "968": {
+    "name": "Germéclat → Floréclat",
+    "members": [
+      968,
+      969
+    ]
+  },
+  "970": {
+    "name": "Toutombe → Tomberro",
+    "members": [
+      970,
+      971
+    ]
+  },
+  "996": {
+    "name": "Frigodo → Glaçodo → Glaivodo",
+    "members": [
+      996,
+      997,
+      998
+    ]
+  },
+  "999": {
+    "name": "Mordudor → Gromago",
+    "members": [
+      999,
+      1000
+    ]
+  },
+  "1012": {
+    "name": "Poltchageist → Théffroyable",
+    "members": [
+      1012,
+      1013
+    ]
+  }
+},
+    memberToRoot: {},
+    init() {
+      for (const [rStr, fam] of Object.entries(this.families)) {
+        const r = Number(rStr);
+        this.memberToRoot[r] = r;
+        if (fam.members) {
+          for (const m of fam.members) {
+            this.memberToRoot[m] = r;
+          }
+        }
+      }
+    },
+    getRootId(target) {
+      if (!target && target !== 0) return 0;
+      try {
+        if (typeof target?.species?.getRootSpeciesId === 'function') {
+          const r = target.species.getRootSpeciesId();
+          if (r !== undefined && r !== null) return Number(r);
+        }
+        if (typeof target?.getRootSpeciesId === 'function') {
+          const r = target.getRootSpeciesId();
+          if (r !== undefined && r !== null) return Number(r);
+        }
+      } catch (e) {}
+      const spId = Number(target?.species?.speciesId ?? target?.speciesId ?? target);
+      if (!isNaN(spId) && spId > 0) {
+        if (this.memberToRoot[spId]) return this.memberToRoot[spId];
+        return spId;
+      }
+      return 0;
+    },
+    getFamilyKey(target) {
+      const rootId = this.getRootId(target);
+      return 'family_' + rootId;
+    },
+    getFamilyInfo(target, fallbackName) {
+      const rootId = this.getRootId(target);
+      const familyKey = 'family_' + rootId;
+      let lineageName = '';
+      if (this.families[rootId]) {
+        lineageName = this.families[rootId].name;
+      } else {
+        const directName = target?.species?.name || target?.name || fallbackName || ('Espèce #' + rootId);
+        lineageName = directName;
+      }
+      return { rootId, familyKey, lineageName };
+    }
+  };
+  LineageManager.init();
+
   // --- STATE & STORE ---
   const PokeSkip = {
     rules: Storage.get(STORAGE_KEY, {}),
@@ -91,7 +2853,9 @@
       quickPromptDuration: 15
     }, Storage.get(SETTINGS_KEY, {})),
     stats: Storage.get(STATS_KEY, {
-      totalSkipped: 0
+      totalSkipped: 0,
+      currentSeed: null,
+      runSkipped: 0
     }),
     game: null,
     scene: null,
@@ -109,14 +2873,98 @@
       Storage.set(STATS_KEY, this.stats);
     },
 
-    getSpeciesRule(speciesId) {
-      if (!speciesId) return null;
-      return this.rules[speciesId] || null;
+    getCurrentRunSeed() {
+      try {
+        const sc = this.scene || (typeof unsafeWindow !== 'undefined' ? unsafeWindow.globalScene : window.globalScene);
+        if (sc && sc.seed) return String(sc.seed);
+      } catch (e) {}
+      return 'default_session';
     },
 
-    isMoveSkipped(speciesId, moveName, moveId) {
+    getRunSkippedCount() {
+      const seed = this.getCurrentRunSeed();
+      if (this.stats.currentSeed !== seed) {
+        this.stats.currentSeed = seed;
+        this.stats.runSkipped = 0;
+        this.saveStats();
+      }
+      return this.stats.runSkipped || 0;
+    },
+
+    recordSkip() {
+      this.stats.totalSkipped = (this.stats.totalSkipped || 0) + 1;
+      const seed = this.getCurrentRunSeed();
+      if (this.stats.currentSeed !== seed) {
+        this.stats.currentSeed = seed;
+        this.stats.runSkipped = 0;
+      }
+      this.stats.runSkipped = (this.stats.runSkipped || 0) + 1;
+      this.saveStats();
+      UI.updateHudBadge();
+    },
+
+    migrateRules() {
+      let changed = false;
+      const newRules = {};
+
+      // 1. D'abord initialiser toutes les règles déjà au format family_
+      for (const [key, rule] of Object.entries(this.rules)) {
+        if (!rule) continue;
+        if (key.startsWith('family_')) {
+          newRules[key] = {
+            familyId: rule.familyId,
+            lineageName: rule.lineageName,
+            skippedMoves: Object.assign({}, rule.skippedMoves || {}),
+            skipAll: !!rule.skipAll,
+            updatedAt: rule.updatedAt || Date.now()
+          };
+        }
+      }
+
+      // 2. Ensuite migrer et fusionner les anciennes règles (ex: IDs d'évolutions séparés)
+      for (const [key, rule] of Object.entries(this.rules)) {
+        if (!rule || key.startsWith('family_')) continue;
+        changed = true;
+        const spId = parseInt(rule.speciesId || key, 10);
+        const familyInfo = LineageManager.getFamilyInfo(isNaN(spId) ? key : spId, rule.speciesName);
+        const famKey = familyInfo.familyKey;
+
+        if (!newRules[famKey]) {
+          newRules[famKey] = {
+            familyId: familyInfo.rootId,
+            lineageName: familyInfo.lineageName,
+            skippedMoves: {},
+            skipAll: !!rule.skipAll,
+            updatedAt: rule.updatedAt || Date.now()
+          };
+        }
+        if (rule.skippedMoves) {
+          Object.assign(newRules[famKey].skippedMoves, rule.skippedMoves);
+        }
+        if (rule.skipAll) {
+          newRules[famKey].skipAll = true;
+        }
+      }
+
+      if (changed) {
+        this.rules = newRules;
+        this.saveRules();
+      }
+    },
+
+    getFamilyRule(target) {
+      if (!target && target !== 0) return null;
+      const key = LineageManager.getFamilyKey(target);
+      return this.rules[key] || null;
+    },
+
+    getSpeciesRule(target) {
+      return this.getFamilyRule(target);
+    },
+
+    isMoveSkipped(target, moveName, moveId) {
       if (!this.settings.enabled) return false;
-      const rule = this.getSpeciesRule(speciesId);
+      const rule = this.getFamilyRule(target);
       if (!rule) return false; // Par défaut : RIEN n'est skip !
       if (rule.skipAll) return true;
       if (!rule.skippedMoves) return false;
@@ -127,21 +2975,20 @@
       return false;
     },
 
-    setMoveSkipped(speciesId, speciesName, moveName, moveId, isSkipped) {
-      if (!speciesId) return;
-      if (!this.rules[speciesId]) {
-        this.rules[speciesId] = {
-          speciesId: speciesId,
-          speciesName: speciesName || `Espèce #${speciesId}`,
+    setMoveSkipped(target, speciesName, moveName, moveId, isSkipped) {
+      const familyInfo = LineageManager.getFamilyInfo(target, speciesName);
+      const familyKey = familyInfo.familyKey;
+      if (!this.rules[familyKey]) {
+        this.rules[familyKey] = {
+          familyId: familyInfo.rootId,
+          lineageName: familyInfo.lineageName,
           skippedMoves: {},
           skipAll: false,
           updatedAt: Date.now()
         };
       }
-      const rule = this.rules[speciesId];
-      if (speciesName && (!rule.speciesName || rule.speciesName.startsWith('Espèce #'))) {
-        rule.speciesName = speciesName;
-      }
+      const rule = this.rules[familyKey];
+      if (familyInfo.lineageName) rule.lineageName = familyInfo.lineageName;
 
       const key = moveName ? moveName.trim().toLowerCase() : `id_${moveId}`;
       if (isSkipped) {
@@ -155,11 +3002,16 @@
       this.saveRules();
     },
 
-    deleteSpeciesRule(speciesId) {
-      if (this.rules[speciesId]) {
-        delete this.rules[speciesId];
+    deleteFamilyRule(familyKey) {
+      if (this.rules[familyKey]) {
+        delete this.rules[familyKey];
         this.saveRules();
       }
+    },
+
+    deleteSpeciesRule(target) {
+      const key = LineageManager.getFamilyKey(target);
+      this.deleteFamilyRule(key);
     }
   };
 
@@ -209,6 +3061,7 @@
 
       PokeSkip.game = found.game;
       PokeSkip.scene = found.scene;
+      PokeSkip.migrateRules();
       applyPhaseManagerHooks(found.scene);
       PokeSkip.hooked = true;
       console.log('🎉 [PokéSkip] Connecté avec succès à PokéRogue !');
@@ -265,10 +3118,16 @@
     proto._pokeskipHooked = true;
 
     // Fermeture automatique du prompt dès que LearnMovePhase se termine (évite tout débordement sur la phase de récompense)
+    // Protection anti-double appel de end()
     const origEnd = proto.end;
     if (typeof origEnd === 'function') {
       proto.end = function () {
         UI.dismissQuickSkipPrompt();
+        if (this._pokeskipEnded) return;
+        this._pokeskipEnded = true;
+        if (typeof this._restoreUi === 'function') {
+          this._restoreUi();
+        }
         return origEnd.apply(this, arguments);
       };
     }
@@ -283,18 +3142,15 @@
       const isLevelUpMove = this.learnMoveType === 0 || this.learnMoveType === undefined;
 
       if (PokeSkip.settings.enabled && isLevelUpMove) {
-        const speciesId = pokemon?.species?.speciesId ?? pokemon?.speciesId;
-        const speciesName = pokemon?.species?.name || pokemon?.name || 'Pokémon';
+        const familyInfo = LineageManager.getFamilyInfo(pokemon);
         const moveName = move?.name || `Move #${this.moveId}`;
 
-        if (PokeSkip.isMoveSkipped(speciesId, moveName, this.moveId)) {
-          PokeSkip.stats.totalSkipped++;
-          PokeSkip.saveStats();
-          UI.updateHudBadge();
+        if (PokeSkip.isMoveSkipped(pokemon, moveName, this.moveId)) {
+          PokeSkip.recordSkip();
 
           if (PokeSkip.settings.showToasts) {
             UI.showToast(
-              `⏭️ <b>${speciesName}</b> a ignoré <i>${moveName}</i> (Règle mémorisée)`,
+              `⏭️ <b>${familyInfo.lineageName}</b> a ignoré <i>${moveName}</i> (Règle mémorisée)`,
               'info',
               PokeSkip.settings.toastDuration
             );
@@ -307,6 +3163,52 @@
         // Si l'attaque n'est pas ignorée et l'option activée : proposer le bouton rapide en haut au milieu
         if (PokeSkip.settings.showQuickPrompt !== false) {
           UI.showQuickSkipPrompt(this, pokemon, move);
+        }
+      }
+
+      // Si l'utilisateur a déjà cliqué sur "Toujours ignorer" avant que replaceMoveCheck ne démarre :
+      if (this._pokeskipIgnored) {
+        this.end();
+        return;
+      }
+
+      const phase = this;
+      const scene = phase.scene || PokeSkip.scene || window.globalScene;
+      const ui = scene?.ui;
+
+      if (ui && typeof ui.showTextPromise === 'function') {
+        const origShowTextPromise = ui.showTextPromise;
+        const origSetModeWithoutClear = ui.setModeWithoutClear;
+
+        // Interception des affichages pour cette phase afin de neutraliser la demande d'apprentissage si ignorée
+        ui.showTextPromise = async function (text, callbackDelay, prompt, promptDelay) {
+          if (phase._pokeskipIgnored) {
+            return;
+          }
+          return origShowTextPromise.call(this, text, callbackDelay, prompt, promptDelay);
+        };
+
+        if (typeof origSetModeWithoutClear === 'function') {
+          ui.setModeWithoutClear = function (mode, ...args) {
+            // Si la capacité a été marquée comme ignorée, bloquer l'ouverture du menu [Oui][Non] (mode CONFIRM = 14)
+            if (phase._pokeskipIgnored && mode === 14) {
+              phase.end();
+              return Promise.resolve();
+            }
+            return origSetModeWithoutClear.call(this, mode, ...args);
+          };
+        }
+
+        const restoreUi = () => {
+          ui.showTextPromise = origShowTextPromise;
+          if (origSetModeWithoutClear) ui.setModeWithoutClear = origSetModeWithoutClear;
+        };
+        phase._restoreUi = restoreUi;
+
+        try {
+          return await origReplaceMoveCheck.apply(phase, arguments);
+        } finally {
+          restoreUi();
         }
       }
 
@@ -482,6 +3384,29 @@
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
+        .pokeskip-hud-status {
+          font-size: 11px;
+          font-weight: 700;
+          padding: 2px 7px;
+          border-radius: 6px;
+          letter-spacing: 0.3px;
+          user-select: none;
+        }
+        .pokeskip-hud-status.on {
+          background: rgba(16, 185, 129, 0.2);
+          color: #34d399;
+          border: 1px solid rgba(52, 211, 153, 0.35);
+        }
+        .pokeskip-hud-status.off {
+          background: rgba(148, 163, 184, 0.15);
+          color: #94a3b8;
+          border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .pokeskip-hud-divider {
+          color: rgba(255, 255, 255, 0.2);
+          font-size: 12px;
+          font-weight: 300;
+        }
         .pokeskip-hud-badge {
           font-size: 11px;
           padding: 2px 7px;
@@ -603,6 +3528,33 @@
           padding: 2px 6px;
           border-radius: 6px;
           margin-top: 4px;
+        }
+        .pokeskip-member-sprite-container {
+          width: 52px;
+          height: 52px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          margin-bottom: 2px;
+        }
+        .pokeskip-member-sprite {
+          max-width: 52px;
+          max-height: 52px;
+          object-fit: contain;
+          image-rendering: pixelated;
+          filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+          transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .pokeskip-member-card:hover .pokeskip-member-sprite {
+          transform: scale(1.15);
+        }
+        .pokeskip-shiny-badge {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          font-size: 11px;
+          filter: drop-shadow(0 0 3px #facc15);
         }
 
         /* --- NOUVEAU DESIGN DES CARTES D'ATTAQUES --- */
@@ -893,9 +3845,15 @@
       const hud = document.createElement('div');
       hud.id = 'pokeskip-hud';
       hud.title = 'PokéSkip (P) • Glisser-déposer pour déplacer';
+      const runCount = PokeSkip.getRunSkippedCount();
+      const enabled = PokeSkip.settings.enabled;
       hud.innerHTML = `
         ${this.getPokeballSvg(20)}
-        <span class="pokeskip-hud-badge" id="pokeskip-hud-count">0 passée(s)</span>
+        <span class="pokeskip-hud-status ${enabled ? 'on' : 'off'}">
+          ${enabled ? '● ON' : '○ OFF'}
+        </span>
+        <span class="pokeskip-hud-divider">|</span>
+        <span class="pokeskip-hud-badge" id="pokeskip-hud-count">${runCount} passée${runCount > 1 ? 's' : ''}</span>
       `;
       this.makeHudDraggable(hud);
       document.body.appendChild(hud);
@@ -970,8 +3928,18 @@
     },
 
     updateHudBadge() {
-      const el = document.getElementById('pokeskip-hud-count');
-      if (el) el.textContent = `${PokeSkip.stats.totalSkipped} passée(s)`;
+      const countEl = document.getElementById('pokeskip-hud-count');
+      const statusEl = document.querySelector('.pokeskip-hud-status');
+      const enabled = PokeSkip.settings.enabled;
+      const runCount = PokeSkip.getRunSkippedCount();
+
+      if (countEl) {
+        countEl.textContent = `${runCount} passée${runCount > 1 ? 's' : ''}`;
+      }
+      if (statusEl) {
+        statusEl.className = `pokeskip-hud-status ${enabled ? 'on' : 'off'}`;
+        statusEl.textContent = enabled ? '● ON' : '○ OFF';
+      }
     },
 
     createModal() {
@@ -1066,6 +4034,7 @@
       document.getElementById('pokeskip-toggle-enabled').addEventListener('change', (e) => {
         PokeSkip.settings.enabled = e.target.checked;
         PokeSkip.saveSettings();
+        this.updateHudBadge();
         this.showToast(PokeSkip.settings.enabled ? 'PokéSkip activé' : 'PokéSkip en pause', 'info');
       });
 
@@ -1221,16 +4190,25 @@
       }
 
       party.forEach((pkmn, idx) => {
-        const speciesId = pkmn.species?.speciesId ?? pkmn.speciesId;
+        const familyInfo = LineageManager.getFamilyInfo(pkmn);
+        const speciesId = pkmn.species?.speciesId ?? pkmn.speciesId ?? LineageManager.getRootId(pkmn);
         const name = pkmn.name || pkmn.species?.name || `Pokémon #${idx + 1}`;
         const level = pkmn.level || 1;
-        const rule = PokeSkip.getSpeciesRule(speciesId);
-        const skippedCount = rule?.skippedMoves ? Object.keys(rule.skippedMoves).length : 0;
+        const isShiny = !!pkmn.shiny;
+        const spriteUrl = isShiny
+          ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${speciesId}.png`
+          : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${speciesId}.png`;
+        const rule = PokeSkip.getFamilyRule(familyInfo.familyKey);
+        const skippedCount = rule?.skippedMoves ? Object.keys(rule.skippedMoves).filter(k => !k.startsWith('id_')).length : 0;
 
         const card = document.createElement('div');
         card.className = `pokeskip-member-card ${idx === this.selectedTeamIndex ? 'active' : ''}`;
         card.innerHTML = `
-          <div style="font-size: 24px;">⚡</div>
+          <div class="pokeskip-member-sprite-container">
+            <img src="${spriteUrl}" alt="${name}" class="pokeskip-member-sprite" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none; font-size: 24px;">⚡</div>
+            ${isShiny ? '<span class="pokeskip-shiny-badge" title="Chromatique / Shiny">✨</span>' : ''}
+          </div>
           <div class="pokeskip-member-name">${name}</div>
           <div style="font-size: 11px; color: #94a3b8;">Niv. ${level}</div>
           <div class="pokeskip-member-badge">${skippedCount > 0 ? `${skippedCount} ignorée(s)` : 'Toutes gardées'}</div>
@@ -1249,9 +4227,14 @@
     },
 
     renderPokemonMoveConfig(container, pokemon) {
-      const speciesId = pokemon.species?.speciesId ?? pokemon.speciesId;
-      const speciesName = pokemon.species?.name || pokemon.name || 'Pokémon';
-      const rule = PokeSkip.getSpeciesRule(speciesId) || { skippedMoves: {}, skipAll: false };
+      const familyInfo = LineageManager.getFamilyInfo(pokemon);
+      const currentName = pokemon.species?.name || pokemon.name || 'Pokémon';
+      const speciesId = pokemon.species?.speciesId ?? pokemon.speciesId ?? LineageManager.getRootId(pokemon);
+      const isShiny = !!pokemon.shiny;
+      const spriteUrl = isShiny
+        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${speciesId}.png`
+        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${speciesId}.png`;
+      const rule = PokeSkip.getFamilyRule(familyInfo.familyKey) || { skippedMoves: {}, skipAll: false };
 
       // Récupération de TOUTES les attaques apprenables (futures + actuelles)
       const learnable = getPokemonFullLearnset(pokemon);
@@ -1259,12 +4242,19 @@
       container.innerHTML = `
         <div style="background: #0f172a; padding: 16px; border-radius: 14px; border: 1px solid rgba(56, 189, 248, 0.2);">
           <div class="pokeskip-moves-header">
-            <div>
-              <h3 style="margin: 0 0 4px 0; font-size: 16px; color: #fff;">
-                Capacités apprenables pour : <span style="color: #38bdf8;">${speciesName}</span>
-              </h3>
-              <div style="font-size: 12px; color: #94a3b8;">
-                🔵 <b>Coché en bleu = Attaque gardée</b> (par défaut). <b>Décochez</b> les attaques que vous souhaitez <b>ignorer automatiquement</b>.
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="pokeskip-member-sprite-container" style="width: 48px; height: 48px; flex-shrink: 0;">
+                <img src="${spriteUrl}" alt="${currentName}" class="pokeskip-member-sprite" style="max-width: 48px; max-height: 48px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display:none; font-size: 24px;">⚡</div>
+                ${isShiny ? '<span class="pokeskip-shiny-badge" title="Chromatique / Shiny">✨</span>' : ''}
+              </div>
+              <div>
+                <h3 style="margin: 0 0 4px 0; font-size: 16px; color: #fff;">
+                  Lignée : <span style="color: #38bdf8;">${familyInfo.lineageName}</span>
+                </h3>
+                <div style="font-size: 12px; color: #94a3b8;">
+                  Actuel : <b style="color: #f8fafc;">${currentName}</b> • Les capacités sélectionnées s'appliquent à tous les membres et formes de cette lignée.
+                </div>
               </div>
             </div>
 
@@ -1286,7 +4276,7 @@
 
       const renderGrid = (filter = '') => {
         grid.innerHTML = '';
-        const currentRule = PokeSkip.getSpeciesRule(speciesId) || { skippedMoves: {} };
+        const currentRule = PokeSkip.getFamilyRule(familyInfo.familyKey) || { skippedMoves: {} };
 
         const filtered = learnable.filter(m => !filter || m.name.toLowerCase().includes(filter.toLowerCase()));
 
@@ -1296,7 +4286,7 @@
         }
 
         filtered.forEach(moveItem => {
-          const isSkipped = PokeSkip.isMoveSkipped(speciesId, moveItem.name, moveItem.moveId);
+          const isSkipped = PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
           const isKept = !isSkipped;
           const cardEl = document.createElement('div');
           cardEl.className = `pokeskip-move-card ${isSkipped ? 'skipped' : ''}`;
@@ -1329,7 +4319,7 @@
               badge.className = `pokeskip-keep-badge ${kept ? 'kept' : 'skip'}`;
               badge.textContent = kept ? '✓ Gardée' : '✕ Ignorée';
             }
-            PokeSkip.setMoveSkipped(speciesId, speciesName, moveItem.name, moveItem.moveId, !kept);
+            PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
             UI.updateHudBadge();
           };
 
@@ -1354,21 +4344,21 @@
 
       container.querySelector('#pokeskip-btn-select-all').addEventListener('click', () => {
         // Tout garder (Tout cocher en bleu)
-        learnable.forEach(m => PokeSkip.setMoveSkipped(speciesId, speciesName, m.name, m.moveId, false));
+        learnable.forEach(m => PokeSkip.setMoveSkipped(pokemon, currentName, m.name, m.moveId, false));
         if (rule.skippedMoves) {
           for (const k of Object.keys(rule.skippedMoves)) {
-            PokeSkip.setMoveSkipped(speciesId, speciesName, k, null, false);
+            PokeSkip.setMoveSkipped(pokemon, currentName, k, null, false);
           }
         }
         renderGrid(container.querySelector('#pokeskip-move-filter').value);
-        UI.showToast(`Toutes les capacités sont <b>gardées</b> pour <b>${speciesName}</b>`, 'info');
+        UI.showToast(`Toutes les capacités sont <b>gardées</b> pour <b>${familyInfo.lineageName}</b>`, 'info');
       });
 
       container.querySelector('#pokeskip-btn-deselect-all').addEventListener('click', () => {
         // Tout ignorer (Tout décocher)
-        learnable.forEach(m => PokeSkip.setMoveSkipped(speciesId, speciesName, m.name, m.moveId, true));
+        learnable.forEach(m => PokeSkip.setMoveSkipped(pokemon, currentName, m.name, m.moveId, true));
         renderGrid(container.querySelector('#pokeskip-move-filter').value);
-        UI.showToast(`Toutes les capacités sont <b>ignorées</b> pour <b>${speciesName}</b>`, 'warning');
+        UI.showToast(`Toutes les capacités sont <b>ignorées</b> pour <b>${familyInfo.lineageName}</b>`, 'warning');
       });
     },
 
@@ -1377,12 +4367,12 @@
       if (!container) return;
       container.innerHTML = '';
 
-      const speciesKeys = Object.keys(PokeSkip.rules);
-      if (speciesKeys.length === 0) {
+      const familyKeys = Object.keys(PokeSkip.rules);
+      if (familyKeys.length === 0) {
         container.innerHTML = `
           <div style="text-align: center; padding: 30px; color: #94a3b8; background: #111a2e; border-radius: 12px;">
             Aucune règle mémorisée pour le moment.<br>
-            Décochez des attaques dans l'équipe actuelle pour les ignorer : elles resteront enregistrées pour toujours !
+            Décochez des attaques dans l'équipe actuelle pour les ignorer : elles resteront enregistrées pour toute la lignée !
           </div>
         `;
         return;
@@ -1390,32 +4380,32 @@
 
       container.innerHTML = `
         <div style="margin-bottom: 12px; color: #94a3b8; font-size: 13px;">
-          Retrouvez ici toutes les espèces que vous avez configurées. Même si vous commencez une nouvelle équipe, ces réglages seront automatiquement appliqués.
+          Retrouvez ici toutes les lignées d'espèces configurées. Vos réglages s'appliquent automatiquement à tous leurs stades évolutifs et formes, d'une partie à l'autre.
         </div>
       `;
 
-      speciesKeys.forEach(spId => {
-        const rule = PokeSkip.rules[spId];
+      familyKeys.forEach(famKey => {
+        const rule = PokeSkip.rules[famKey];
         const skippedKeys = Object.keys(rule.skippedMoves || {}).filter(k => !k.startsWith('id_'));
         const el = document.createElement('div');
-        el.style.cssText = 'background: #111a2e; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;';
+        el.style.cssText = 'background: #111a2e; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 14px;';
         el.innerHTML = `
-          <div>
-            <div style="font-size: 15px; font-weight: 700; color: #fff;">${rule.speciesName || `Espèce #${spId}`}</div>
+          <div style="flex: 1;">
+            <div style="font-size: 15px; font-weight: 700; color: #fff;">${rule.lineageName || `Lignée #${rule.familyId || famKey}`}</div>
             <div style="font-size: 12px; color: #38bdf8; margin-top: 4px;">
               ${skippedKeys.length > 0 ? `Capacités ignorées (${skippedKeys.length}) : ${skippedKeys.join(', ')}` : 'Aucune capacité ignorée'}
             </div>
           </div>
-          <button style="background:rgba(225,29,72,0.2); border:1px solid rgba(225,29,72,0.4); color:#fda4af; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">
+          <button style="background:rgba(225,29,72,0.2); border:1px solid rgba(225,29,72,0.4); color:#fda4af; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; white-space:nowrap;">
             Supprimer la règle
           </button>
         `;
 
         el.querySelector('button').addEventListener('click', () => {
-          if (confirm(`Supprimer les règles enregistrées pour ${rule.speciesName} ?`)) {
-            PokeSkip.deleteSpeciesRule(spId);
+          if (confirm(`Supprimer les règles enregistrées pour ${rule.lineageName} ?`)) {
+            PokeSkip.deleteFamilyRule(famKey);
             this.renderSavedSpeciesTab();
-            this.showToast(`Règle supprimée pour ${rule.speciesName}`, 'info');
+            this.showToast(`Règle supprimée pour ${rule.lineageName}`, 'info');
           }
         });
 
@@ -1440,14 +4430,13 @@
         document.getElementById('pokeskip-quick-prompt').remove();
       }
 
-      const speciesId = pokemon?.species?.speciesId ?? pokemon?.speciesId;
-      const speciesName = pokemon?.species?.name || pokemon?.name || 'ce Pokémon';
+      const familyInfo = LineageManager.getFamilyInfo(pokemon);
       const moveName = move?.name || `Move #${phaseInstance.moveId}`;
 
       const el = document.createElement('div');
       el.id = 'pokeskip-quick-prompt';
       el.innerHTML = `
-        <span class="pokeskip-quick-text">⚡ Ignorer <b>${moveName}</b> pour <b>${speciesName}</b> ?</span>
+        <span class="pokeskip-quick-text">⚡ Ignorer <b>${moveName}</b> pour <b>${familyInfo.lineageName}</b> ?</span>
         <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">Toujours ignorer</button>
         <button class="pokeskip-quick-close" id="pokeskip-quick-close">&times;</button>
       `;
@@ -1465,22 +4454,49 @@
 
       el.querySelector('#pokeskip-quick-skip-always').addEventListener('click', (e) => {
         e.stopPropagation();
-        PokeSkip.setMoveSkipped(speciesId, speciesName, moveName, phaseInstance.moveId, true);
-        PokeSkip.stats.totalSkipped++;
-        PokeSkip.saveStats();
-        this.updateHudBadge();
+        PokeSkip.setMoveSkipped(pokemon, pokemon?.species?.name, moveName, phaseInstance.moveId, true);
+        PokeSkip.recordSkip();
 
-        this.showToast(`✅ Règle enregistrée : <b>${speciesName}</b> ignorera <b>${moveName}</b> !`, 'success');
+        this.showToast(`✅ Règle enregistrée : <b>${familyInfo.lineageName}</b> ignorera <b>${moveName}</b> !`, 'success');
         dismiss();
+
+        // 1. Marquer la phase comme ignorée par PokéSkip
+        phaseInstance._pokeskipIgnored = true;
 
         const scene = phaseInstance.scene || PokeSkip.scene || window.globalScene;
         const pm = scene?.phaseManager;
         const currentPhase = pm ? (typeof pm.getCurrentPhase === 'function' ? pm.getCurrentPhase() : pm.currentPhase) : null;
+        const ui = scene?.ui;
 
-        // VÉRIFICATION DE SÉCURITÉ :
-        // Ne terminer la phase que si LearnMovePhase est encore la phase courante !
-        // Si le jeu est déjà passé à SelectModifierPhase (l'objet cadeau), on ne touche SURTOUT PAS à end()
-        if (currentPhase && (currentPhase === phaseInstance || currentPhase.phaseName === 'LearnMovePhase')) {
+        // Vérifier l'état actuel de l'UI in-game
+        const currentMode = ui ? (typeof ui.getMode === 'function' ? ui.getMode() : ui.mode) : null;
+        const isConfirmOrSummaryActive = currentMode === 14 || currentMode === 9;
+
+        // VÉRIFICATION DU TEXTE :
+        // Déterminer si le texte actuellement affiché est un message d'une autre nature
+        // (ex: évolution, montée de niveau, stats) ou bien le message d'apprentissage de cette capacité
+        let isOtherNatureMessage = false;
+        try {
+          const msgHandler = typeof ui?.getMessageHandler === 'function' ? ui.getMessageHandler() : null;
+          const currentText = msgHandler?.message?.text || '';
+          // Si du texte est présent et qu'il ne mentionne pas le nom de cette capacité, c'est un message d'une autre nature
+          if (currentText && moveName && !currentText.includes(moveName)) {
+            isOtherNatureMessage = true;
+          }
+        } catch (err) {}
+
+        // 2. Gestion de l'UI in-game :
+        // Si le menu Oui/Non (CONFIRM = 14) ou de sélection des attaques (SUMMARY = 9) était déjà ouvert,
+        // on le ferme immédiatement pour ne pas bloquer le joueur
+        if (isConfirmOrSummaryActive && ui) {
+          try {
+            const handler = typeof ui.getHandler === 'function' ? ui.getHandler() : null;
+            if (handler && typeof handler.clear === 'function') handler.clear();
+            if (ui.handlers && ui.handlers[14] && typeof ui.handlers[14].clear === 'function') {
+              ui.handlers[14].clear();
+            }
+          } catch (err) {}
+
           const targetMode = phaseInstance.messageMode ?? 0;
           let ended = false;
           const safeEnd = () => {
@@ -1493,29 +4509,29 @@
             }
           };
 
-          // Si le joueur était dans le menu des 4 attaques (UiMode.SUMMARY = 9) ou confirmation (14),
-          // on réinitialise l'UI pour quitter ce menu immédiatement et proprement
-          if (scene && scene.ui && typeof scene.ui.setMode === 'function') {
+          if (typeof ui.setMode === 'function') {
             try {
-              scene.ui.setMode(targetMode).then(safeEnd).catch(safeEnd);
-              setTimeout(safeEnd, 200);
+              ui.setMode(targetMode).then(safeEnd).catch(safeEnd);
+              setTimeout(safeEnd, 150);
             } catch (err) {
               safeEnd();
             }
           } else {
             safeEnd();
           }
-        } else {
-          // Si LearnMovePhase est déjà passée mais que l'UI est restée coincée sur Summary (9) ou Confirm (14) :
-          if (scene && scene.ui && typeof scene.ui.setMode === 'function') {
-            try {
-              const currentMode = typeof scene.ui.getMode === 'function' ? scene.ui.getMode() : scene.ui.mode;
-              if (currentMode === 9 || currentMode === 14) {
-                scene.ui.setMode(phaseInstance.messageMode ?? 0);
-              }
-            } catch (err) {}
+        } else if (!isOtherNatureMessage && currentPhase && (currentPhase === phaseInstance || currentPhase.phaseName === 'LearnMovePhase')) {
+          // Si ce n'est PAS un message d'une autre nature et qu'on est déjà dans LearnMovePhase,
+          // on peut clôturer la phase en toute sécurité
+          try {
+            phaseInstance.end();
+          } catch (err) {
+            console.warn('[PokeSkip] Erreur clôture phase:', err);
           }
         }
+        // NOTE : Si isOtherNatureMessage est vrai, on NE TOUCHE PAS au texte et on ne force pas end() immédiatement.
+        // Le joueur peut lire tranquillement son message d'évolution ou de niveau sans le perdre.
+        // Dès que ce message d'une autre nature se terminera, l'intercepteur dans replaceMoveCheck
+        // verra que _pokeskipIgnored est vrai et sautera automatiquement la demande Oui/Non !
       });
 
       // Reste selon la durée configurée (par défaut 15s) pour laisser le temps de décider

@@ -103,14 +103,6 @@ Vous pouvez utiliser PokéSkip sur votre smartphone ou tablette Android :
 
 ---
 
-## 🛠️ Simulateur Interactif Hors-Ligne
-
-Le projet inclut un banc de test interactif situé dans le dossier [`demo/`](demo/) :
-- Vous pouvez ouvrir [`demo/index.html`](demo/index.html) directement dans votre navigateur.
-- Permet de simuler des combats, tester la montée en niveau (+XP), vérifier l'auto-skip et configurer des équipes sans lancer PokéRogue.
-
----
-
 ## 📂 Organisation du Code
 
 ```text
@@ -122,11 +114,19 @@ pokeskip/
 │   ├── popup.html/js/css  # Menu d'extension dans la barre d'outils
 │   └── icons/             # Icônes officielles
 ├── pokeskip.user.js       # Script tout-en-un pour Tampermonkey / Violentmonkey
-├── demo/                  # Démo interactive et simulateur autonome
 ├── pokeskip-extension.zip # Archive précompilée prête au téléchargement
+├── CHANGELOG.md           # Journal détaillé des versions et patch notes
 ├── CONTRIBUTING.md        # Guide de contribution
 └── LICENSE                # Licence MIT
 ```
+
+---
+
+## 📦 Releases & Patch Notes
+
+Chaque version est documentée et publiée avec ses livrables prêts à l'emploi :
+- Consultez le [**Journal des Modifications (CHANGELOG.md)**](CHANGELOG.md) pour retrouver le patch note détaillé de chaque version.
+- Téléchargez directement les archives pré-packagées sur la page des [**Releases GitHub**](https://github.com/estelar9/pokerogue-pokeskip/releases).
 
 ---
 

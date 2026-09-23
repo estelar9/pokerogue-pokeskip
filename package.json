@@ -1,10 +1,10 @@
 {
   "name": "pokeskip",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "L'Auto-Skip intelligent et sélectif de capacités pour PokéRogue.",
   "main": "pokeskip.user.js",
   "scripts": {
-    "lint": "node -c extension/inject.js pokeskip.user.js demo/demo.js extension/content.js extension/popup.js",
+    "lint": "node -c extension/inject.js pokeskip.user.js extension/content.js extension/popup.js",
     "build:zip": "powershell -Command \"Compress-Archive -Path 'extension\\*' -DestinationPath 'pokeskip-extension.zip' -Force\""
   },
   "keywords": [

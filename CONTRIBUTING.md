@@ -15,7 +15,6 @@ Le projet est conçu pour être à la fois une **extension de navigateur native*
   - `popup.html` / `popup.js` / `popup.css` : Interface de la popup de la barre d'outils navigateur.
   - `icons/` : Icônes aux formats 16x16, 48x48 et 128x128.
 - **`pokeskip.user.js`** : Version Userscript prête à l'emploi avec en-têtes `// ==UserScript==` pour Tampermonkey.
-- **`demo/`** : Simulateur interactif hors-ligne permettant de tester le fonctionnement du skip sans avoir à lancer de partie.
 - **`pokeskip-extension.zip`** : Archive compressée du dossier `extension/` pour installation directe en un clic.
 
 ---
