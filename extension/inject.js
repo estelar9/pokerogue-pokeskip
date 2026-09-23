@@ -1,6 +1,12 @@
 (function () {
   'use strict';
 
+  if (window.__POKESKIP_INJECTED__) {
+    console.log('[PokéSkip] Le plugin est déjà actif sur cette page !');
+    return;
+  }
+  window.__POKESKIP_INJECTED__ = true;
+
   const STORAGE_KEY = 'pokeskip_species_rules_v1';
   const SETTINGS_KEY = 'pokeskip_settings_v1';
   const STATS_KEY = 'pokeskip_stats_v1';
@@ -2775,6 +2781,54 @@
   }
 },
     memberToRoot: {},
+    megaFamilies: {
+      3: { suffix: '(Méga)', defaultMegaSpriteId: 10033 },
+      6: { suffix: '(Méga X / Y)', defaultMegaSpriteId: 10034 },
+      9: { suffix: '(Méga)', defaultMegaSpriteId: 10036 },
+      15: { suffix: '(Méga)', defaultMegaSpriteId: 10090 },
+      18: { suffix: '(Méga)', defaultMegaSpriteId: 10073 },
+      65: { suffix: '(Méga)', defaultMegaSpriteId: 10037 },
+      80: { suffix: '(Méga)', defaultMegaSpriteId: 10074 },
+      94: { suffix: '(Méga)', defaultMegaSpriteId: 10038 },
+      115: { suffix: '(Méga)', defaultMegaSpriteId: 10039 },
+      127: { suffix: '(Méga)', defaultMegaSpriteId: 10040 },
+      130: { suffix: '(Méga)', defaultMegaSpriteId: 10041 },
+      142: { suffix: '(Méga)', defaultMegaSpriteId: 10042 },
+      150: { suffix: '(Méga X / Y)', defaultMegaSpriteId: 10043 },
+      181: { suffix: '(Méga)', defaultMegaSpriteId: 10045 },
+      208: { suffix: '(Méga)', defaultMegaSpriteId: 10075 },
+      212: { suffix: '(Méga)', defaultMegaSpriteId: 10046 },
+      214: { suffix: '(Méga)', defaultMegaSpriteId: 10047 },
+      229: { suffix: '(Méga)', defaultMegaSpriteId: 10048 },
+      248: { suffix: '(Méga)', defaultMegaSpriteId: 10049 },
+      254: { suffix: '(Méga)', defaultMegaSpriteId: 10065 },
+      257: { suffix: '(Méga)', defaultMegaSpriteId: 10050 },
+      260: { suffix: '(Méga)', defaultMegaSpriteId: 10064 },
+      282: { suffix: '(Méga)', defaultMegaSpriteId: 10051 },
+      302: { suffix: '(Méga)', defaultMegaSpriteId: 10066 },
+      303: { suffix: '(Méga)', defaultMegaSpriteId: 10052 },
+      306: { suffix: '(Méga)', defaultMegaSpriteId: 10053 },
+      308: { suffix: '(Méga)', defaultMegaSpriteId: 10054 },
+      310: { suffix: '(Méga)', defaultMegaSpriteId: 10055 },
+      319: { suffix: '(Méga)', defaultMegaSpriteId: 10070 },
+      323: { suffix: '(Méga)', defaultMegaSpriteId: 10071 },
+      334: { suffix: '(Méga)', defaultMegaSpriteId: 10067 },
+      354: { suffix: '(Méga)', defaultMegaSpriteId: 10056 },
+      359: { suffix: '(Méga)', defaultMegaSpriteId: 10057 },
+      362: { suffix: '(Méga)', defaultMegaSpriteId: 10078 },
+      373: { suffix: '(Méga)', defaultMegaSpriteId: 10089 },
+      376: { suffix: '(Méga)', defaultMegaSpriteId: 10076 },
+      380: { suffix: '(Méga)', defaultMegaSpriteId: 10062 },
+      381: { suffix: '(Méga)', defaultMegaSpriteId: 10063 },
+      384: { suffix: '(Méga)', defaultMegaSpriteId: 10079 },
+      428: { suffix: '(Méga)', defaultMegaSpriteId: 10088 },
+      445: { suffix: '(Méga)', defaultMegaSpriteId: 10058 },
+      448: { suffix: '(Méga)', defaultMegaSpriteId: 10059 },
+      460: { suffix: '(Méga)', defaultMegaSpriteId: 10060 },
+      475: { suffix: '(Méga)', defaultMegaSpriteId: 10068 },
+      531: { suffix: '(Méga)', defaultMegaSpriteId: 10069 },
+      719: { suffix: '(Méga)', defaultMegaSpriteId: 10077 }
+    },
     init() {
       for (const [rStr, fam] of Object.entries(this.families)) {
         const r = Number(rStr);
@@ -2783,8 +2837,44 @@
           for (const m of fam.members) {
             this.memberToRoot[m] = r;
           }
+          // Enrichir l'intitulé avec la mention Méga si un membre est concerné
+          for (const m of fam.members) {
+            if (this.megaFamilies[m] && !fam.name.includes('(Méga')) {
+              fam.name += ` ${this.megaFamilies[m].suffix}`;
+              break;
+            }
+          }
         }
       }
+    },
+    isPokemonMega(pokemon) {
+      if (!pokemon) return false;
+      const name = (pokemon.name || pokemon.species?.name || '').toLowerCase();
+      if (name.includes('mega') || name.includes('méga')) return true;
+      if (typeof pokemon.formeIndex === 'number' && pokemon.formeIndex > 0) return true;
+      if (typeof pokemon.formIndex === 'number' && pokemon.formIndex > 0) return true;
+      return false;
+    },
+    getPokemonSpriteUrl(pokemon) {
+      const speciesId = pokemon?.species?.speciesId ?? pokemon?.speciesId ?? this.getRootId(pokemon);
+      const isShiny = !!pokemon?.shiny;
+      const isMega = this.isPokemonMega(pokemon);
+
+      let spriteId = speciesId;
+      if (isMega && this.megaFamilies[speciesId]) {
+        const name = (pokemon.name || pokemon.species?.name || '').toUpperCase();
+        if (speciesId === 6) { // Dracaufeu
+          spriteId = name.includes('Y') ? 10035 : 10034;
+        } else if (speciesId === 150) { // Mewtwo
+          spriteId = name.includes('Y') ? 10044 : 10043;
+        } else {
+          spriteId = this.megaFamilies[speciesId].defaultMegaSpriteId;
+        }
+      }
+
+      return isShiny
+        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${spriteId}.png`
+        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${spriteId}.png`;
     },
     getRootId(target) {
       if (!target && target !== 0) return 0;
@@ -2833,7 +2923,9 @@
       toastDuration: 2800,
       soundFeedback: false,
       showQuickPrompt: true,
-      quickPromptDuration: 15
+      quickPromptDuration: 15,
+      showHudCount: true,
+      advancedMode: false
     }, Storage.get(SETTINGS_KEY, {})),
     stats: Storage.get(STATS_KEY, {
       totalSkipped: 0,
@@ -2899,6 +2991,7 @@
             lineageName: rule.lineageName,
             skippedMoves: Object.assign({}, rule.skippedMoves || {}),
             skipAll: !!rule.skipAll,
+            replacements: Array.isArray(rule.replacements) ? rule.replacements.slice() : [],
             updatedAt: rule.updatedAt || Date.now()
           };
         }
@@ -2918,6 +3011,7 @@
             lineageName: familyInfo.lineageName,
             skippedMoves: {},
             skipAll: !!rule.skipAll,
+            replacements: Array.isArray(rule.replacements) ? rule.replacements.slice() : [],
             updatedAt: rule.updatedAt || Date.now()
           };
         }
@@ -2967,6 +3061,7 @@
           lineageName: familyInfo.lineageName,
           skippedMoves: {},
           skipAll: false,
+          replacements: [],
           updatedAt: Date.now()
         };
       }
@@ -2995,6 +3090,89 @@
     deleteSpeciesRule(target) {
       const key = LineageManager.getFamilyKey(target);
       this.deleteFamilyRule(key);
+    },
+
+    getFamilyReplacements(target) {
+      const rule = this.getFamilyRule(target);
+      return (rule && Array.isArray(rule.replacements)) ? rule.replacements : [];
+    },
+
+    addReplacementRule(target, newMoveName, newMoveId, oldMoveName, oldMoveId) {
+      const familyInfo = LineageManager.getFamilyInfo(target);
+      const famKey = familyInfo.familyKey;
+      if (!this.rules[famKey]) {
+        this.rules[famKey] = {
+          familyId: familyInfo.rootId,
+          lineageName: familyInfo.lineageName,
+          skippedMoves: {},
+          skipAll: false,
+          replacements: [],
+          updatedAt: Date.now()
+        };
+      }
+      if (!Array.isArray(this.rules[famKey].replacements)) {
+        this.rules[famKey].replacements = [];
+      }
+
+      const ruleObj = {
+        id: 'rep_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+        newMoveName: newMoveName.trim(),
+        newMoveId: newMoveId || null,
+        oldMoveName: oldMoveName.trim(),
+        oldMoveId: oldMoveId || null,
+        enabled: true,
+        createdAt: Date.now()
+      };
+
+      this.rules[famKey].replacements.push(ruleObj);
+      this.rules[famKey].updatedAt = Date.now();
+      this.saveRules();
+      return ruleObj;
+    },
+
+    toggleReplacementRule(target, ruleId, enabled) {
+      const rule = this.getFamilyRule(target);
+      if (!rule || !Array.isArray(rule.replacements)) return false;
+      const r = rule.replacements.find(item => item.id === ruleId);
+      if (r) {
+        r.enabled = enabled !== undefined ? enabled : !r.enabled;
+        rule.updatedAt = Date.now();
+        this.saveRules();
+        return true;
+      }
+      return false;
+    },
+
+    deleteReplacementRule(target, ruleId) {
+      const rule = this.getFamilyRule(target);
+      if (!rule || !Array.isArray(rule.replacements)) return false;
+      rule.replacements = rule.replacements.filter(item => item.id !== ruleId);
+      rule.updatedAt = Date.now();
+      this.saveRules();
+      return true;
+    },
+
+    clearAllReplacements(target) {
+      const rule = this.getFamilyRule(target);
+      if (!rule) return false;
+      rule.replacements = [];
+      rule.updatedAt = Date.now();
+      this.saveRules();
+      return true;
+    },
+
+    findActiveReplacement(target, incomingMoveName, incomingMoveId) {
+      if (!this.settings.enabled || !this.settings.advancedMode) return null;
+      const rule = this.getFamilyRule(target);
+      if (!rule || !Array.isArray(rule.replacements)) return null;
+
+      const incName = incomingMoveName ? incomingMoveName.trim().toLowerCase() : '';
+      return rule.replacements.find(r => {
+        if (!r.enabled) return false;
+        if (incName && r.newMoveName.trim().toLowerCase() === incName) return true;
+        if (incomingMoveId && r.newMoveId && r.newMoveId === incomingMoveId) return true;
+        return false;
+      }) || null;
     }
   };
 
@@ -3141,6 +3319,61 @@
 
           this.end();
           return;
+        }
+
+        // 2. Mode Avancé : Remplacement automatique d'attaque si configuré
+        if (PokeSkip.settings.advancedMode) {
+          const currentMoveset = typeof pokemon.getMoveset === 'function' ? pokemon.getMoveset() : (pokemon.moveset || []);
+          if (currentMoveset && currentMoveset.length === 4) {
+            const replRule = PokeSkip.findActiveReplacement(pokemon, moveName, this.moveId);
+            if (replRule && replRule.oldMoveName) {
+              const targetOld = replRule.oldMoveName.trim().toLowerCase();
+              let replaceIndex = -1;
+              let foundOldName = '';
+
+              for (let i = 0; i < currentMoveset.length; i++) {
+                const m = currentMoveset[i];
+                if (!m) continue;
+                let mName = '';
+                if (typeof m.getName === 'function') mName = m.getName();
+                else if (typeof m.getMove === 'function') mName = m.getMove()?.name || '';
+                else if (m.name) mName = m.name;
+                else if (PokeSkip.knownMovesCache[m.moveId || m.id]) mName = PokeSkip.knownMovesCache[m.moveId || m.id];
+
+                if (mName && mName.trim().toLowerCase() === targetOld) {
+                  replaceIndex = i;
+                  foundOldName = mName;
+                  break;
+                }
+                if (replRule.oldMoveId && (m.moveId === replRule.oldMoveId || m.id === replRule.oldMoveId)) {
+                  replaceIndex = i;
+                  foundOldName = mName || replRule.oldMoveName;
+                  break;
+                }
+              }
+
+              if (replaceIndex !== -1) {
+                console.log(`⚡ [PokeSkip] Remplacement auto : ${moveName} remplace ${foundOldName} (slot ${replaceIndex})`);
+                if (PokeSkip.settings.showToasts) {
+                  UI.showToast(
+                    `⚡ [PokéSkip] <b>${moveName}</b> a remplacé <i>${foundOldName}</i> sur <b>${familyInfo.lineageName}</b> !`,
+                    'success',
+                    PokeSkip.settings.toastDuration || 3500
+                  );
+                }
+
+                if (typeof this.learnMove === 'function') {
+                  return this.learnMove(replaceIndex, move, pokemon);
+                } else if (typeof pokemon.learnMove === 'function') {
+                  pokemon.learnMove(this.moveId, replaceIndex);
+                  this.end();
+                  return;
+                }
+              } else {
+                console.log(`⚡ [PokeSkip] Règle active trouvée pour ${moveName}, mais ${replRule.oldMoveName} n'est pas connue par le Pokémon. La main est laissée au joueur.`);
+              }
+            }
+          }
         }
 
         // Si l'attaque n'est pas ignorée et l'option activée : proposer le bouton rapide en haut au milieu
@@ -3539,6 +3772,37 @@
           font-size: 11px;
           filter: drop-shadow(0 0 3px #facc15);
         }
+        .pokeskip-mega-badge {
+          background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+          color: #ffffff;
+          font-size: 10px;
+          font-weight: 800;
+          padding: 1px 6px;
+          border-radius: 6px;
+          box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+          letter-spacing: 0.5px;
+          margin-top: 2px;
+          display: inline-block;
+        }
+        .pokeskip-saved-species-card {
+          background: #111a2e;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          padding: 12px 16px;
+          margin-bottom: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pokeskip-saved-species-card:hover {
+          background: #16243f !important;
+          border-color: rgba(56, 189, 248, 0.45) !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+          transform: translateY(-1px);
+        }
 
         /* --- NOUVEAU DESIGN DES CARTES D'ATTAQUES --- */
         .pokeskip-moves-header {
@@ -3830,13 +4094,14 @@
       hud.title = 'PokéSkip (P) • Glisser-déposer pour déplacer';
       const runCount = PokeSkip.getRunSkippedCount();
       const enabled = PokeSkip.settings.enabled;
+      const showCount = PokeSkip.settings.showHudCount !== false;
       hud.innerHTML = `
         ${this.getPokeballSvg(20)}
         <span class="pokeskip-hud-status ${enabled ? 'on' : 'off'}">
           ${enabled ? '● ON' : '○ OFF'}
         </span>
-        <span class="pokeskip-hud-divider">|</span>
-        <span class="pokeskip-hud-badge" id="pokeskip-hud-count">${runCount} passée${runCount > 1 ? 's' : ''}</span>
+        <span class="pokeskip-hud-divider" id="pokeskip-hud-divider" style="display: ${showCount ? 'inline' : 'none'};">|</span>
+        <span class="pokeskip-hud-badge" id="pokeskip-hud-count" style="display: ${showCount ? 'inline-block' : 'none'};">${runCount} passée${runCount > 1 ? 's' : ''}</span>
       `;
       this.makeHudDraggable(hud);
       document.body.appendChild(hud);
@@ -3912,12 +4177,18 @@
 
     updateHudBadge() {
       const countEl = document.getElementById('pokeskip-hud-count');
+      const dividerEl = document.getElementById('pokeskip-hud-divider');
       const statusEl = document.querySelector('.pokeskip-hud-status');
       const enabled = PokeSkip.settings.enabled;
+      const showCount = PokeSkip.settings.showHudCount !== false;
       const runCount = PokeSkip.getRunSkippedCount();
 
       if (countEl) {
         countEl.textContent = `${runCount} passée${runCount > 1 ? 's' : ''}`;
+        countEl.style.display = showCount ? 'inline-block' : 'none';
+      }
+      if (dividerEl) {
+        dividerEl.style.display = showCount ? 'inline' : 'none';
       }
       if (statusEl) {
         statusEl.className = `pokeskip-hud-status ${enabled ? 'on' : 'off'}`;
@@ -3970,6 +4241,11 @@
                   Afficher les notifications toast lors d'un auto-skip
                 </label>
 
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+                  <input type="checkbox" id="pokeskip-opt-hud-count" ${PokeSkip.settings.showHudCount !== false ? 'checked' : ''} style="accent-color: #38bdf8;">
+                  Afficher le compteur de capacités passées sur la pastille
+                </label>
+
                 <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 10px;">
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
                     <input type="checkbox" id="pokeskip-opt-quick-prompt" ${PokeSkip.settings.showQuickPrompt !== false ? 'checked' : ''} style="accent-color: #38bdf8;">
@@ -3983,6 +4259,24 @@
                       <span>secondes</span>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(168, 85, 247, 0.25); display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <h4 style="margin: 0; font-size: 14px; color: #c084fc; display: flex; align-items: center; gap: 6px;">
+                    <span>⚡ Mode Avancé : Remplacement d'Attaques</span>
+                  </h4>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: #fff; font-weight: 600;">
+                    <input type="checkbox" id="pokeskip-opt-advanced-mode" ${PokeSkip.settings.advancedMode ? 'checked' : ''} style="accent-color: #a855f7; width: 16px; height: 16px;">
+                    Activer
+                  </label>
+                </div>
+                <div style="font-size: 12px; color: #94a3b8; line-height: 1.4;">
+                  Permet de configurer des remplacements automatiques d'anciennes attaques lorsqu'une nouvelle capacité (non ignorée) est apprise et que le Pokémon possède déjà 4 attaques.
+                </div>
+                <div id="pokeskip-advanced-status-desc" style="font-size: 11px; color: ${PokeSkip.settings.advancedMode ? '#a855f7' : '#64748b'};">
+                  ${PokeSkip.settings.advancedMode ? '✓ Actif : les sections de remplacement sont visibles dans les onglets.' : '✕ Désactivé : les règles sont conservées mais non exécutées.'}
                 </div>
               </div>
 
@@ -4037,6 +4331,34 @@
         PokeSkip.settings.showToasts = e.target.checked;
         PokeSkip.saveSettings();
       });
+
+      const optHudCount = document.getElementById('pokeskip-opt-hud-count');
+      if (optHudCount) {
+        optHudCount.addEventListener('change', (e) => {
+          PokeSkip.settings.showHudCount = e.target.checked;
+          PokeSkip.saveSettings();
+          this.updateHudBadge();
+        });
+      }
+
+      const optAdvancedMode = document.getElementById('pokeskip-opt-advanced-mode');
+      if (optAdvancedMode) {
+        optAdvancedMode.addEventListener('change', (e) => {
+          PokeSkip.settings.advancedMode = e.target.checked;
+          PokeSkip.saveSettings();
+          const statusDesc = document.getElementById('pokeskip-advanced-status-desc');
+          if (statusDesc) {
+            statusDesc.textContent = e.target.checked
+              ? '✓ Actif : les sections de remplacement sont visibles dans les onglets.'
+              : '✕ Désactivé : les règles sont conservées mais non exécutées.';
+            statusDesc.style.color = e.target.checked ? '#a855f7' : '#64748b';
+          }
+          this.showToast(
+            e.target.checked ? '⚡ Mode Avancé activé' : 'Mode Avancé désactivé (règles conservées)',
+            e.target.checked ? 'success' : 'info'
+          );
+        });
+      }
 
       const optQuickPrompt = document.getElementById('pokeskip-opt-quick-prompt');
       const optQuickDuration = document.getElementById('pokeskip-opt-quick-duration');
@@ -4174,13 +4496,11 @@
 
       party.forEach((pkmn, idx) => {
         const familyInfo = LineageManager.getFamilyInfo(pkmn);
-        const speciesId = pkmn.species?.speciesId ?? pkmn.speciesId ?? LineageManager.getRootId(pkmn);
         const name = pkmn.name || pkmn.species?.name || `Pokémon #${idx + 1}`;
         const level = pkmn.level || 1;
         const isShiny = !!pkmn.shiny;
-        const spriteUrl = isShiny
-          ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${speciesId}.png`
-          : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${speciesId}.png`;
+        const isMega = LineageManager.isPokemonMega(pkmn);
+        const spriteUrl = LineageManager.getPokemonSpriteUrl(pkmn);
         const rule = PokeSkip.getFamilyRule(familyInfo.familyKey);
         const skippedCount = rule?.skippedMoves ? Object.keys(rule.skippedMoves).filter(k => !k.startsWith('id_')).length : 0;
 
@@ -4194,6 +4514,7 @@
           </div>
           <div class="pokeskip-member-name">${name}</div>
           <div style="font-size: 11px; color: #94a3b8;">Niv. ${level}</div>
+          ${isMega ? '<div class="pokeskip-mega-badge">🧬 MÉGA</div>' : ''}
           <div class="pokeskip-member-badge">${skippedCount > 0 ? `${skippedCount} ignorée(s)` : 'Toutes gardées'}</div>
         `;
         card.addEventListener('click', () => {
@@ -4212,11 +4533,9 @@
     renderPokemonMoveConfig(container, pokemon) {
       const familyInfo = LineageManager.getFamilyInfo(pokemon);
       const currentName = pokemon.species?.name || pokemon.name || 'Pokémon';
-      const speciesId = pokemon.species?.speciesId ?? pokemon.speciesId ?? LineageManager.getRootId(pokemon);
       const isShiny = !!pokemon.shiny;
-      const spriteUrl = isShiny
-        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${speciesId}.png`
-        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${speciesId}.png`;
+      const isMega = LineageManager.isPokemonMega(pokemon);
+      const spriteUrl = LineageManager.getPokemonSpriteUrl(pokemon);
       const rule = PokeSkip.getFamilyRule(familyInfo.familyKey) || { skippedMoves: {}, skipAll: false };
 
       // Récupération de TOUTES les attaques apprenables (futures + actuelles)
@@ -4232,8 +4551,9 @@
                 ${isShiny ? '<span class="pokeskip-shiny-badge" title="Chromatique / Shiny">✨</span>' : ''}
               </div>
               <div>
-                <h3 style="margin: 0 0 4px 0; font-size: 16px; color: #fff;">
-                  Lignée : <span style="color: #38bdf8;">${familyInfo.lineageName}</span>
+                <h3 style="margin: 0 0 4px 0; font-size: 16px; color: #fff; display: flex; align-items: center; gap: 8px;">
+                  <span>Lignée : <span style="color: #38bdf8;">${familyInfo.lineageName}</span></span>
+                  ${isMega ? '<span class="pokeskip-mega-badge">🧬 MÉGA</span>' : ''}
                 </h3>
                 <div style="font-size: 12px; color: #94a3b8;">
                   Actuel : <b style="color: #f8fafc;">${currentName}</b> • Les capacités sélectionnées s'appliquent à tous les membres et formes de cette lignée.
@@ -4343,6 +4663,26 @@
         renderGrid(container.querySelector('#pokeskip-move-filter').value);
         UI.showToast(`Toutes les capacités sont <b>ignorées</b> pour <b>${familyInfo.lineageName}</b>`, 'warning');
       });
+
+      if (PokeSkip.settings.advancedMode) {
+        const currentMoveset = typeof pokemon.getMoveset === 'function' ? pokemon.getMoveset() : (pokemon.moveset || []);
+        const currentMoveNames = currentMoveset.map(m => {
+          if (!m) return '';
+          if (typeof m.getName === 'function') return m.getName();
+          if (typeof m.getMove === 'function') return m.getMove()?.name || '';
+          return m.name || (m.moveId ? PokeSkip.knownMovesCache[m.moveId] : '') || '';
+        }).filter(Boolean);
+
+        const repWrapper = document.createElement('div');
+        container.firstElementChild.appendChild(repWrapper);
+
+        const refreshReplacements = () => {
+          repWrapper.innerHTML = '';
+          this.renderReplacementSection(repWrapper, pokemon, learnable, currentMoveNames, refreshReplacements);
+          renderGrid(container.querySelector('#pokeskip-move-filter').value);
+        };
+        refreshReplacements();
+      }
     },
 
     renderSavedSpeciesTab() {
@@ -4370,30 +4710,379 @@
       familyKeys.forEach(famKey => {
         const rule = PokeSkip.rules[famKey];
         const skippedKeys = Object.keys(rule.skippedMoves || {}).filter(k => !k.startsWith('id_'));
+        const rootId = rule.familyId || parseInt(famKey.replace('family_', ''), 10) || 1;
+        const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${rootId}.png`;
+
         const el = document.createElement('div');
-        el.style.cssText = 'background: #111a2e; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 14px;';
+        el.className = 'pokeskip-saved-species-card';
         el.innerHTML = `
-          <div style="flex: 1;">
-            <div style="font-size: 15px; font-weight: 700; color: #fff;">${rule.lineageName || `Lignée #${rule.familyId || famKey}`}</div>
-            <div style="font-size: 12px; color: #38bdf8; margin-top: 4px;">
-              ${skippedKeys.length > 0 ? `Capacités ignorées (${skippedKeys.length}) : ${skippedKeys.join(', ')}` : 'Aucune capacité ignorée'}
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+            <div class="pokeskip-member-sprite-container" style="width: 44px; height: 44px; flex-shrink: 0; margin-bottom: 0;">
+              <img src="${spriteUrl}" alt="${rule.lineageName}" class="pokeskip-member-sprite" style="max-width: 44px; max-height: 44px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div style="display:none; font-size: 22px;">⚡</div>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 15px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rule.lineageName || `Lignée #${rule.familyId || famKey}`}</div>
+              <div style="font-size: 12px; color: #38bdf8; margin-top: 3px;">
+                ${skippedKeys.length > 0 ? `Capacités ignorées (${skippedKeys.length}) : ${skippedKeys.join(', ')}` : 'Aucune capacité ignorée'}
+              </div>
             </div>
           </div>
-          <button style="background:rgba(225,29,72,0.2); border:1px solid rgba(225,29,72,0.4); color:#fda4af; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; white-space:nowrap;">
-            Supprimer la règle
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+            <button class="pokeskip-btn-edit-lineage" style="background:#0369a1; border:1px solid #38bdf8; color:#fff; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:600; white-space:nowrap;">
+              ✏️ Modifier
+            </button>
+            <button class="pokeskip-btn-del-lineage" style="background:rgba(225,29,72,0.2); border:1px solid rgba(225,29,72,0.4); color:#fda4af; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer; white-space:nowrap;" title="Supprimer la règle">
+              ✕
+            </button>
+          </div>
         `;
 
-        el.querySelector('button').addEventListener('click', () => {
-          if (confirm(`Supprimer les règles enregistrées pour ${rule.lineageName} ?`)) {
-            PokeSkip.deleteFamilyRule(famKey);
-            this.renderSavedSpeciesTab();
-            this.showToast(`Règle supprimée pour ${rule.lineageName}`, 'info');
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('.pokeskip-btn-del-lineage')) {
+            e.stopPropagation();
+            if (confirm(`Supprimer les règles enregistrées pour ${rule.lineageName} ?`)) {
+              PokeSkip.deleteFamilyRule(famKey);
+              this.renderSavedSpeciesTab();
+              this.showToast(`Règle supprimée pour ${rule.lineageName}`, 'info');
+            }
+            return;
           }
+          this.renderFamilyRuleEditor(container, famKey);
         });
 
         container.appendChild(el);
       });
+    },
+
+    renderFamilyRuleEditor(container, famKey) {
+      const rule = PokeSkip.rules[famKey];
+      if (!rule) {
+        this.renderSavedSpeciesTab();
+        return;
+      }
+      const rootId = rule.familyId || parseInt(famKey.replace('family_', ''), 10) || 1;
+      const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${rootId}.png`;
+      const skippedList = Object.keys(rule.skippedMoves || {}).filter(k => !k.startsWith('id_'));
+
+      // Vérifier si un membre de cette lignée est actuellement dans l'équipe active
+      const teamIdx = PokeSkip.activeParty.findIndex(p => LineageManager.getFamilyKey(p) === famKey);
+
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <button id="pokeskip-btn-back-saved" style="background: #1e293b; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.12); padding: 7px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              ← Retour aux espèces
+            </button>
+            ${teamIdx !== -1 ? `
+              <button id="pokeskip-btn-open-in-team" style="background: #0284c7; color: #fff; border: 1px solid #38bdf8; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 600;">
+                👥 Voir dans l'Équipe Actuelle
+              </button>
+            ` : ''}
+          </div>
+
+          <div style="background: #0f172a; padding: 16px; border-radius: 14px; border: 1px solid rgba(56, 189, 248, 0.25); display: flex; align-items: center; gap: 14px;">
+            <div class="pokeskip-member-sprite-container" style="width: 52px; height: 52px; flex-shrink: 0; margin-bottom: 0;">
+              <img src="${spriteUrl}" alt="${rule.lineageName}" class="pokeskip-member-sprite" style="max-width: 52px; max-height: 52px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div style="display:none; font-size: 24px;">⚡</div>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 16px; font-weight: 700; color: #fff;">${rule.lineageName}</div>
+              <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
+                Modifiez ici les capacités ignorées pour toute la lignée (tous stades et formes).
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Ajout rapide d'une attaque à ignorer -->
+          <div style="background: #111a2e; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="pokeskip-input-add-move" placeholder="Ajouter une capacité à ignorer (ex: Tornade, Charge)..." style="flex: 1; background: #090e1a; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 13px; outline: none;">
+            <button id="pokeskip-btn-add-move" style="background: #e11d48; color: #fff; border: 1px solid #fda4af; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; white-space: nowrap;">
+              + Ignorer
+            </button>
+          </div>
+
+          <!-- Liste des capacités ignorées -->
+          <div style="background: #111a2e; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="font-size: 14px; font-weight: 700; color: #f8fafc;">
+                Capacités actuellement ignorées (${skippedList.length}) :
+              </div>
+              ${skippedList.length > 0 ? `
+                <button id="pokeskip-btn-clear-lineage-moves" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;">
+                  Tout rétablir (Ne rien ignorer)
+                </button>
+              ` : ''}
+            </div>
+
+            <div id="pokeskip-family-moves-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto;">
+              ${skippedList.length === 0 ? `
+                <div style="color: #64748b; font-size: 13px; text-align: center; padding: 22px;">
+                  Aucune capacité n'est ignorée pour cette lignée.<br>Toutes les attaques proposées seront apprises ou présentées normalement.
+                </div>
+              ` : skippedList.map(mvKey => {
+                const displayName = mvKey.charAt(0).toUpperCase() + mvKey.slice(1);
+                return `
+                  <div style="background: #090e1a; border: 1px solid rgba(244,63,94,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="color: #f43f5e; font-weight: 700; font-size: 13px;">✕ Ignorée</span>
+                      <span style="color: #fff; font-weight: 600; font-size: 14px;">${displayName}</span>
+                    </div>
+                    <button class="pokeskip-btn-unskip-move" data-move="${mvKey}" style="background: #10b981; color: #fff; border: 1px solid #34d399; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600;">
+                      ✓ Garder à nouveau
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Bouton retour
+      container.querySelector('#pokeskip-btn-back-saved').addEventListener('click', () => {
+        this.renderSavedSpeciesTab();
+      });
+
+      // Bouton "Voir dans l'Équipe Actuelle" si présent
+      const btnOpenTeam = container.querySelector('#pokeskip-btn-open-in-team');
+      if (btnOpenTeam && teamIdx !== -1) {
+        btnOpenTeam.addEventListener('click', () => {
+          this.selectedTeamIndex = teamIdx;
+          const tabBtn = document.querySelector('.pokeskip-tab-btn[data-tab="team"]');
+          if (tabBtn) tabBtn.click();
+        });
+      }
+
+      // Ajout manuel d'une capacité
+      const inputAdd = container.querySelector('#pokeskip-input-add-move');
+      const btnAdd = container.querySelector('#pokeskip-btn-add-move');
+      const handleAdd = () => {
+        const val = inputAdd.value.trim();
+        if (!val) return;
+        PokeSkip.setMoveSkipped(famKey, rule.lineageName, val, null, true);
+        this.showToast(`Capacité <b>${val}</b> ignorée pour <b>${rule.lineageName}</b>`, 'warning');
+        this.renderFamilyRuleEditor(container, famKey);
+      };
+      btnAdd.addEventListener('click', handleAdd);
+      inputAdd.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleAdd();
+      });
+
+      // Rétablir tout
+      const btnClearAll = container.querySelector('#pokeskip-btn-clear-lineage-moves');
+      if (btnClearAll) {
+        btnClearAll.addEventListener('click', () => {
+          rule.skippedMoves = {};
+          rule.updatedAt = Date.now();
+          PokeSkip.saveRules();
+          this.showToast(`Toutes les capacités sont rétablies pour <b>${rule.lineageName}</b>`, 'info');
+          this.renderFamilyRuleEditor(container, famKey);
+        });
+      }
+
+      // Boutons individuels "Garder à nouveau"
+      container.querySelectorAll('.pokeskip-btn-unskip-move').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const moveKey = btn.dataset.move;
+          delete rule.skippedMoves[moveKey];
+          rule.updatedAt = Date.now();
+          PokeSkip.saveRules();
+          this.showToast(`Capacité <b>${moveKey}</b> rétablie pour <b>${rule.lineageName}</b>`, 'success');
+          this.renderFamilyRuleEditor(container, famKey);
+        });
+      });
+
+      if (PokeSkip.settings.advancedMode) {
+        const activePartyMember = teamIdx !== -1 ? PokeSkip.activeParty[teamIdx] : null;
+        let partyCurrentMoves = [];
+        let partyLearnable = [];
+        if (activePartyMember) {
+          const ms = typeof activePartyMember.getMoveset === 'function' ? activePartyMember.getMoveset() : (activePartyMember.moveset || []);
+          partyCurrentMoves = ms.map(m => {
+            if (!m) return '';
+            if (typeof m.getName === 'function') return m.getName();
+            if (typeof m.getMove === 'function') return m.getMove()?.name || '';
+            return m.name || '';
+          }).filter(Boolean);
+          partyLearnable = getPokemonFullLearnset(activePartyMember);
+        }
+
+        const repWrapper = document.createElement('div');
+        container.firstElementChild.appendChild(repWrapper);
+
+        const refreshReplacements = () => {
+          repWrapper.innerHTML = '';
+          this.renderReplacementSection(repWrapper, famKey, partyLearnable, partyCurrentMoves, refreshReplacements);
+        };
+        refreshReplacements();
+      }
+    },
+
+    renderReplacementSection(container, target, defaultLearnable = [], defaultCurrent = [], onUpdate = null) {
+      if (!PokeSkip.settings.advancedMode) return;
+
+      const familyInfo = LineageManager.getFamilyInfo(target);
+      const famKey = familyInfo.familyKey;
+      const replacements = PokeSkip.getFamilyReplacements(target);
+      const activeCount = replacements.filter(r => r.enabled).length;
+
+      // Suggestions
+      const learnableNames = Array.from(new Set(defaultLearnable.map(m => (m && (m.name || m)) || '').filter(Boolean))).sort();
+      const currentNames = Array.from(new Set(defaultCurrent.map(m => (m && (m.name || m)) || '').filter(Boolean))).sort();
+
+      const uniqueRand = Math.random().toString(36).substring(2, 6);
+      const newDatalistId = `datalist-new-${uniqueRand}`;
+      const oldDatalistId = `datalist-old-${uniqueRand}`;
+
+      const secEl = document.createElement('div');
+      secEl.className = 'pokeskip-replacement-section';
+      secEl.style.cssText = 'margin-top: 14px; background: #080e1e; border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 12px; padding: 14px;';
+
+      secEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 15px;">⚡</span>
+            <span style="font-size: 13px; font-weight: 700; color: #c084fc;">
+              Mode Avancé : Remplacement Automatique de Capacités
+            </span>
+            <span style="font-size: 11px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; padding: 2px 7px; border-radius: 10px; font-weight: 600;">
+              ${activeCount}/${replacements.length} active(s)
+            </span>
+          </div>
+          ${replacements.length > 0 ? `
+            <button class="pokeskip-btn-clear-rep" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;">
+              🗑️ Tout supprimer (${replacements.length})
+            </button>
+          ` : ''}
+        </div>
+
+        <div style="font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.4;">
+          Quand cette lignée apprend l'une des nouvelles capacités et possède 4 capacités, l'ancienne capacité est automatiquement remplacée sans interrompre le jeu.
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <div style="background: #111a2e; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
+          <div style="font-size: 12px; font-weight: 600; color: #f8fafc; margin-bottom: 8px;">
+            ➕ Ajouter une règle de remplacement :
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 170px;">
+              <div style="font-size: 11px; color: #94a3b8; margin-bottom: 3px;">Quand il débloque :</div>
+              <input type="text" class="pokeskip-rep-input-new" list="${newDatalistId}" placeholder="Nouvelle capacité..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <datalist id="${newDatalistId}">
+                ${learnableNames.map(n => `<option value="${n}">`).join('')}
+              </datalist>
+            </div>
+
+            <div style="color: #c084fc; font-weight: bold; font-size: 16px; padding-top: 16px;">➔</div>
+
+            <div style="flex: 1; min-width: 170px;">
+              <div style="font-size: 11px; color: #94a3b8; margin-bottom: 3px;">Remplacer l'actuelle :</div>
+              <input type="text" class="pokeskip-rep-input-old" list="${oldDatalistId}" placeholder="Capacité à remplacer..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <datalist id="${oldDatalistId}">
+                ${currentNames.map(n => `<option value="${n}"> (Actuelle)`).join('')}
+                ${learnableNames.filter(n => !currentNames.includes(n)).map(n => `<option value="${n}">`).join('')}
+              </datalist>
+            </div>
+
+            <div style="padding-top: 16px;">
+              <button class="pokeskip-btn-add-rep" style="background: #7e22ce; color: #fff; border: 1px solid #c084fc; padding: 7px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; white-space: nowrap;">
+                + Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des règles -->
+        <div class="pokeskip-rep-list-container" style="display: flex; flex-direction: column; gap: 6px;">
+          ${replacements.length === 0 ? `
+            <div style="color: #64748b; font-size: 12px; text-align: center; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px;">
+              Aucune règle de remplacement pour <b>${familyInfo.lineageName}</b>.<br>
+              Créez une règle ci-dessus pour remplacer automatiquement une attaque dès son déblocage.
+            </div>
+          ` : replacements.map(r => `
+            <div style="background: #111a2e; border: 1px solid ${r.enabled ? 'rgba(168, 85, 247, 0.35)' : 'rgba(255, 255, 255, 0.08)'}; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; opacity: ${r.enabled ? '1' : '0.6'};">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-weight: 700; color: #38bdf8; font-size: 13px;">${r.newMoveName}</span>
+                <span style="color: #a855f7; font-size: 12px; font-weight: bold;">➔ remplace ➔</span>
+                <span style="font-weight: 700; color: #f43f5e; font-size: 13px;">${r.oldMoveName}</span>
+                <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: ${r.enabled ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.06)'}; color: ${r.enabled ? '#c084fc' : '#94a3b8'};">
+                  ${r.enabled ? 'Active' : 'Désactivée'}
+                </span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button class="pokeskip-btn-toggle-single-rep" data-id="${r.id}" style="background: ${r.enabled ? '#334155' : '#7e22ce'}; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">
+                  ${r.enabled ? 'Désactiver' : 'Activer'}
+                </button>
+                <button class="pokeskip-btn-delete-single-rep" data-id="${r.id}" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;" title="Supprimer cette règle">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      container.appendChild(secEl);
+
+      const inputNew = secEl.querySelector('.pokeskip-rep-input-new');
+      const inputOld = secEl.querySelector('.pokeskip-rep-input-old');
+      const btnAdd = secEl.querySelector('.pokeskip-btn-add-rep');
+
+      const handleAdd = () => {
+        const newM = inputNew?.value.trim();
+        const oldM = inputOld?.value.trim();
+        if (!newM || !oldM) {
+          UI.showToast('Veuillez renseigner la nouvelle capacité et celle à remplacer.', 'warning');
+          return;
+        }
+        if (newM.toLowerCase() === oldM.toLowerCase()) {
+          UI.showToast('La nouvelle capacité et l\'ancienne doivent être différentes.', 'warning');
+          return;
+        }
+
+        PokeSkip.addReplacementRule(target, newM, null, oldM, null);
+        PokeSkip.setMoveSkipped(target, null, newM, null, false);
+
+        UI.showToast(`Règle enregistrée : <b>${newM}</b> remplacera <b>${oldM}</b> sur <b>${familyInfo.lineageName}</b>`, 'success');
+        if (typeof onUpdate === 'function') {
+          onUpdate();
+        }
+      };
+
+      btnAdd?.addEventListener('click', handleAdd);
+      inputOld?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleAdd();
+      });
+
+      secEl.querySelectorAll('.pokeskip-btn-toggle-single-rep').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ruleId = btn.getAttribute('data-id');
+          PokeSkip.toggleReplacementRule(target, ruleId);
+          if (typeof onUpdate === 'function') onUpdate();
+        });
+      });
+
+      secEl.querySelectorAll('.pokeskip-btn-delete-single-rep').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ruleId = btn.getAttribute('data-id');
+          PokeSkip.deleteReplacementRule(target, ruleId);
+          UI.showToast('Règle de remplacement supprimée.', 'info');
+          if (typeof onUpdate === 'function') onUpdate();
+        });
+      });
+
+      const btnClear = secEl.querySelector('.pokeskip-btn-clear-rep');
+      if (btnClear) {
+        btnClear.addEventListener('click', () => {
+          if (confirm(`Supprimer toutes les règles de remplacement pour ${familyInfo.lineageName} ?`)) {
+            PokeSkip.clearAllReplacements(target);
+            UI.showToast(`Toutes les règles de remplacement supprimées pour ${familyInfo.lineageName}.`, 'info');
+            if (typeof onUpdate === 'function') onUpdate();
+          }
+        });
+      }
     },
 
     dismissQuickSkipPrompt() {

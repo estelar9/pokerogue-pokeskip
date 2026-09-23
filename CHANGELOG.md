@@ -5,6 +5,46 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.6.0] - 2026-09-23
+
+### ⚡ Mode Avancé : Remplacement Automatique de Capacités
+
+- **Moteur de Remplacement In-Game Automatisé** :
+  - Permet de remplacer automatiquement une ancienne capacité par une nouvelle dès son déblocage lors d'une montée de niveau.
+  - S'active uniquement lorsque le Pokémon possède déjà ses 4 capacités et que la nouvelle capacité **n'est pas ignorée** par PokéSkip.
+  - Apprentissage direct dans le slot de combat sans dialogue de confirmation intempestif, garantissant un flow de jeu 100% fluide.
+- **Contrôle & Confidentialité (Interrupteur Dédié)** :
+  - Le Mode Avancé est **désactivé par défaut** et caché derrière un interrupteur dans l'onglet **Options & Sauvegarde**.
+  - Sa désactivation suspend immédiatement la fonctionnalité en jeu et masque les formulaires de remplacement, tout en **conservant précieusement en mémoire toutes les règles configurées** en cas de réactivation.
+- **Gestion Flexible des Règles par Lignée** :
+  - Création de règles intuitives : *Quand il débloque [Attaque B] ➔ Remplacer l'actuelle [Attaque A]*.
+  - Suggestions intelligentes avec listes déroulantes basées sur les attaques apprenables et actuelles.
+  - Activation ou désactivation individuelle d'une règle (bouton toggle ON/OFF).
+  - Suppression d'une règle individuelle (icône 🗑️) ou suppression groupée de toutes les règles de la lignée.
+
+### 🧬 Prise en charge Complète des Méga-Évolutions
+
+- **Intitulés enrichis des 46 familles Méga** :
+  - Mention explicite dans les noms de lignées : `Bulbizarre → Herbizarre → Florizarre (Méga)`, `Salamèche → Reptincel → Dracaufeu (Méga X / Y)`, `Mewtwo (Méga X / Y)`, etc.
+- **Détection in-game des formes actives** :
+  - Affichage d'un badge violet lumineux `🧬 MÉGA` sur le Pokémon en combat ou dans l'équipe.
+  - Récupération dynamique et affichage du sprite pixel-art officiel de la forme Méga (avec gestion des formes X/Y et du caractère Chromatique / Shiny ✨).
+
+### 📚 Éditeur Visuel d'Espèces Mémorisées
+
+- **Sprites pixel-art dans l'onglet Espèces** :
+  - Rendu miniature officiel pour chaque lignée mémorisée.
+- **Édition directe sans avoir le Pokémon en équipe** :
+  - En cliquant sur une espèce ou sur `✏️ Modifier`, ouverture d'un écran dédié permettant de réactiver une capacité ignorée, d'ajouter manuellement une attaque à ignorer, ou de gérer les règles de remplacement du Mode Avancé.
+  - Bouton d'accès direct `👥 Voir dans l'Équipe Actuelle` si un membre de la lignée fait partie du groupe actif.
+
+### ⚙️ Options d'Affichage HUD
+
+- **Masquage du compteur sur la pastille** :
+  - Nouvelle option permettant de cacher le libellé `X passée(s)` de la pastille flottante pour une discrétion maximale en jeu, tout en continuant à incrémenter les statistiques de run et globales en arrière-plan.
+
+---
+
 ## [v1.5.0] - 2026-09-23
 
 ### 🌟 Nouveautés majeures
