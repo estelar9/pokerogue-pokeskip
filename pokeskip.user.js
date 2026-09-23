@@ -4525,6 +4525,8 @@
         const spriteUrl = LineageManager.getPokemonSpriteUrl(pkmn);
         const rule = PokeSkip.getFamilyRule(familyInfo.familyKey);
         const skippedCount = rule?.skippedMoves ? Object.keys(rule.skippedMoves).filter(k => !k.startsWith('id_')).length : 0;
+        const repRules = PokeSkip.getFamilyReplacements(pkmn);
+        const repActive = repRules.filter(r => r.enabled).length;
 
         const card = document.createElement('div');
         card.className = `pokeskip-member-card ${idx === this.selectedTeamIndex ? 'active' : ''}`;
@@ -4537,7 +4539,10 @@
           <div class="pokeskip-member-name">${name}</div>
           <div style="font-size: 11px; color: #94a3b8;">Niv. ${level}</div>
           ${isMega ? '<div class="pokeskip-mega-badge">🧬 MÉGA</div>' : ''}
-          <div class="pokeskip-member-badge">${skippedCount > 0 ? `${skippedCount} ignorée(s)` : 'Toutes gardées'}</div>
+          <div class="pokeskip-member-badge">
+            ${skippedCount > 0 ? `${skippedCount} ignorée(s)` : 'Toutes gardées'}
+            ${PokeSkip.settings.advancedMode && repActive > 0 ? `<span style="background: rgba(168,85,247,0.3); color: #d8b4fe; padding: 1px 5px; border-radius: 4px; font-size: 10px; margin-left: 4px; font-weight: 700;">⚡ ${repActive} remp.</span>` : ''}
+          </div>
         `;
         card.addEventListener('click', () => {
           this.selectedTeamIndex = idx;
@@ -4589,7 +4594,9 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+          <div id="pokeskip-pokemon-replacements-slot"></div>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 14px; margin-top: 14px;">
             <input type="text" id="pokeskip-move-filter" placeholder="Filtrer une attaque par nom..." style="background:#111a2e; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; flex:1;">
           </div>
 
@@ -4687,23 +4694,42 @@
       });
 
       if (PokeSkip.settings.advancedMode) {
-        const currentMoveset = typeof pokemon.getMoveset === 'function' ? pokemon.getMoveset() : (pokemon.moveset || []);
-        const currentMoveNames = currentMoveset.map(m => {
-          if (!m) return '';
-          if (typeof m.getName === 'function') return m.getName();
-          if (typeof m.getMove === 'function') return m.getMove()?.name || '';
-          return m.name || (m.moveId ? PokeSkip.knownMovesCache[m.moveId] : '') || '';
-        }).filter(Boolean);
+        const slotEl = container.querySelector('#pokeskip-pokemon-replacements-slot');
+        if (slotEl) {
+          const currentMoveset = typeof pokemon.getMoveset === 'function' ? pokemon.getMoveset() : (pokemon.moveset || []);
+          const currentMoveNames = currentMoveset.map(m => {
+            if (!m) return '';
+            if (typeof m.getName === 'function') return m.getName();
+            if (typeof m.getMove === 'function') return m.getMove()?.name || '';
+            return m.name || (m.moveId ? PokeSkip.knownMovesCache[m.moveId] : '') || '';
+          }).filter(Boolean);
 
-        const repWrapper = document.createElement('div');
-        container.firstElementChild.appendChild(repWrapper);
-
-        const refreshReplacements = () => {
-          repWrapper.innerHTML = '';
-          this.renderReplacementSection(repWrapper, pokemon, learnable, currentMoveNames, refreshReplacements);
-          renderGrid(container.querySelector('#pokeskip-move-filter').value);
-        };
-        refreshReplacements();
+          const refreshReplacements = () => {
+            slotEl.innerHTML = '';
+            this.renderReplacementSection(slotEl, pokemon, learnable, currentMoveNames, refreshReplacements);
+            renderGrid(container.querySelector('#pokeskip-move-filter').value);
+            // Rafraîchir les compteurs sur les cartes de l'équipe
+            const teamContainer = document.getElementById('pokeskip-team-selector');
+            if (teamContainer) {
+              const activeCards = teamContainer.querySelectorAll('.pokeskip-member-card');
+              const currentCard = activeCards[this.selectedTeamIndex];
+              if (currentCard) {
+                const repRules = PokeSkip.getFamilyReplacements(pokemon);
+                const repActive = repRules.filter(r => r.enabled).length;
+                const badgeEl = currentCard.querySelector('.pokeskip-member-badge');
+                if (badgeEl) {
+                  const rule = PokeSkip.getFamilyRule(familyInfo.familyKey);
+                  const skippedCount = rule?.skippedMoves ? Object.keys(rule.skippedMoves).filter(k => !k.startsWith('id_')).length : 0;
+                  badgeEl.innerHTML = `
+                    ${skippedCount > 0 ? `${skippedCount} ignorée(s)` : 'Toutes gardées'}
+                    ${repActive > 0 ? `<span style="background: rgba(168,85,247,0.3); color: #d8b4fe; padding: 1px 5px; border-radius: 4px; font-size: 10px; margin-left: 4px; font-weight: 700;">⚡ ${repActive} remp.</span>` : ''}
+                  `;
+                }
+              }
+            }
+          };
+          refreshReplacements();
+        }
       }
     },
 
