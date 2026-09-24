@@ -3113,7 +3113,21 @@
       return (rule && Array.isArray(rule.replacements)) ? rule.replacements : [];
     },
 
-    addReplacementRule(target, newMoveName, oldMoveName, newMoveId = null, oldMoveId = null) {
+    addReplacementRule(target, newMoveName, arg2, arg3 = null, arg4 = null) {
+      let oldMoveName = '';
+      let newMoveId = null;
+      let oldMoveId = null;
+
+      if (typeof arg2 === 'string') {
+        oldMoveName = arg2;
+        newMoveId = arg3;
+        oldMoveId = arg4;
+      } else {
+        newMoveId = arg2;
+        oldMoveName = typeof arg3 === 'string' ? arg3 : '';
+        oldMoveId = arg4;
+      }
+
       if (!newMoveName || !oldMoveName) return null;
       const familyInfo = LineageManager.getFamilyInfo(target);
       const famKey = familyInfo.familyKey;
@@ -3123,6 +3137,7 @@
           familyId: familyInfo.rootId,
           lineageName: familyInfo.lineageName,
           skippedMoves: {},
+          skipAll: false,
           replacements: [],
           updatedAt: Date.now()
         };
@@ -3137,7 +3152,7 @@
       );
 
       const ruleObj = {
-        id: 'repl_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        id: 'rep_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
         newMoveName: newMoveName.trim(),
         newMoveId: newMoveId || null,
         oldMoveName: oldMoveName.trim(),
@@ -4975,9 +4990,117 @@
       const replacements = PokeSkip.getFamilyReplacements(target);
       const activeCount = replacements.filter(r => r.enabled).length;
 
-      // Suggestions
-      const learnableNames = Array.from(new Set(defaultLearnable.map(m => (m && (m.name || m)) || '').filter(Boolean))).sort();
-      const currentNames = Array.from(new Set(defaultCurrent.map(m => (m && (m.name || m)) || '').filter(Boolean))).sort();
+      // Préparation et déduplication des capacités avec leurs niveaux
+      const moveMap = new Map();
+
+      const getMoveLevelWeight = (lvl) => {
+        if (typeof lvl === 'number') {
+          if (lvl < 0) return 0;
+          if (lvl === 0) return 0.5;
+          return lvl;
+        }
+        if (typeof lvl === 'string') {
+          const s = lvl.trim().toLowerCase();
+          if (s.includes('départ') || s.includes('depart')) return 0;
+          if (s.includes('évol') || s.includes('evol')) return 0.5;
+          if (s.includes('actuelle')) return 0.1;
+          const match = s.match(/\d+/);
+          if (match) return parseInt(match[0], 10);
+        }
+        return 999;
+      };
+
+      if (Array.isArray(defaultLearnable)) {
+        for (const item of defaultLearnable) {
+          if (!item) continue;
+          const rawName = typeof item === 'string' ? item : item.name;
+          const name = (rawName || '').trim();
+          if (!name) continue;
+          const key = name.toLowerCase();
+          const level = typeof item === 'object' && item.level !== undefined ? item.level : null;
+          const weight = getMoveLevelWeight(level);
+
+          if (!moveMap.has(key)) {
+            moveMap.set(key, { name, level, isCurrent: false, weight });
+          } else {
+            const existing = moveMap.get(key);
+            if (existing.weight === 999 && weight !== 999) {
+              existing.level = level;
+              existing.weight = weight;
+            }
+          }
+        }
+      }
+
+      if (Array.isArray(defaultCurrent)) {
+        for (const item of defaultCurrent) {
+          if (!item) continue;
+          const rawName = typeof item === 'string' ? item : item.name;
+          const name = (rawName || '').trim();
+          if (!name) continue;
+          const key = name.toLowerCase();
+          if (moveMap.has(key)) {
+            moveMap.get(key).isCurrent = true;
+          } else {
+            moveMap.set(key, { name, level: 'Actuelle', isCurrent: true, weight: 0.1 });
+          }
+        }
+      }
+
+      const familyRule = PokeSkip.getFamilyRule(target);
+      if (familyRule) {
+        if (familyRule.skippedMoves) {
+          for (const rawName of Object.keys(familyRule.skippedMoves)) {
+            if (rawName.startsWith('id_')) continue;
+            const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+            const key = name.toLowerCase();
+            if (!moveMap.has(key)) {
+              moveMap.set(key, { name, level: null, isCurrent: false, weight: 999 });
+            }
+          }
+        }
+        if (Array.isArray(familyRule.replacements)) {
+          for (const rep of familyRule.replacements) {
+            if (rep.oldMoveName && !moveMap.has(rep.oldMoveName.toLowerCase())) {
+              moveMap.set(rep.oldMoveName.toLowerCase(), { name: rep.oldMoveName, level: null, isCurrent: false, weight: 999 });
+            }
+            if (rep.newMoveName && !moveMap.has(rep.newMoveName.toLowerCase())) {
+              moveMap.set(rep.newMoveName.toLowerCase(), { name: rep.newMoveName, level: null, isCurrent: false, weight: 999 });
+            }
+          }
+        }
+      }
+
+      // Tri strict par niveau obtenu croissant, puis ordre alphabétique
+      const sortedMoves = Array.from(moveMap.values()).sort((a, b) => {
+        if (a.weight !== b.weight) {
+          return a.weight - b.weight;
+        }
+        return a.name.localeCompare(b.name, 'fr');
+      });
+
+      const formatOptionText = (m, showCurrentBadge = true) => {
+        let prefix = '';
+        if (m.level !== undefined && m.level !== null && m.level !== '') {
+          if (typeof m.level === 'number') {
+            if (m.level < 0) prefix = '[Départ] ';
+            else if (m.level === 0) prefix = '[Évolution] ';
+            else prefix = `[Niv. ${m.level}] `;
+          } else {
+            const s = String(m.level).trim();
+            if (/^\d+$/.test(s)) prefix = `[Niv. ${s}] `;
+            else if (/évol/i.test(s)) prefix = '[Évolution] ';
+            else if (/départ|depart/i.test(s)) prefix = '[Départ] ';
+            else if (/actuelle/i.test(s)) prefix = '[Actuelle] ';
+            else prefix = `[${s}] `;
+          }
+        } else if (m.isCurrent && showCurrentBadge) {
+          prefix = '[Actuelle] ';
+        }
+
+        const suffix = (m.isCurrent && showCurrentBadge && prefix !== '[Actuelle] ') ? ' (Actuelle)' : '';
+        return `${prefix}${m.name}${suffix}`;
+      };
 
       const uniqueRand = Math.random().toString(36).substring(2, 6);
       const newDatalistId = `datalist-new-${uniqueRand}`;
@@ -5006,31 +5129,30 @@
         </div>
 
         <div style="font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.4;">
-          Quand cette lignée apprend l'une des nouvelles capacités et possède 4 capacités, l'ancienne capacité est automatiquement remplacée sans interrompre le jeu.
+          Définit les attaques à remplacer automatiquement : dès que la nouvelle capacité est débloquée et que le Pokémon possède 4 attaques, l'ancienne est remplacée sans interrompre le jeu.
         </div>
 
-        <!-- Formulaire d'ajout -->
+        <!-- Formulaire d'ajout : Ancienne attaque d'abord, puis Nouvelle attaque -->
         <div style="background: #111a2e; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
           <div style="font-size: 12px; font-weight: 600; color: #f8fafc; margin-bottom: 8px;">
             ➕ Ajouter une règle de remplacement :
           </div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 170px;">
-              <div style="font-size: 11px; color: #94a3b8; margin-bottom: 3px;">Quand il débloque :</div>
-              <input type="text" class="pokeskip-rep-input-new" list="${newDatalistId}" placeholder="Nouvelle capacité..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
-              <datalist id="${newDatalistId}">
-                ${learnableNames.map(n => `<option value="${n}">`).join('')}
+              <div style="font-size: 11px; color: #f43f5e; font-weight: 600; margin-bottom: 3px;">Toujours remplacer :</div>
+              <input type="text" class="pokeskip-rep-input-old" list="${oldDatalistId}" placeholder="Ancienne capacité..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <datalist id="${oldDatalistId}">
+                ${sortedMoves.map(m => `<option value="${formatOptionText(m, true)}" label="${formatOptionText(m, true)}">`).join('')}
               </datalist>
             </div>
 
-            <div style="color: #c084fc; font-weight: bold; font-size: 16px; padding-top: 16px;">➔</div>
+            <div style="color: #c084fc; font-weight: bold; font-size: 14px; padding-top: 16px; white-space: nowrap;">➔ par ➔</div>
 
             <div style="flex: 1; min-width: 170px;">
-              <div style="font-size: 11px; color: #94a3b8; margin-bottom: 3px;">Remplacer l'actuelle :</div>
-              <input type="text" class="pokeskip-rep-input-old" list="${oldDatalistId}" placeholder="Capacité à remplacer..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
-              <datalist id="${oldDatalistId}">
-                ${currentNames.map(n => `<option value="${n}"> (Actuelle)`).join('')}
-                ${learnableNames.filter(n => !currentNames.includes(n)).map(n => `<option value="${n}">`).join('')}
+              <div style="font-size: 11px; color: #38bdf8; font-weight: 600; margin-bottom: 3px;">Par la nouvelle :</div>
+              <input type="text" class="pokeskip-rep-input-new" list="${newDatalistId}" placeholder="Nouvelle capacité..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <datalist id="${newDatalistId}">
+                ${sortedMoves.map(m => `<option value="${formatOptionText(m, false)}" label="${formatOptionText(m, false)}">`).join('')}
               </datalist>
             </div>
 
@@ -5047,14 +5169,15 @@
           ${replacements.length === 0 ? `
             <div style="color: #64748b; font-size: 12px; text-align: center; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px;">
               Aucune règle de remplacement pour <b>${familyInfo.lineageName}</b>.<br>
-              Créez une règle ci-dessus pour remplacer automatiquement une attaque dès son déblocage.
+              Créez une règle ci-dessus pour remplacer automatiquement une ancienne attaque dès le déblocage d'une nouvelle.
             </div>
           ` : replacements.map(r => `
             <div style="background: #111a2e; border: 1px solid ${r.enabled ? 'rgba(168, 85, 247, 0.35)' : 'rgba(255, 255, 255, 0.08)'}; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; opacity: ${r.enabled ? '1' : '0.6'};">
               <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <span style="font-weight: 700; color: #38bdf8; font-size: 13px;">${r.newMoveName}</span>
-                <span style="color: #a855f7; font-size: 12px; font-weight: bold;">➔ remplace ➔</span>
+                <span style="font-size: 12px; color: #94a3b8;">Toujours remplacer</span>
                 <span style="font-weight: 700; color: #f43f5e; font-size: 13px;">${r.oldMoveName}</span>
+                <span style="color: #a855f7; font-size: 12px; font-weight: bold;">➔ par ➔</span>
+                <span style="font-weight: 700; color: #38bdf8; font-size: 13px;">${r.newMoveName}</span>
                 <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: ${r.enabled ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.06)'}; color: ${r.enabled ? '#c084fc' : '#94a3b8'};">
                   ${r.enabled ? 'Active' : 'Désactivée'}
                 </span>
@@ -5074,15 +5197,26 @@
 
       container.appendChild(secEl);
 
-      const inputNew = secEl.querySelector('.pokeskip-rep-input-new');
       const inputOld = secEl.querySelector('.pokeskip-rep-input-old');
+      const inputNew = secEl.querySelector('.pokeskip-rep-input-new');
       const btnAdd = secEl.querySelector('.pokeskip-btn-add-rep');
 
+      const cleanMoveName = (raw) => {
+        if (!raw) return '';
+        return String(raw)
+          .replace(/^\[.*?\]\s*/, '')
+          .replace(/\s*\(.*?\)$/, '')
+          .trim();
+      };
+
       const handleAdd = () => {
-        const newM = inputNew?.value.trim();
-        const oldM = inputOld?.value.trim();
-        if (!newM || !oldM) {
-          UI.showToast('Veuillez renseigner la nouvelle capacité et celle à remplacer.', 'warning');
+        const rawOld = inputOld?.value.trim();
+        const rawNew = inputNew?.value.trim();
+        const oldM = cleanMoveName(rawOld);
+        const newM = cleanMoveName(rawNew);
+
+        if (!oldM || !newM) {
+          UI.showToast('Veuillez renseigner l\'ancienne capacité à remplacer et la nouvelle capacité.', 'warning');
           return;
         }
         if (newM.toLowerCase() === oldM.toLowerCase()) {
@@ -5090,10 +5224,10 @@
           return;
         }
 
-        PokeSkip.addReplacementRule(target, newM, null, oldM, null);
+        PokeSkip.addReplacementRule(target, newM, oldM, null, null);
         PokeSkip.setMoveSkipped(target, null, newM, null, false);
 
-        UI.showToast(`Règle enregistrée : <b>${newM}</b> remplacera <b>${oldM}</b> sur <b>${familyInfo.lineageName}</b>`, 'success');
+        UI.showToast(`Règle enregistrée : Toujours remplacer <b>${oldM}</b> par <b>${newM}</b> sur <b>${familyInfo.lineageName}</b>`, 'success');
         if (typeof onUpdate === 'function') {
           onUpdate();
         }
@@ -5101,7 +5235,24 @@
 
       btnAdd?.addEventListener('click', handleAdd);
       inputOld?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (!inputNew?.value.trim()) {
+            inputNew?.focus();
+            try { if (typeof inputNew.showPicker === 'function') inputNew.showPicker(); } catch (err) {}
+          } else {
+            handleAdd();
+          }
+        }
+      });
+      inputNew?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') handleAdd();
+      });
+
+      inputOld?.addEventListener('click', () => {
+        try { if (typeof inputOld.showPicker === 'function') inputOld.showPicker(); } catch (err) {}
+      });
+      inputNew?.addEventListener('click', () => {
+        try { if (typeof inputNew.showPicker === 'function') inputNew.showPicker(); } catch (err) {}
       });
 
       secEl.querySelectorAll('.pokeskip-btn-toggle-single-rep').forEach(btn => {

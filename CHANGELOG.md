@@ -17,8 +17,8 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
   - Le Mode Avancé est **désactivé par défaut** et caché derrière un interrupteur dans l'onglet **Options & Sauvegarde**.
   - Sa désactivation suspend immédiatement la fonctionnalité en jeu et masque les formulaires de remplacement, tout en **conservant précieusement en mémoire toutes les règles configurées** en cas de réactivation.
 - **Gestion Flexible des Règles par Lignée** :
-  - Création de règles intuitives : *Quand il débloque [Attaque B] ➔ Remplacer l'actuelle [Attaque A]*.
-  - Suggestions intelligentes avec listes déroulantes basées sur les attaques apprenables et actuelles.
+  - Création de règles intuitives suivant la logique : *Toujours remplacer [Ancienne Attaque A] ➔ par ➔ [Nouvelle Attaque B]*.
+  - Suggestions intelligentes avec listes déroulantes **triées chronologiquement par niveau d'obtention** avec affichage explicite des niveaux (`[Niv. X]`, `[Départ]`, `[Évolution]`, `(Actuelle)`).
   - Activation ou désactivation individuelle d'une règle (bouton toggle ON/OFF).
   - Suppression d'une règle individuelle (icône 🗑️) ou suppression groupée de toutes les règles de la lignée.
 
