@@ -13,25 +13,66 @@
 
   // --- RÉFÉRENTIELS TYPES & CATÉGORIES POKÉMON ---
   const POKEMON_TYPES = [
-    { name: 'Normal', color: '#f8fafc', bg: '#64748b' },
-    { name: 'Combat', color: '#ffffff', bg: '#b91c1c' },
-    { name: 'Vol', color: '#ffffff', bg: '#2563eb' },
-    { name: 'Poison', color: '#ffffff', bg: '#7e22ce' },
-    { name: 'Sol', color: '#ffffff', bg: '#b45309' },
-    { name: 'Roche', color: '#ffffff', bg: '#78350f' },
-    { name: 'Insecte', color: '#ffffff', bg: '#4d7c0f' },
-    { name: 'Spectre', color: '#ffffff', bg: '#581c87' },
-    { name: 'Acier', color: '#ffffff', bg: '#475569' },
-    { name: 'Feu', color: '#ffffff', bg: '#dc2626' },
-    { name: 'Eau', color: '#ffffff', bg: '#0284c7' },
-    { name: 'Plante', color: '#ffffff', bg: '#16a34a' },
-    { name: 'Électrik', color: '#0f172a', bg: '#eab308' },
-    { name: 'Psy', color: '#ffffff', bg: '#db2777' },
-    { name: 'Glace', color: '#0f172a', bg: '#38bdf8' },
-    { name: 'Dragon', color: '#ffffff', bg: '#4338ca' },
-    { name: 'Ténèbres', color: '#ffffff', bg: '#27272a' },
-    { name: 'Fée', color: '#ffffff', bg: '#be185d' },
-    { name: 'Stellaire', color: '#ffffff', bg: '#4f46e5' }
+    { name: 'Normal', code: 'NOR', color: '#ffffff', bg: '#A8A77A' },
+    { name: 'Combat', code: 'COM', color: '#ffffff', bg: '#C22E28' },
+    { name: 'Vol', code: 'VOL', color: '#ffffff', bg: '#A98FF3' },
+    { name: 'Poison', code: 'POI', color: '#ffffff', bg: '#A33EA1' },
+    { name: 'Sol', code: 'SOL', color: '#0f172a', bg: '#E2BF65' },
+    { name: 'Roche', code: 'ROC', color: '#ffffff', bg: '#B6A136' },
+    { name: 'Insecte', code: 'INS', color: '#ffffff', bg: '#A6B91A' },
+    { name: 'Spectre', code: 'SPE', color: '#ffffff', bg: '#735797' },
+    { name: 'Acier', code: 'ACI', color: '#0f172a', bg: '#B7B7CE' },
+    { name: 'Feu', code: 'FEU', color: '#ffffff', bg: '#EE8130' },
+    { name: 'Eau', code: 'EAU', color: '#ffffff', bg: '#6390F0' },
+    { name: 'Plante', code: 'PLA', color: '#ffffff', bg: '#7AC74C' },
+    { name: 'Électrik', code: 'ÉLE', color: '#0f172a', bg: '#F7D02C' },
+    { name: 'Psy', code: 'PSY', color: '#ffffff', bg: '#F95587' },
+    { name: 'Glace', code: 'GLA', color: '#0f172a', bg: '#96D9D6' },
+    { name: 'Dragon', code: 'DRA', color: '#ffffff', bg: '#6F35FC' },
+    { name: 'Ténèbres', code: 'TÉN', color: '#ffffff', bg: '#705746' },
+    { name: 'Fée', code: 'FÉE', color: '#ffffff', bg: '#D685AD' },
+    { name: 'Stellaire', code: 'STE', color: '#ffffff', bg: '#4F55A8' }
+  ];
+
+  // Matrice 18x18 d'efficacité des types (Gen 6-9) : TYPE_CHART[attaquant][défenseur]
+  // 1 = normal, 2 = super efficace, 0.5 = peu efficace, 0 = inefficace
+  const TYPE_CHART = [
+    // 0: Normal
+    [1, 1, 1, 1, 1, 0.5, 1, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    // 1: Combat
+    [2, 1, 0.5, 0.5, 1, 2, 0.5, 0, 2, 1, 1, 1, 1, 0.5, 2, 1, 2, 0.5],
+    // 2: Vol
+    [1, 2, 1, 1, 1, 0.5, 2, 1, 0.5, 1, 1, 2, 0.5, 1, 1, 1, 1, 1],
+    // 3: Poison
+    [1, 1, 1, 0.5, 0.5, 0.5, 1, 0.5, 0, 1, 1, 2, 1, 1, 1, 1, 1, 2],
+    // 4: Sol
+    [1, 1, 0, 2, 1, 2, 0.5, 1, 2, 2, 1, 0.5, 2, 1, 1, 1, 1, 1],
+    // 5: Roche
+    [1, 0.5, 2, 1, 0.5, 1, 2, 1, 0.5, 2, 1, 1, 1, 1, 2, 1, 1, 1],
+    // 6: Insecte
+    [1, 0.5, 0.5, 0.5, 1, 1, 1, 0.5, 0.5, 0.5, 1, 2, 1, 2, 1, 1, 2, 0.5],
+    // 7: Spectre
+    [0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 0.5, 1],
+    // 8: Acier
+    [1, 1, 1, 1, 1, 2, 1, 1, 0.5, 0.5, 0.5, 1, 0.5, 1, 2, 1, 1, 2],
+    // 9: Feu
+    [1, 1, 1, 1, 1, 0.5, 2, 1, 2, 0.5, 0.5, 2, 1, 1, 2, 0.5, 1, 1],
+    // 10: Eau
+    [1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 0.5, 0.5, 1, 1, 1, 0.5, 1, 1],
+    // 11: Plante
+    [1, 1, 0.5, 0.5, 2, 2, 0.5, 1, 0.5, 0.5, 2, 0.5, 1, 1, 1, 0.5, 1, 1],
+    // 12: Électrik
+    [1, 1, 2, 1, 0, 1, 1, 1, 1, 1, 2, 0.5, 0.5, 1, 1, 0.5, 1, 1],
+    // 13: Psy
+    [1, 2, 1, 2, 1, 1, 1, 1, 0.5, 1, 1, 1, 1, 0.5, 1, 1, 0, 1],
+    // 14: Glace
+    [1, 1, 2, 1, 2, 1, 1, 1, 0.5, 0.5, 0.5, 2, 1, 1, 0.5, 2, 1, 1],
+    // 15: Dragon
+    [1, 1, 1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 1, 1, 1, 2, 1, 0],
+    // 16: Ténèbres
+    [1, 0.5, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 0.5, 0.5],
+    // 17: Fée
+    [1, 2, 1, 0.5, 1, 1, 1, 1, 0.5, 0.5, 1, 1, 1, 1, 1, 2, 2, 1]
   ];
 
   const MOVE_CATEGORIES = [
@@ -3547,6 +3588,156 @@
     return moves;
   }
 
+  // --- DÉTECTION DES TYPES DES POKÉMON ENNEMIS EN COMBAT (SIMPLE OU DOUBLE) ---
+  function getActiveEnemyTypes() {
+    try {
+      const scene = PokeSkip.scene || (typeof unsafeWindow !== 'undefined' ? unsafeWindow.globalScene : window.globalScene);
+      if (!scene) return { types: [], name: '', enemies: [] };
+
+      const activePokemonList = [];
+
+      const addPokemon = (p) => {
+        if (!p || typeof p !== 'object') return;
+        const actual = p.pokemon || p;
+        if (!actual) return;
+        // Vérifier que c'est bien une entité Pokémon (types ou espèce)
+        const hasTypes = typeof actual.getTypes === 'function' || Array.isArray(actual.types) || actual.species || actual.type1 !== undefined;
+        if (!hasTypes) return;
+        // Exclure les Pokémon KO / fainted
+        if (typeof actual.isFainted === 'function' && actual.isFainted()) return;
+        if (actual.hp !== undefined && actual.hp <= 0) return;
+        // Éviter les doublons
+        if (activePokemonList.some(item => item === actual || (item.id && actual.id && item.id === actual.id))) return;
+        activePokemonList.push(actual);
+      };
+
+      // 1. Accès via scene.getEnemyField() (combat simple ou double)
+      if (typeof scene.getEnemyField === 'function') {
+        try {
+          const field = scene.getEnemyField();
+          if (Array.isArray(field)) {
+            field.forEach(addPokemon);
+          }
+        } catch (_) {}
+      }
+
+      // 2. Accès via scene.enemySide.pokemon ou scene.enemySide.active
+      if (scene.enemySide) {
+        if (Array.isArray(scene.enemySide.pokemon)) {
+          scene.enemySide.pokemon.forEach(addPokemon);
+        }
+        if (Array.isArray(scene.enemySide.active)) {
+          scene.enemySide.active.forEach(addPokemon);
+        }
+      }
+
+      // 3. Accès via scene.getEnemyPokemon(0) et scene.getEnemyPokemon(1)
+      if (typeof scene.getEnemyPokemon === 'function') {
+        try {
+          addPokemon(scene.getEnemyPokemon(0));
+        } catch (_) {
+          try { addPokemon(scene.getEnemyPokemon()); } catch (_) {}
+        }
+        try {
+          addPokemon(scene.getEnemyPokemon(1));
+        } catch (_) {}
+      }
+
+      // 4. Accès via scene.currentBattle.getEnemyPokemon(0/1)
+      if (scene.currentBattle && typeof scene.currentBattle.getEnemyPokemon === 'function') {
+        try {
+          addPokemon(scene.currentBattle.getEnemyPokemon(0));
+        } catch (_) {
+          try { addPokemon(scene.currentBattle.getEnemyPokemon()); } catch (_) {}
+        }
+        try {
+          addPokemon(scene.currentBattle.getEnemyPokemon(1));
+        } catch (_) {}
+      }
+
+      // 5. Repli : si aucun trouvé, scruter currentBattle.enemyParty ou scene.enemyParty
+      if (activePokemonList.length === 0) {
+        const party = (scene.currentBattle && Array.isArray(scene.currentBattle.enemyParty))
+          ? scene.currentBattle.enemyParty
+          : (Array.isArray(scene.enemyParty) ? scene.enemyParty : null);
+
+        if (party && party.length > 0) {
+          const isDouble = Boolean(scene.currentBattle?.double || scene.currentBattle?.isDouble);
+          const count = isDouble ? Math.min(2, party.length) : 1;
+          for (let i = 0; i < count; i++) {
+            addPokemon(party[i]);
+          }
+        }
+      }
+
+      if (activePokemonList.length === 0) return { types: [], name: '', enemies: [] };
+
+      // Helper pour extraire les types d'un Pokémon
+      const getTypesFromPokemon = (poke) => {
+        let rawTypes = [];
+        if (typeof poke.getTypes === 'function') {
+          rawTypes = poke.getTypes();
+        } else if (Array.isArray(poke.types)) {
+          rawTypes = poke.types;
+        } else if (poke.type1 !== undefined || poke.type2 !== undefined) {
+          if (poke.type1 !== undefined && poke.type1 !== null) rawTypes.push(poke.type1);
+          if (poke.type2 !== undefined && poke.type2 !== null && poke.type2 !== poke.type1) rawTypes.push(poke.type2);
+        } else if (poke.species) {
+          if (poke.species.type1 !== undefined) rawTypes.push(poke.species.type1);
+          if (poke.species.type2 !== undefined && poke.species.type2 !== poke.species.type1) rawTypes.push(poke.species.type2);
+        }
+
+        const indices = [];
+        for (const t of rawTypes) {
+          if (typeof t === 'number' && t >= 0 && t < 18) {
+            if (!indices.includes(t)) indices.push(t);
+          } else if (typeof t === 'string') {
+            const idx = POKEMON_TYPES.findIndex(pt => pt.name.toLowerCase() === t.toLowerCase());
+            if (idx !== -1 && idx < 18 && !indices.includes(idx)) indices.push(idx);
+          } else if (t && typeof t === 'object' && t.name) {
+            const idx = POKEMON_TYPES.findIndex(pt => pt.name.toLowerCase() === t.name.toLowerCase());
+            if (idx !== -1 && idx < 18 && !indices.includes(idx)) indices.push(idx);
+          }
+        }
+        return indices;
+      };
+
+      // Helper pour extraire le nom d'un Pokémon
+      const getNameFromPokemon = (poke) => {
+        if (typeof poke.getName === 'function') return poke.getName();
+        if (poke.name) return poke.name;
+        if (poke.species?.name) return poke.species.name;
+        return 'Adversaire';
+      };
+
+      const enemies = [];
+      const allUniqueTypes = [];
+
+      for (const poke of activePokemonList) {
+        const pokeTypes = getTypesFromPokemon(poke);
+        const pokeName = getNameFromPokemon(poke);
+        enemies.push({
+          name: pokeName,
+          types: pokeTypes
+        });
+        for (const tIdx of pokeTypes) {
+          if (!allUniqueTypes.includes(tIdx)) {
+            allUniqueTypes.push(tIdx);
+          }
+        }
+      }
+
+      return {
+        types: allUniqueTypes,
+        name: enemies.map(e => e.name).join(' & '),
+        enemies: enemies
+      };
+    } catch (e) {
+      console.warn('[PokeSkip] Erreur détection types adverses:', e);
+      return { types: [], name: '', enemies: [] };
+    }
+  }
+
   // --- INTERFACE UTILISATEUR (HUD FLOTTANT & MODAL) ---
   const UI = {
     hudContainer: null,
@@ -3573,22 +3764,15 @@
           z-index: 999999;
           display: flex;
           align-items: center;
-          gap: 8px;
-          background: rgba(15, 23, 42, 0.94);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          gap: 6px;
+          background: transparent;
+          border: none;
           box-shadow: none !important;
-          backdrop-filter: blur(12px);
-          padding: 6px 14px;
-          border-radius: 9999px;
+          padding: 0;
           cursor: grab;
           user-select: none;
-          transition: border-color 0.2s;
           font-family: system-ui, -apple-system, sans-serif;
           color: #f8fafc;
-        }
-        #pokeskip-hud:hover {
-          border-color: rgba(255, 255, 255, 0.35);
-          box-shadow: none !important;
         }
         #pokeskip-hud.dragging {
           cursor: grabbing;
@@ -3596,62 +3780,106 @@
           opacity: 0.85;
           box-shadow: none !important;
         }
-        .pokeskip-ball-icon {
-          width: 20px;
-          height: 20px;
-          background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-          border-radius: 50%;
+        .pokeskip-hud-pill {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(15, 23, 42, 0.94);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          backdrop-filter: blur(12px);
+          padding: 4px 8px;
+          border-radius: 9999px;
+          cursor: pointer;
+          transition: border-color 0.2s, background 0.2s, transform 0.15s;
+        }
+        #pokeskip-hud.on .pokeskip-hud-pill {
+          border-color: rgba(56, 189, 248, 0.35);
+        }
+        #pokeskip-hud.off .pokeskip-hud-pill {
+          border-color: rgba(255, 255, 255, 0.08);
+          background: rgba(15, 23, 42, 0.82);
+        }
+        .pokeskip-hud-pill:hover {
+          border-color: rgba(56, 189, 248, 0.6);
+          transform: scale(1.02);
+        }
+        #pokeskip-hud-type-btn {
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-        }
-        .pokeskip-ball-center {
-          width: 8px;
-          height: 8px;
-          background: #ffffff;
+          width: 28px;
+          height: 28px;
+          min-width: 28px;
           border-radius: 50%;
-          border: 2px solid #0f172a;
-        }
-        .pokeskip-hud-title {
-          font-weight: 700;
+          background: rgba(15, 23, 42, 0.94);
+          border: 1px solid rgba(168, 85, 247, 0.45);
+          backdrop-filter: blur(12px);
+          color: #e9d5ff;
           font-size: 13px;
-          letter-spacing: 0.5px;
-          background: linear-gradient(135deg, #ffffff 40%, #bae6fd 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        .pokeskip-hud-status {
-          font-size: 11px;
-          font-weight: 700;
-          padding: 2px 7px;
-          border-radius: 6px;
-          letter-spacing: 0.3px;
+          line-height: 1;
+          cursor: pointer;
+          padding: 0;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          transition: all 0.2s ease;
           user-select: none;
         }
-        .pokeskip-hud-status.on {
-          background: rgba(16, 185, 129, 0.2);
-          color: #34d399;
-          border: 1px solid rgba(52, 211, 153, 0.35);
+        #pokeskip-hud-type-btn:hover {
+          background: rgba(168, 85, 247, 0.28);
+          border-color: #c084fc;
+          color: #ffffff;
+          transform: scale(1.12);
+          box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
         }
-        .pokeskip-hud-status.off {
-          background: rgba(148, 163, 184, 0.15);
-          color: #94a3b8;
-          border: 1px solid rgba(148, 163, 184, 0.25);
+        #pokeskip-hud-type-btn:active {
+          transform: scale(0.95);
         }
-        .pokeskip-hud-divider {
-          color: rgba(255, 255, 255, 0.2);
-          font-size: 12px;
-          font-weight: 300;
+        .pokeskip-hud-ball-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+        .pokeskip-hud-ball {
+          display: block;
+          flex-shrink: 0;
+          transition: all 0.25s ease;
+          border-radius: 50%;
+        }
+        .pokeskip-hud-ball.on {
+          filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.7));
+        }
+        .pokeskip-hud-ball.on:hover {
+          filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.95));
+        }
+        .pokeskip-hud-ball.off {
+          filter: grayscale(1) opacity(0.42);
+        }
+        .pokeskip-hud-ball.off:hover {
+          filter: grayscale(0.8) opacity(0.65);
+        }
+        @keyframes pksPulseCenter {
+          0%, 100% { fill: #34d399; filter: drop-shadow(0 0 1px #34d399); }
+          50% { fill: #10b981; filter: drop-shadow(0 0 3px #34d399); }
+        }
+        .pokeskip-hud-ball.on .pks-ball-center-dot {
+          animation: pksPulseCenter 2.5s infinite ease-in-out;
         }
         .pokeskip-hud-badge {
           font-size: 11px;
           padding: 2px 7px;
           border-radius: 12px;
-          background: rgba(14, 165, 233, 0.25);
+          background: rgba(14, 165, 233, 0.22);
           color: #7dd3fc;
           font-weight: 600;
-          border: 1px solid rgba(56, 189, 248, 0.3);
+          border: 1px solid rgba(56, 189, 248, 0.25);
+          white-space: nowrap;
+        }
+        .pokeskip-hud-status {
+          display: none;
+        }
+        .pokeskip-hud-divider {
+          display: none;
         }
 
         /* --- MODAL --- */
@@ -4055,6 +4283,522 @@
           from { transform: translateX(100%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
         }
+
+        /* --- TABLEAU DES TYPES 18x18 --- */
+        #pokeskip-typechart-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 1000000;
+          display: none;
+          align-items: center;
+          align-items: safe center;
+          justify-content: center;
+          padding: 8px;
+          background: rgba(3, 7, 18, 0.85);
+          backdrop-filter: blur(6px);
+          user-select: none;
+          font-family: system-ui, -apple-system, sans-serif;
+          box-sizing: border-box;
+          overflow: auto;
+        }
+        .pokeskip-typechart-box {
+          background: #090e1a;
+          border: 1px solid rgba(168, 85, 247, 0.4);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(168, 85, 247, 0.15);
+          border-radius: 10px;
+          padding: 8px 12px;
+          width: 760px;
+          min-width: 760px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          box-sizing: border-box;
+          overflow: hidden;
+          zoom: var(--pks-tc-scale, 1);
+          transform-origin: center center;
+          transition: zoom 0.12s ease-out, transform 0.12s ease-out;
+        }
+        @supports not (zoom: 1) {
+          .pokeskip-typechart-box {
+            transform: scale(var(--pks-tc-scale, 1));
+          }
+        }
+        .pokeskip-typechart-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          padding-bottom: 4px;
+          min-height: 32px;
+          box-sizing: border-box;
+        }
+        .pokeskip-typechart-close {
+          background: none;
+          border: none;
+          color: #94a3b8;
+          font-size: 20px;
+          cursor: pointer;
+          padding: 0 4px;
+          line-height: 1;
+        }
+        .pokeskip-typechart-close:hover {
+          color: #fff;
+        }
+        .pokeskip-typechart-table-wrap {
+          overflow: visible;
+          border-radius: 6px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          padding: 6px 4px 14px 4px;
+          background: rgba(10, 15, 29, 0.5);
+          box-sizing: border-box;
+          height: 550px;
+          min-height: 550px;
+          max-height: 550px;
+        }
+        .pokeskip-typechart-table {
+          border-collapse: separate;
+          border-spacing: 1px;
+          background: #0b1329;
+          margin: 0 auto;
+          font-size: 11.5px;
+          table-layout: fixed;
+          width: auto;
+        }
+        .pokeskip-th-corner {
+          background: #070d1e;
+          color: #94a3b8;
+          font-size: 9px;
+          padding: 2px 3px;
+          text-align: center;
+          position: sticky;
+          top: 0;
+          left: 0;
+          z-index: 4;
+          width: 66px;
+          min-width: 66px;
+          max-width: 66px;
+          height: 66px;
+          min-height: 66px;
+          max-height: 66px;
+          box-sizing: border-box;
+          vertical-align: middle;
+          border-radius: 3px;
+        }
+        .pokeskip-th-col {
+          padding: 0;
+          width: 24px;
+          min-width: 24px;
+          max-width: 24px;
+          height: 66px;
+          min-height: 66px;
+          max-height: 66px;
+          position: sticky;
+          top: 0;
+          z-index: 3;
+          border-radius: 3px;
+          position: relative;
+          box-sizing: border-box;
+          vertical-align: middle;
+          text-align: center;
+          color: #ffffff !important;
+          border: 1px solid rgba(0, 0, 0, 0.5);
+          background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.28) 100%);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.45);
+        }
+        .pokeskip-th-col.highlighted-col {
+          outline: 2px solid #38bdf8;
+          box-shadow: 0 0 10px rgba(56, 189, 248, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+          z-index: 5;
+        }
+        .pokeskip-th-col-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          box-sizing: border-box;
+          overflow: hidden;
+          position: relative;
+        }
+        .pokeskip-th-col.highlighted-col .pokeskip-th-col-content {
+          padding-top: 6px;
+        }
+        .pokeskip-col-marker {
+          position: absolute;
+          top: 2px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 8px;
+          line-height: 1;
+          z-index: 2;
+        }
+        .pokeskip-th-col-name {
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          white-space: nowrap;
+          font-size: 9px;
+          font-weight: 800;
+          letter-spacing: 0.2px;
+          text-transform: uppercase;
+          line-height: 1;
+          color: #ffffff !important;
+          text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 1px 2px rgba(0, 0, 0, 0.95);
+          display: inline-block;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .pokeskip-th-row {
+          padding: 0 4px;
+          width: 66px;
+          min-width: 66px;
+          max-width: 66px;
+          height: 24px;
+          line-height: 22px;
+          text-align: center;
+          position: sticky;
+          left: 0;
+          z-index: 2;
+          border-radius: 3px;
+          white-space: nowrap;
+          font-size: 9px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.2px;
+          color: #ffffff !important;
+          border: 1px solid rgba(0, 0, 0, 0.5);
+          background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.28) 100%);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.45);
+          text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 1px 2px rgba(0, 0, 0, 0.95);
+          box-sizing: border-box;
+          transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .pokeskip-td-cell {
+          text-align: center;
+          padding: 0;
+          width: 24px;
+          min-width: 24px;
+          max-width: 24px;
+          height: 24px;
+          line-height: 24px;
+          border-radius: 2px;
+          font-size: 11.5px;
+          box-sizing: border-box;
+          transition: background 0.1s;
+          user-select: none;
+        }
+        /* ×2 Super efficace : Vert éclatant, bordure et contraste puissant */
+        .pokeskip-td-cell.super {
+          background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+          color: #ffffff !important;
+          font-weight: 900;
+          border: 1px solid rgba(0, 0, 0, 0.4);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+        }
+        /* ×0.5 Peu efficace : Rouge vif soutenu, haute lisibilité */
+        .pokeskip-td-cell.half {
+          background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+          color: #ffffff !important;
+          font-weight: 900;
+          border: 1px solid rgba(0, 0, 0, 0.4);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+        }
+        /* ×0 Inefficace : Noir profond avec bordure contrastée et 0 éclatant */
+        .pokeskip-td-cell.zero {
+          background: #020617;
+          color: #f1f5f9 !important;
+          font-weight: 900;
+          border: 1px solid rgba(255, 255, 255, 0.28);
+          box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.5);
+          text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+        /* ×1 Neutre : Subtil pour faire ressortir les 2, ½ et 0 */
+        .pokeskip-td-cell.neutral {
+          color: #64748b;
+          font-size: 11px;
+          border: 1px solid transparent;
+        }
+
+        /* --- ZÉBRURE UNE LIGNE SUR DEUX --- */
+        .pokeskip-typechart-table tbody tr:nth-child(odd) .pokeskip-td-cell.neutral {
+          background: rgba(255, 255, 255, 0.025);
+        }
+        .pokeskip-typechart-table tbody tr:nth-child(even) .pokeskip-td-cell.neutral {
+          background: rgba(255, 255, 255, 0.065);
+          color: #94a3b8;
+        }
+
+        /* --- SURVOL D'UNE LIGNE POUR LECTURE FACILE --- */
+        .pokeskip-typechart-table tbody tr:hover {
+          outline: 1.5px solid rgba(255, 255, 255, 0.25);
+        }
+        .pokeskip-typechart-table tbody tr:hover .pokeskip-td-cell.neutral {
+          background: rgba(255, 255, 255, 0.14);
+          color: #ffffff;
+        }
+        .pokeskip-typechart-table tbody tr:hover .pokeskip-th-row {
+          outline: 2px solid #ffffff;
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        /* --- CELLULES SURLIGNÉES ADVERSAIRE --- */
+        .pokeskip-td-cell.highlighted-cell {
+          outline: 1.5px solid #38bdf8;
+          z-index: 1;
+        }
+        .pokeskip-td-cell.highlighted-cell.super {
+          background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%);
+          box-shadow: 0 0 8px rgba(56, 189, 248, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+        .pokeskip-td-cell.highlighted-cell.half {
+          background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+          box-shadow: 0 0 8px rgba(56, 189, 248, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        .pokeskip-td-cell.highlighted-cell.zero {
+          background: #000000;
+          border-color: #38bdf8;
+          box-shadow: 0 0 8px rgba(56, 189, 248, 0.9);
+        }
+        .pokeskip-td-cell.highlighted-cell.neutral {
+          background: rgba(56, 189, 248, 0.18);
+          color: #ffffff;
+          font-weight: 600;
+        }
+
+        .pokeskip-typechart-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 6px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          padding-top: 3px;
+        }
+        .pokeskip-typechart-legend {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 10px;
+          color: #cbd5e1;
+        }
+        .legend-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 15px;
+          height: 15px;
+          border-radius: 2px;
+          font-size: 9.5px;
+          font-weight: 900;
+        }
+        .legend-badge.super {
+          background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+          color: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.4);
+        }
+        .legend-badge.half {
+          background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+          color: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.4);
+        }
+        .legend-badge.zero {
+          background: #020617;
+          color: #f1f5f9;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .legend-badge.neutral {
+          background: rgba(255, 255, 255, 0.06);
+          color: #64748b;
+        }
+
+        /* --- COMMUTATEUR DE MODE (TABLEAU VS SIMPLIFIÉ) --- */
+        .pokeskip-mode-switch {
+          display: inline-flex;
+          align-items: center;
+          background: rgba(15, 23, 42, 0.95);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 6px;
+          padding: 2px;
+          gap: 2px;
+        }
+        .pokeskip-mode-btn {
+          background: transparent;
+          border: none;
+          color: #94a3b8;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 2px 9px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.15s;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .pokeskip-mode-btn:hover {
+          color: #fff;
+          background: rgba(255, 255, 255, 0.08);
+        }
+        .pokeskip-mode-btn.active {
+          background: #38bdf8;
+          color: #0f172a;
+          font-weight: 700;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- MODE SIMPLIFIÉ (VUE SYNTHÉTIQUE 1 COLONNE AVEC PASTILLES 3D HOMOGÈNES) --- */
+        .pokeskip-ref-container {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding: 6px 8px 10px 8px;
+          box-sizing: border-box;
+          height: 550px;
+          min-height: 550px;
+          max-height: 550px;
+          border-radius: 6px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(10, 15, 29, 0.5);
+          overflow-y: hidden;
+          overflow-x: auto;
+          width: fit-content;
+          margin: 0 auto;
+        }
+        .pokeskip-ref-header {
+          display: flex;
+          align-items: center;
+          height: 24px;
+          min-height: 24px;
+          max-height: 24px;
+          padding: 0;
+          font-size: 11px;
+          font-weight: 700;
+          margin-bottom: 3px;
+          user-select: none;
+        }
+        .pokeskip-ref-left-label {
+          width: 305px;
+          min-width: 305px;
+          text-align: right;
+          color: #fca5a5;
+          letter-spacing: 0.3px;
+        }
+        .pokeskip-ref-center-label {
+          width: 102px;
+          min-width: 102px;
+          text-align: center;
+          color: #38bdf8;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
+        .pokeskip-ref-right-label {
+          width: 305px;
+          min-width: 305px;
+          text-align: left;
+          color: #86efac;
+          letter-spacing: 0.3px;
+        }
+        .pokeskip-ref-row {
+          display: flex;
+          align-items: center;
+          flex: 1;
+          min-height: 24px;
+          box-sizing: border-box;
+          border-radius: 4px;
+          transition: background 0.12s;
+        }
+        .pokeskip-ref-row:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+        .pokeskip-ref-row.enemy-row {
+          background: rgba(56, 189, 248, 0.16);
+          outline: 1.5px solid #38bdf8;
+        }
+        .pokeskip-ref-left {
+          width: 305px;
+          min-width: 305px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 3px;
+          flex-shrink: 0;
+        }
+        .pokeskip-ref-arrow-left {
+          width: 20px;
+          min-width: 20px;
+          text-align: center;
+          color: #cbd5e1;
+          font-weight: 900;
+          font-size: 13px;
+          user-select: none;
+          flex-shrink: 0;
+        }
+        .pokeskip-ref-center {
+          width: 62px;
+          min-width: 62px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-shrink: 0;
+        }
+        .pokeskip-ref-arrow-right {
+          width: 20px;
+          min-width: 20px;
+          text-align: center;
+          color: #cbd5e1;
+          font-weight: 900;
+          font-size: 13px;
+          user-select: none;
+          flex-shrink: 0;
+        }
+        .pokeskip-ref-right {
+          width: 305px;
+          min-width: 305px;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          gap: 3px;
+          flex-shrink: 0;
+        }
+        .pokeskip-badge-pill {
+          width: 58px;
+          min-width: 58px;
+          max-width: 58px;
+          height: 20px;
+          line-height: 18px;
+          border-radius: 3px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-size: 9.5px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.2px;
+          box-sizing: border-box;
+          position: relative;
+          user-select: none;
+          flex-shrink: 0;
+          color: #ffffff !important;
+          border: 1px solid rgba(0, 0, 0, 0.45);
+          background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.28) 100%);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.45);
+          text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 1px 2px rgba(0, 0, 0, 0.9);
+          transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .pokeskip-badge-pill:hover {
+          transform: translateY(-1px);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -2px 0 rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        .pokeskip-badge-pill.enemy-target {
+          outline: 2px solid #38bdf8;
+          box-shadow: 0 0 10px rgba(56, 189, 248, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
       `;
       const style = document.createElement('style');
       style.id = 'pokeskip-styles';
@@ -4083,10 +4827,11 @@
         setTimeout(() => toast.remove(), 250);
       }, duration);
     },
-
-    getPokeballSvg(size = 20) {
+    getPokeballSvg(size = 20, enabled = true) {
+      const isEnabled = enabled !== false;
+      const centerFill = isEnabled ? '#34d399' : '#475569';
       return `
-        <svg viewBox="0 0 100 100" width="${size}" height="${size}" style="display:block; flex-shrink:0;">
+        <svg class="pokeskip-hud-ball ${isEnabled ? 'on' : 'off'}" viewBox="0 0 100 100" width="${size}" height="${size}" style="display:block; flex-shrink:0;">
           <defs>
             <linearGradient id="pksBlue" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#38bdf8"/>
@@ -4103,7 +4848,7 @@
           <circle cx="50" cy="50" r="45" fill="none" stroke="#0f172a" stroke-width="8"/>
           <circle cx="50" cy="50" r="14" fill="#0f172a"/>
           <circle cx="50" cy="50" r="8" fill="#ffffff"/>
-          <circle cx="50" cy="50" r="3.5" fill="#cbd5e1"/>
+          <circle class="pks-ball-center-dot" cx="50" cy="50" r="4" fill="${centerFill}"/>
         </svg>
       `;
     },
@@ -4112,19 +4857,30 @@
       if (document.getElementById('pokeskip-hud')) return;
       const hud = document.createElement('div');
       hud.id = 'pokeskip-hud';
-      hud.title = 'PokéSkip (P) • Glisser-déposer pour déplacer';
-      const runCount = PokeSkip.getRunSkippedCount();
       const enabled = PokeSkip.settings.enabled;
+      hud.className = enabled ? 'on' : 'off';
+      hud.title = `PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Raccourci P • Glisser pour déplacer`;
+      const runCount = PokeSkip.getRunSkippedCount();
       const showCount = PokeSkip.settings.showHudCount !== false;
       hud.innerHTML = `
-        ${this.getPokeballSvg(20)}
-        <span class="pokeskip-hud-status ${enabled ? 'on' : 'off'}">
-          ${enabled ? '● ON' : '○ OFF'}
-        </span>
-        <span class="pokeskip-hud-divider" id="pokeskip-hud-divider" style="display: ${showCount ? 'inline' : 'none'};">|</span>
-        <span class="pokeskip-hud-badge" id="pokeskip-hud-count" style="display: ${showCount ? 'inline-block' : 'none'};">${runCount} passée${runCount > 1 ? 's' : ''}</span>
+        <div class="pokeskip-hud-pill" title="PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Clic pour gérer les capacités • Raccourci P">
+          <div class="pokeskip-hud-ball-wrap" title="${enabled ? 'PokéSkip : ACTIF (ON)' : 'PokéSkip : EN PAUSE (OFF)'}">
+            ${this.getPokeballSvg(20, enabled)}
+          </div>
+          <span class="pokeskip-hud-badge" id="pokeskip-hud-count" style="display: ${showCount ? 'inline-block' : 'none'};">${runCount} passée${runCount > 1 ? 's' : ''}</span>
+        </div>
+        <button id="pokeskip-hud-type-btn" title="Tableau des Types (Touche T)">⚔️</button>
       `;
       this.makeHudDraggable(hud);
+
+      const typeBtn = hud.querySelector('#pokeskip-hud-type-btn');
+      if (typeBtn) {
+        typeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.toggleTypeChart(false);
+        });
+      }
+
       document.body.appendChild(hud);
       this.hudContainer = hud;
     },
@@ -4145,6 +4901,7 @@
 
       hud.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
+        if (e.target && e.target.closest('#pokeskip-hud-type-btn')) return;
         isDragging = true;
         hasMoved = false;
         startX = e.clientX;
@@ -4192,11 +4949,20 @@
           hasMoved = false;
           return;
         }
-        this.toggleModal();
+        if (e.target && e.target.closest('#pokeskip-hud-type-btn')) {
+          return;
+        }
+        if (e.target && e.target.closest('.pokeskip-hud-pill')) {
+          this.toggleModal();
+        }
       });
     },
 
     updateHudBadge() {
+      const hud = document.getElementById('pokeskip-hud');
+      const pill = hud?.querySelector('.pokeskip-hud-pill');
+      const ball = hud?.querySelector('.pokeskip-hud-ball');
+      const ballWrap = hud?.querySelector('.pokeskip-hud-ball-wrap');
       const countEl = document.getElementById('pokeskip-hud-count');
       const dividerEl = document.getElementById('pokeskip-hud-divider');
       const statusEl = document.querySelector('.pokeskip-hud-status');
@@ -4204,12 +4970,31 @@
       const showCount = PokeSkip.settings.showHudCount !== false;
       const runCount = PokeSkip.getRunSkippedCount();
 
+      if (hud) {
+        hud.classList.toggle('on', !!enabled);
+        hud.classList.toggle('off', !enabled);
+        hud.title = `PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Raccourci P • Glisser pour déplacer`;
+      }
+      if (pill) {
+        pill.title = `PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Clic pour gérer les capacités • Raccourci P`;
+      }
+      if (ballWrap) {
+        ballWrap.title = enabled ? 'PokéSkip : ACTIF (ON)' : 'PokéSkip : EN PAUSE (OFF)';
+      }
+      if (ball) {
+        ball.classList.toggle('on', !!enabled);
+        ball.classList.toggle('off', !enabled);
+        const centerDot = ball.querySelector('.pks-ball-center-dot');
+        if (centerDot) {
+          centerDot.setAttribute('fill', enabled ? '#34d399' : '#475569');
+        }
+      }
       if (countEl) {
         countEl.textContent = `${runCount} passée${runCount > 1 ? 's' : ''}`;
         countEl.style.display = showCount ? 'inline-block' : 'none';
       }
       if (dividerEl) {
-        dividerEl.style.display = showCount ? 'inline' : 'none';
+        dividerEl.style.display = 'none';
       }
       if (statusEl) {
         statusEl.className = `pokeskip-hud-status ${enabled ? 'on' : 'off'}`;
@@ -4474,12 +5259,332 @@
       }
     },
 
+    typeChartContainer: null,
+    typeChartOpenedViaKey: false,
+    typeChartViewMode: 'simplified',
+
+    createTypeChartContainer() {
+      if (document.getElementById('pokeskip-typechart-overlay')) {
+        this.typeChartContainer = document.getElementById('pokeskip-typechart-overlay');
+        this.typeChartViewMode = Storage.get('pokeskip_typechart_view_mode', 'simplified');
+        return;
+      }
+      this.typeChartViewMode = Storage.get('pokeskip_typechart_view_mode', 'simplified');
+      const overlay = document.createElement('div');
+      overlay.id = 'pokeskip-typechart-overlay';
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          this.hideTypeChart(false);
+        }
+      });
+      document.body.appendChild(overlay);
+      this.typeChartContainer = overlay;
+    },
+
+    renderTypeChart() {
+      if (!this.typeChartContainer) this.createTypeChartContainer();
+      if (!this.typeChartViewMode) {
+        this.typeChartViewMode = Storage.get('pokeskip_typechart_view_mode', 'simplified');
+      }
+      const mode = this.typeChartViewMode;
+
+      const enemyInfo = getActiveEnemyTypes();
+      const enemyTypeIndices = enemyInfo.types || [];
+      const hasEnemy = enemyTypeIndices.length > 0;
+      const types18 = POKEMON_TYPES.slice(0, 18);
+
+      let targetHeaderHtml = '';
+      if (hasEnemy) {
+        const enemiesList = (enemyInfo.enemies && enemyInfo.enemies.length > 0)
+          ? enemyInfo.enemies
+          : [{ name: enemyInfo.name || 'Adversaire', types: enemyTypeIndices }];
+
+        const targetBlocks = enemiesList.map(en => {
+          const badges = en.types.map(idx => {
+            const t = POKEMON_TYPES[idx];
+            return `<span class="pokeskip-badge-pill" style="background-color: ${t.bg}; margin-left: 3px;">${t.name}</span>`;
+          }).join('');
+          return `
+            <div style="display: inline-flex; align-items: center; gap: 3px;">
+              <span style="color: #fff; font-weight: 600;">${en.name}</span>
+              ${badges}
+            </div>
+          `;
+        }).join('<span style="color: #64748b; font-size: 11px; margin: 0 4px; font-weight: bold;">•</span>');
+
+        targetHeaderHtml = `
+          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); padding: 2px 8px; border-radius: 6px; font-size: 11px; flex-wrap: wrap;">
+            <span style="color: #38bdf8; font-weight: bold;">🎯 ${enemiesList.length > 1 ? 'Cibles :' : 'Cible :'}</span>
+            ${targetBlocks}
+          </div>
+        `;
+      }
+
+      let bodyHtml = '';
+      let footerHtml = '';
+
+      if (mode === 'table') {
+        bodyHtml = `
+          <div class="pokeskip-typechart-table-wrap">
+            <table class="pokeskip-typechart-table">
+              <thead>
+                <tr>
+                  <th class="pokeskip-th-corner">
+                    <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; font-size: 9px; padding: 4px 3px; box-sizing: border-box;">
+                      <span style="align-self: flex-end; color: #38bdf8; font-weight: 700;">Déf. ➔</span>
+                      <span style="align-self: flex-start; color: #f8fafc; font-weight: 700;">⬇ Att.</span>
+                    </div>
+                  </th>
+                  ${types18.map((t, colIdx) => {
+                    const isHigh = enemyTypeIndices.includes(colIdx);
+                    return `
+                      <th class="pokeskip-th-col ${isHigh ? 'highlighted-col' : ''}" style="background-color: ${t.bg};" title="Défenseur : ${t.name}">
+                        <div class="pokeskip-th-col-content">
+                          ${isHigh ? '<span class="pokeskip-col-marker">🎯</span>' : ''}
+                          <span class="pokeskip-th-col-name">${t.name}</span>
+                        </div>
+                      </th>
+                    `;
+                  }).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${types18.map((rowType, rowIdx) => `
+                  <tr>
+                    <th class="pokeskip-th-row" style="background-color: ${rowType.bg};" title="Attaquant : ${rowType.name}">
+                      ${rowType.name}
+                    </th>
+                    ${types18.map((colType, colIdx) => {
+                      const mult = TYPE_CHART[rowIdx][colIdx];
+                      const isHigh = enemyTypeIndices.includes(colIdx);
+                      let cellContent = '—';
+                      let cellClass = 'neutral';
+                      if (mult === 2) {
+                        cellContent = '2';
+                        cellClass = 'super';
+                      } else if (mult === 0.5) {
+                        cellContent = '½';
+                        cellClass = 'half';
+                      } else if (mult === 0) {
+                        cellContent = '0';
+                        cellClass = 'zero';
+                      }
+                      return `
+                        <td class="pokeskip-td-cell ${cellClass} ${isHigh ? 'highlighted-cell' : ''}" title="${rowType.name} ➔ ${colType.name} : ×${mult}">
+                          ${cellContent}
+                        </td>
+                      `;
+                    }).join('')}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        footerHtml = `
+          <div class="pokeskip-typechart-footer">
+            <div class="pokeskip-typechart-legend">
+              <span class="legend-badge super">2</span> <span>×2 Super</span>
+              <span class="legend-badge half">½</span> <span>×0.5 Peu</span>
+              <span class="legend-badge zero">0</span> <span>×0 Nul</span>
+              <span class="legend-badge neutral">—</span> <span>×1 Neutre</span>
+            </div>
+            <div style="font-size: 10px; color: #94a3b8;">
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> Maintenir / Masquer
+            </div>
+          </div>
+        `;
+      } else {
+        // Mode Simplifié (Synthétique 1 colonne inspiré de la référence officielle)
+        const SIMPLIFIED_ORDER_NAMES = [
+          'Fée', 'Acier', 'Ténèbres', 'Dragon', 'Spectre', 'Roche',
+          'Insecte', 'Psy', 'Vol', 'Sol', 'Poison', 'Combat',
+          'Glace', 'Plante', 'Électrik', 'Eau', 'Feu', 'Normal'
+        ];
+
+        const rowItems = SIMPLIFIED_ORDER_NAMES.map(name => {
+          const idx = types18.findIndex(item => item.name === name);
+          if (idx === -1) return '';
+          const t = types18[idx];
+          const isEnemy = enemyTypeIndices.includes(idx);
+          const weaknesses = [];
+          const strengths = [];
+          for (let otherIdx = 0; otherIdx < 18; otherIdx++) {
+            if (TYPE_CHART[otherIdx][idx] === 2) weaknesses.push(types18[otherIdx]);
+            if (TYPE_CHART[idx][otherIdx] === 2) strengths.push(types18[otherIdx]);
+          }
+
+          const weakPills = weaknesses.map(w => `
+            <span class="pokeskip-badge-pill" style="background-color: ${w.bg};" title="Subit ×2 de ${w.name}">
+              ${w.name}
+            </span>
+          `).join('');
+
+          const strongPills = strengths.map(s => `
+            <span class="pokeskip-badge-pill" style="background-color: ${s.bg};" title="Inflige ×2 à ${s.name}">
+              ${s.name}
+            </span>
+          `).join('');
+
+          return `
+            <div class="pokeskip-ref-row ${isEnemy ? 'enemy-row' : ''}">
+              <div class="pokeskip-ref-left">
+                ${weakPills}
+              </div>
+              <div class="pokeskip-ref-arrow-left">➔</div>
+              <div class="pokeskip-ref-center">
+                <span class="pokeskip-badge-pill ${isEnemy ? 'enemy-target' : ''}" style="background-color: ${t.bg};" title="${t.name}">
+                  ${t.name}
+                </span>
+              </div>
+              <div class="pokeskip-ref-arrow-right">➔</div>
+              <div class="pokeskip-ref-right">
+                ${strongPills}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        bodyHtml = `
+          <div class="pokeskip-ref-container">
+            <div class="pokeskip-ref-header">
+              <div class="pokeskip-ref-left-label">⚠️ Faiblesses (reçoit ×2)</div>
+              <div class="pokeskip-ref-center-label">Type</div>
+              <div class="pokeskip-ref-right-label">Forces (inflige ×2) ⚔️</div>
+            </div>
+            ${rowItems}
+          </div>
+        `;
+
+        footerHtml = `
+          <div class="pokeskip-typechart-footer">
+            <div class="pokeskip-typechart-legend">
+              <span style="color: #fca5a5; font-weight: 700;">Faiblesses ➔</span> <span>Types qui lui infligent ×2</span>
+              <span style="margin: 0 4px; color: #475569;">•</span>
+              <span style="color: #86efac; font-weight: 700;">➔ Forces</span> <span>Types auxquels il inflige ×2</span>
+            </div>
+            <div style="font-size: 10px; color: #94a3b8;">
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> Maintenir / Masquer
+            </div>
+          </div>
+        `;
+      }
+
+      this.typeChartContainer.innerHTML = `
+        <div class="pokeskip-typechart-box">
+          <div class="pokeskip-typechart-header">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span style="font-size: 16px;">⚔️</span>
+              <span style="font-size: 13.5px; font-weight: 700; color: #f8fafc;">Forces & Faiblesses</span>
+              <div class="pokeskip-mode-switch">
+                <button class="pokeskip-mode-btn ${mode === 'simplified' ? 'active' : ''}" data-mode="simplified" title="Mode simplifié : Faiblesses ➔ Type ➔ Forces">⚡ Simplifié</button>
+                <button class="pokeskip-mode-btn ${mode === 'table' ? 'active' : ''}" data-mode="table" title="Tableau complet 18 × 18">📊 Tableau 18×18</button>
+              </div>
+              ${targetHeaderHtml}
+            </div>
+            <button class="pokeskip-typechart-close" title="Fermer (T ou Échap)">&times;</button>
+          </div>
+
+          ${bodyHtml}
+          ${footerHtml}
+        </div>
+      `;
+
+      const modeBtns = this.typeChartContainer.querySelectorAll('.pokeskip-mode-btn');
+      modeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const newMode = btn.dataset.mode;
+          if (newMode && newMode !== this.typeChartViewMode) {
+            this.typeChartViewMode = newMode;
+            Storage.set('pokeskip_typechart_view_mode', newMode);
+            this.renderTypeChart();
+          }
+        });
+      });
+
+      const closeBtn = this.typeChartContainer.querySelector('.pokeskip-typechart-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          this.hideTypeChart(false);
+        });
+      }
+
+      this.updateTypeChartResponsiveScale();
+    },
+
+    updateTypeChartResponsiveScale() {
+      if (!this.typeChartContainer) return;
+      const box = this.typeChartContainer.querySelector('.pokeskip-typechart-box');
+      if (!box) return;
+
+      const baseW = 760;
+      const baseH = 650;
+      const availW = window.innerWidth * 0.94;
+      const availH = window.innerHeight * 0.88;
+
+      let scale = Math.min(availW / baseW, availH / baseH);
+      scale = Math.max(0.65, Math.min(2.5, scale));
+      box.style.setProperty('--pks-tc-scale', scale.toFixed(2));
+    },
+
+    showTypeChart(viaKey = false) {
+      this.typeChartOpenedViaKey = viaKey;
+      if (!this.typeChartContainer) {
+        this.createTypeChartContainer();
+      }
+      this.renderTypeChart();
+      this.typeChartContainer.style.display = 'flex';
+      this.updateTypeChartResponsiveScale();
+    },
+
+    hideTypeChart(viaKey = false) {
+      if (viaKey && !this.typeChartOpenedViaKey) {
+        return;
+      }
+      if (this.typeChartContainer) {
+        this.typeChartContainer.style.display = 'none';
+      }
+      this.typeChartOpenedViaKey = false;
+    },
+
+    toggleTypeChart(viaKey = false) {
+      if (this.typeChartContainer && this.typeChartContainer.style.display === 'flex') {
+        this.hideTypeChart(viaKey);
+      } else {
+        this.showTypeChart(viaKey);
+      }
+    },
+
     bindHotkeys() {
       window.addEventListener('keydown', (e) => {
+        const activeEl = document.activeElement;
+        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) return;
+
         if (e.key === 'p' || e.key === 'P') {
-          const activeEl = document.activeElement;
-          if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) return;
+          if (e.repeat) return;
           this.toggleModal();
+        } else if (e.key === 't' || e.key === 'T') {
+          if (e.repeat) return;
+          this.showTypeChart(true);
+        } else if (e.key === 'Escape') {
+          this.hideTypeChart(false);
+          this.closeModal();
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (e.key === 't' || e.key === 'T') {
+          if (this.typeChartOpenedViaKey) {
+            this.hideTypeChart(true);
+          }
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (this.typeChartContainer && this.typeChartContainer.style.display === 'flex') {
+          this.updateTypeChartResponsiveScale();
         }
       });
     },

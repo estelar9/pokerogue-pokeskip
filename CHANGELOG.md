@@ -5,6 +5,57 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.7.0] - 2026-09-24
+
+### ⚔️ Table des Types Rapide (Mode Simplifié & Tableau 18 × 18) avec Détection Adversaire
+
+- **Accès Éclair Peek & Toggle** :
+  - **Touche `T` (Peek)** : Maintenir la touche `T` enfoncée affiche instantanément la table des types en surimpression transparente ; la relâcher masque immédiatement le tableau.
+  - **Bouton `⚔️` Déporté sur le HUD** : Le bouton d'accès au tableau des types est désormais placé juste à droite de la pastille flottante sous forme de bouton circulaire dédié avec uniquement l'icône `⚔️`. Cela évite tout clic malencontreux entre la gestion des attaques (sur la pastille) et l'ouverture du tableau des types.
+  - **Mémorisation persistante de la vue active** : Le mode choisi (Simplifié ou Complet) est mémorisé automatiquement dans le stockage local. Chaque appui/maintien sur `T` rouvre fidèlement la vue dans l'état où elle a été laissée.
+  - Fermeture possible également via la touche `Échap`, la croix `✕` ou un clic en dehors de la fenêtre.
+  - Aucun déclenchement parasite lors de la saisie dans un champ texte.
+- **Bouton Switch de Mode d'Affichage** :
+  - Un sélecteur à deux boutons dans l'en-tête permet d'alterner instantanément entre :
+    - `⚡ Mode Simplifié` (vue synthétique rapide)
+    - `📊 Tableau 18×18` (matrice complète détaillée)
+- **Mode Simplifié (Vue Référence Unique en 1 Colonne)** :
+  - **Pastilles 3D Homogènes & Identiques (58 × 20 px)** : Toutes les pastilles (faiblesses, type central et forces) possèdent strictement la même taille et le même rendu visuel fidèle aux cartouches officielles de jeux Pokémon (biseautage 3D en relief avec reflet supérieur et ombre inférieure, liseré sombre et typographie blanche détourée de noir).
+  - **Harmonisation de Hauteur & Espacement Aéré (550 px)** : Le conteneur du mode simplifié adopte exactement la même hauteur verticale que la matrice complète (`550 px`) et le même cadre stylisé. Les 18 lignes bénéficient d'un espacement vertical confortable (`gap: 4 px`), offrant une aération optimale sans aucun soubresaut lors du passage d'un mode à l'autre.
+  - **Alignement Rigoureux en Colonne Centrale** : Les 18 types sont empilés verticalement, avec la colonne des types principaux et les flèches `➔` parfaitement alignées sur des axes verticaux fixes.
+  - **Flux Directionnel Clair** :
+    - À gauche : les types super efficaces contre lui (faiblesses reçues) progressent vers la flèche centrale.
+    - Au centre : le type principal mis en valeur.
+    - À droite : les types contre lesquels il est super efficace (forces infligées) démarrent de la flèche centrale.
+  - Surlignage automatique de la ligne du Pokémon adverse actif avec contour cyan lumineux `🎯`.
+- **Mode Complet : Matrice 18 × 18 (Générations 6 à 9)** :
+  - **Couleurs 100% fidèles aux pastilles de jeu** : Utilisation de la palette officielle canonique des types Pokémon (Feu `#EE8130`, Eau `#6390F0`, Plante `#7AC74C`, Vol `#A98FF3`, Normal `#A8A77A`, etc.), garantissant une cohérence visuelle parfaite entre les pastilles des lignes d'attaques et les en-têtes du tableau sans aucune altération de luminosité.
+  - **Pastilles d'En-têtes en Style Cartouche 3D** : Déploiement du style authentique des pastilles 3D (biseautage en relief, reflets d'ombre et de lumière, liseré sombre et texte blanc détouré de noir) sur les en-têtes de lignes et de colonnes de la matrice complète, offrant une lisibilité parfaite y compris sur les types clairs (Sol, Acier, Glace, Électrik).
+  - **Pastilles d'En-têtes Homogènes & Non Écrasées (66 × 24 px)** : Les pastilles de colonnes (`Défenseurs`) possèdent désormais rigoureusement la même taille que celles des lignes (`Attaquants`) avec une longueur complète de `66 px`, supprimant tout aspect écrasé pour les noms longs (`TÉNÈBRES`, `ÉLECTRIK`, `NORMAL`). La case d'angle `Déf. / Att.` forme un carré parfait de `66 × 66 px`.
+  - **Centrage Parfait des Noms & Dégagement du Viseur `🎯`** : Typographie alignée à `9 px` sur toutes les pastilles avec un décalage de respiration sous le marqueur `🎯` en cas de cible adverse surlignée.
+  - **Mise à l'Échelle Dynamique & Responsive (1080p, 1440p, 4K)** : Le tableau et la vue simplifiée adaptent automatiquement leur échelle (`zoom` vectoriel natif) selon les dimensions de l'écran en temps réel. Fini l'effet "minuscule" sur les grands écrans (1440p / 4K / ultrawide) ou le débordement sur les petits écrans : la fenêtre occupe naturellement ~84 à 88% de la hauteur de l'écran, toujours parfaitement centrée et nette au pixel près.
+  - **Extension Vers le Bas & Coussin de Respiration (550 px)** : Le conteneur s'étend confortablement vers le bas de l'écran avec une marge inférieure de `14 px`, assurant que la ligne inférieure (`FÉE`) ne soit plus jamais rognée ou collée contre le pied de page.
+  - **Contraste Éclatant des Multiplicateurs** :
+    - `2` (Vert Émeraude Vibrant) : Dégradé vert soutenu, texte blanc gras 900 détouré avec relief (`linear-gradient(180deg, #22c55e 0%, #15803d 100%)`).
+    - `½` (Rouge Vif Éclatant) : Dégradé carmin puissant, texte blanc net et lisible (`linear-gradient(180deg, #ef4444 0%, #b91c1c 100%)`).
+    - `0` (Noir Profond & Argent) : Fond noir profond avec liseré contrasté et chiffre 0 blanc/argenté éclatant.
+    - `—` (Gris Neutre) : Teinte discrète pour laisser ressortir les multiplicateurs clés au premier coup d'œil.
+  - **Zébrures alternées & Survol** : Alternance visuelle subtile entre les lignes paires et impaires et mise en surbrillance au survol de la souris.
+- **Prise en Charge Intelligente des Combats Doubles & Multi-Cibles** :
+  - **Détection Exhaustive des Ennemis Actifs** : PokéSkip inspecte désormais simultanément toutes les sources du terrain (`getEnemyField()`, `enemySide.pokemon/active`, `getEnemyPokemon(0/1)`, `currentBattle`) pour identifier l'ensemble des Pokémon adverses actuellement en vie sur le champ de bataille.
+  - **Affichage Multi-Cibles dans l'En-tête** : En combat double, l'en-tête affiche distinctement chaque Pokémon adverse avec son nom et ses pastilles de types respectives (ex : `🎯 Cibles : Léviator [Eau] [Vol] • Ronflex [Normal]`).
+  - **Surlignage Cumulé (2, 3 ou 4 types)** :
+    - En **mode tableau**, toutes les colonnes de défense correspondant aux types des deux adversaires sont simultanément surlignées en cyan avec le marqueur `🎯`.
+    - En **mode simplifié**, toutes les lignes correspondant aux types des deux adversaires sont simultanément encadrées et mises en valeur.
+  - Respect strict des consignes : aucun calcul intrusif sur le Pokémon du joueur et aucune grille de pastilles encombrante.
+- **Pastille Flottante (HUD) Ultra-Compacte avec Pokéball Dynamique** :
+  - **Indication d'état ON / OFF intégrée à la Pokéball** : Suppression du badge texte encombrant (`● ON` / `○ OFF`) pour un gain de place immédiat de plus de 35% sur l'écran.
+  - **État ON (Actif)** : Pokéball aux couleurs vives cyan/bleu avec bouton central LED émeraude pulsant (`#34d399`) et halo lumineux bleu.
+  - **État OFF (En pause)** : Pokéball en veille/dormante en niveaux de gris atténués (`grayscale(1) opacity(0.42)`) avec bouton sombre inactif (`#475569`).
+  - Infobulle explicite au survol rappelant le statut et les raccourcis.
+
+---
+
 ## [v1.6.0] - 2026-09-23
 
 ### ⚡ Mode Avancé : Remplacement Automatique de Capacités
