@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
 // @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.7.0
+// @version      1.8.0
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -2839,6 +2839,7 @@
   }
 },
     memberToRoot: {},
+    speciesNames: {},
     megaFamilies: {
       3: { suffix: '(Méga)', defaultMegaSpriteId: 10033 },
       6: { suffix: '(Méga X / Y)', defaultMegaSpriteId: 10034 },
@@ -2895,6 +2896,14 @@
           for (const m of fam.members) {
             this.memberToRoot[m] = r;
           }
+          if (fam.name) {
+            const rawNames = fam.name.replace(/\(Méga.*?\)/g, '').split(/[→/]/).map(s => s.trim()).filter(Boolean);
+            if (rawNames.length === fam.members.length) {
+              fam.members.forEach((m, i) => {
+                this.speciesNames[m] = rawNames[i];
+              });
+            }
+          }
           // Enrichir l'intitulé avec la mention Méga si un membre est concerné
           for (const m of fam.members) {
             if (this.megaFamilies[m] && !fam.name.includes('(Méga')) {
@@ -2904,6 +2913,71 @@
           }
         }
       }
+    },
+    getSpeciesName(speciesId) {
+      if (!speciesId) return '';
+      return this.speciesNames[speciesId] || '';
+    },
+    getLineageMembers(pokemon) {
+      const rootId = this.getRootId(pokemon);
+      const fam = this.families[rootId];
+      const allMembers = (fam && Array.isArray(fam.members) && fam.members.length > 0) ? [...fam.members] : (rootId ? [rootId] : []);
+      const currentId = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? rootId);
+
+      const dynamicEvoIds = [];
+      try {
+        const sp = pokemon?.species || (typeof pokemon?.getSpeciesForm === 'function' ? pokemon.getSpeciesForm(true) : null);
+        if (sp && typeof sp.getEvolutionLevels === 'function') {
+          const evos = sp.getEvolutionLevels();
+          if (Array.isArray(evos)) {
+            for (const item of evos) {
+              const sid = Array.isArray(item) ? item[0] : (item?.speciesId ?? item);
+              if (sid && !dynamicEvoIds.includes(sid)) {
+                dynamicEvoIds.push(sid);
+              }
+            }
+          }
+        }
+      } catch (_) {}
+
+      const futureEvoIds = [];
+      if (dynamicEvoIds.length > 0) {
+        for (const sid of dynamicEvoIds) {
+          if (sid !== currentId && !futureEvoIds.includes(sid)) {
+            futureEvoIds.push(sid);
+          }
+        }
+      }
+
+      const currentIdx = allMembers.indexOf(currentId);
+      if (currentIdx !== -1) {
+        for (let i = currentIdx + 1; i < allMembers.length; i++) {
+          const sid = allMembers[i];
+          if (!futureEvoIds.includes(sid)) {
+            futureEvoIds.push(sid);
+          }
+        }
+      } else {
+        for (const sid of allMembers) {
+          if (sid !== currentId && !futureEvoIds.includes(sid)) {
+            futureEvoIds.push(sid);
+          }
+        }
+      }
+
+      const otherMemberIds = [];
+      for (const sid of allMembers) {
+        if (sid !== currentId && !futureEvoIds.includes(sid) && !otherMemberIds.includes(sid)) {
+          otherMemberIds.push(sid);
+        }
+      }
+
+      return {
+        currentId,
+        futureEvoIds,
+        otherMemberIds,
+        allMembers
+      };
     },
     isPokemonMega(pokemon) {
       if (!pokemon) return false;
@@ -3512,17 +3586,25 @@
     console.log('⚡ [PokeSkip] Prototype LearnMovePhase intercepté avec succès.');
   }
 
-  // --- RÉCUPÉRATION COMPLÈTE DES CAPACITÉS FUTURES & ACTUELLES ---
+  // --- RÉCUPÉRATION COMPLÈTE DES CAPACITÉS FUTURES & ACTUELLES DE LA LIGNÉE ---
   function getPokemonFullLearnset(pokemon) {
     const moves = [];
     const seenMoveIds = new Set();
 
     let getMoveFn = null;
-    if (pokemon.moveset && pokemon.moveset.length > 0 && typeof pokemon.moveset[0].getMove === 'function') {
+    if (pokemon?.moveset && pokemon.moveset.length > 0 && typeof pokemon.moveset[0].getMove === 'function') {
       getMoveFn = pokemon.moveset[0].getMove;
     }
+    if (!getMoveFn && PokeSkip.activeParty && Array.isArray(PokeSkip.activeParty)) {
+      for (const p of PokeSkip.activeParty) {
+        if (p?.moveset && p.moveset.length > 0 && typeof p.moveset[0].getMove === 'function') {
+          getMoveFn = p.moveset[0].getMove;
+          break;
+        }
+      }
+    }
 
-    function resolveMove(moveId, level) {
+    function resolveMove(moveId, level, evolutionSpecies = null) {
       let moveObj = null;
       if (getMoveFn) {
         try {
@@ -3557,45 +3639,175 @@
         power,
         accuracy: accuracyText,
         pp,
-        desc
+        desc,
+        evolutionSpecies: evolutionSpecies || null
       };
     }
 
-    // 1. Récupérer TOUTES les attaques apprenables par montée de niveau
-    let rawLevelMoves = null;
-    try {
-      if (typeof pokemon.getSpeciesForm === 'function') {
-        const sf = pokemon.getSpeciesForm(true);
-        if (sf && typeof sf.getLevelMoves === 'function') {
-          rawLevelMoves = sf.getLevelMoves();
+    const lineage = LineageManager.getLineageMembers(pokemon);
+    const currentSpeciesId = lineage.currentId;
+
+    function getRawLevelMovesForSpecies(targetSpeciesId) {
+      if (!targetSpeciesId) return null;
+
+      // 1. Si espèce courante, tenter d'abord les méthodes directes du pokemon
+      if (targetSpeciesId === currentSpeciesId) {
+        try {
+          if (typeof pokemon?.getSpeciesForm === 'function') {
+            const sf = pokemon.getSpeciesForm(true);
+            if (sf && typeof sf.getLevelMoves === 'function') {
+              const res = sf.getLevelMoves();
+              if (res && Array.isArray(res) && res.length > 0) return res;
+            }
+          }
+          if (pokemon?.species && typeof pokemon.species.getLevelMoves === 'function') {
+            const res = pokemon.species.getLevelMoves();
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+        } catch (_) {}
+      }
+
+      // 2. Tenter d'invoquer getLevelMoves via les prototypes d'espèces
+      let sp = pokemon?.species || (typeof pokemon?.getSpeciesForm === 'function' ? pokemon.getSpeciesForm(true) : null);
+      if (!sp && PokeSkip.activeParty && PokeSkip.activeParty.length > 0) {
+        for (const p of PokeSkip.activeParty) {
+          const cand = p?.species || (typeof p?.getSpeciesForm === 'function' ? p.getSpeciesForm(true) : null);
+          if (cand && typeof cand.getLevelMoves === 'function') {
+            sp = cand;
+            break;
+          }
         }
       }
-      if (!rawLevelMoves && pokemon.species && typeof pokemon.species.getLevelMoves === 'function') {
-        rawLevelMoves = pokemon.species.getLevelMoves();
+
+      if (sp) {
+        try {
+          const proto = Object.getPrototypeOf(sp);
+          const superProto = proto ? Object.getPrototypeOf(proto) : null;
+          if (superProto && typeof superProto.getLevelMoves === 'function') {
+            const res = superProto.getLevelMoves.call({ speciesId: targetSpeciesId });
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+        } catch (_) {}
+
+        try {
+          const proto = Object.getPrototypeOf(sp);
+          if (proto && typeof proto.getLevelMoves === 'function') {
+            const ctx = Object.create(proto);
+            ctx.speciesId = targetSpeciesId;
+            ctx.formIndex = 0;
+            ctx.getFormKey = () => undefined;
+            const res = proto.getLevelMoves.call(ctx);
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+        } catch (_) {}
+
+        try {
+          if (typeof sp.getLevelMoves === 'function') {
+            const ctx = Object.create(sp);
+            ctx.speciesId = targetSpeciesId;
+            ctx.formIndex = 0;
+            ctx.getFormKey = () => undefined;
+            const res = sp.getLevelMoves.call(ctx);
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+        } catch (_) {}
       }
-    } catch (e) {
-      console.warn('[PokeSkip] Erreur getLevelMoves:', e);
+
+      // 3. Registres globaux fenêtre ou scène
+      try {
+        const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+        const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry;
+        if (sdr && typeof sdr.getLevelMoves === 'function') {
+          const res = sdr.getLevelMoves(targetSpeciesId);
+          if (res && Array.isArray(res) && res.length > 0) return res;
+        }
+      } catch (_) {}
+
+      try {
+        const sc = PokeSkip.scene || (typeof unsafeWindow !== 'undefined' ? unsafeWindow.globalScene : window.globalScene);
+        if (sc && sc.speciesDataRegistry && typeof sc.speciesDataRegistry.getLevelMoves === 'function') {
+          const res = sc.speciesDataRegistry.getLevelMoves(targetSpeciesId);
+          if (res && Array.isArray(res) && res.length > 0) return res;
+        }
+      } catch (_) {}
+
+      return null;
     }
 
-    if (rawLevelMoves && Array.isArray(rawLevelMoves)) {
-      // Trier par niveau croissant
-      const sorted = [...rawLevelMoves].sort((a, b) => a[0] - b[0]);
-      for (const entry of sorted) {
+    // 1. Récupérer TOUTES les attaques apprenables de l'espèce courante
+    const currentMovesRaw = getRawLevelMovesForSpecies(currentSpeciesId);
+    if (currentMovesRaw && Array.isArray(currentMovesRaw)) {
+      for (const entry of currentMovesRaw) {
         const lvl = entry[0];
         const moveId = entry[1];
         if (!seenMoveIds.has(moveId)) {
           seenMoveIds.add(moveId);
-          moves.push(resolveMove(moveId, lvl > 0 ? lvl : (lvl === 0 ? 'Évolution' : 'Départ')));
+          moves.push(resolveMove(moveId, lvl > 0 ? lvl : (lvl === 0 ? 'Évolution' : 'Départ'), null));
         }
       }
     }
 
-    // 2. Récupérer les attaques actuelles si non présentes
-    if (pokemon.moveset && Array.isArray(pokemon.moveset)) {
-      for (const pm of pokemon.moveset) {
+    // 2. Récupérer les attaques à venir de ses évolutions dans la lignée
+    for (const evoId of lineage.futureEvoIds) {
+      const evoMovesRaw = getRawLevelMovesForSpecies(evoId);
+      if (evoMovesRaw && Array.isArray(evoMovesRaw)) {
+        const evoName = LineageManager.getSpeciesName(evoId) || `Évolution #${evoId}`;
+        for (const entry of evoMovesRaw) {
+          const lvl = entry[0];
+          const moveId = entry[1];
+          if (!seenMoveIds.has(moveId)) {
+            seenMoveIds.add(moveId);
+            moves.push(resolveMove(moveId, lvl > 0 ? lvl : (lvl === 0 ? 'Évolution' : 'Départ'), evoName));
+          }
+        }
+      }
+    }
+
+    // 3. Récupérer les attaques des autres membres de la lignée (ex: pré-évolutions)
+    for (const otherId of lineage.otherMemberIds) {
+      const otherMovesRaw = getRawLevelMovesForSpecies(otherId);
+      if (otherMovesRaw && Array.isArray(otherMovesRaw)) {
+        const otherName = LineageManager.getSpeciesName(otherId) || `Espèce #${otherId}`;
+        for (const entry of otherMovesRaw) {
+          const lvl = entry[0];
+          const moveId = entry[1];
+          if (!seenMoveIds.has(moveId)) {
+            seenMoveIds.add(moveId);
+            moves.push(resolveMove(moveId, lvl > 0 ? lvl : (lvl === 0 ? 'Évolution' : 'Départ'), otherName));
+          }
+        }
+      }
+    }
+
+    // 4. Trier les attaques apprises par niveau croissant
+    const getLevelWeight = (lvl) => {
+      if (typeof lvl === 'number') {
+        if (lvl < 0) return 0;
+        if (lvl === 0) return 0.5;
+        return lvl;
+      }
+      if (lvl === 'Départ') return 0;
+      if (lvl === 'Évolution') return 0.5;
+      if (lvl === 'Actuelle') return -1;
+      return 999;
+    };
+
+    moves.sort((a, b) => {
+      const wA = getLevelWeight(a.level);
+      const wB = getLevelWeight(b.level);
+      if (wA !== wB) return wA - wB;
+      if (!a.evolutionSpecies && b.evolutionSpecies) return -1;
+      if (a.evolutionSpecies && !b.evolutionSpecies) return 1;
+      return a.name.localeCompare(b.name, 'fr');
+    });
+
+    // 5. Récupérer les attaques actuelles si non présentes (insérées au début)
+    if (pokemon?.moveset && Array.isArray(pokemon.moveset)) {
+      for (let i = pokemon.moveset.length - 1; i >= 0; i--) {
+        const pm = pokemon.moveset[i];
         if (pm && pm.moveId && !seenMoveIds.has(pm.moveId)) {
           seenMoveIds.add(pm.moveId);
-          const resolved = resolveMove(pm.moveId, 'Actuelle');
+          const resolved = resolveMove(pm.moveId, 'Actuelle', null);
           moves.unshift(resolved);
         }
       }
@@ -4133,6 +4345,19 @@
           padding: 2px 7px;
           border-radius: 6px;
         }
+        .pokeskip-evo-tag {
+          background: rgba(168, 85, 247, 0.15);
+          color: #c084fc;
+          border: 1px solid rgba(168, 85, 247, 0.35);
+          border-radius: 6px;
+          padding: 2px 7px;
+          font-size: 11px;
+          font-weight: 700;
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          letter-spacing: 0.2px;
+        }
         .pokeskip-move-name-txt {
           font-size: 15px;
           font-weight: 700;
@@ -4506,6 +4731,12 @@
           transition: background 0.1s;
           user-select: none;
         }
+        .pokeskip-td-cell:hover {
+          outline: 2px solid #ffffff;
+          z-index: 6;
+          position: relative;
+          cursor: pointer;
+        }
         /* ×2 Super efficace : Vert éclatant, bordure et contraste puissant */
         .pokeskip-td-cell.super {
           background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
@@ -4680,7 +4911,7 @@
           border-radius: 6px;
           border: 1px solid rgba(255, 255, 255, 0.1);
           background: rgba(10, 15, 29, 0.5);
-          overflow-y: hidden;
+          overflow-y: auto;
           overflow-x: auto;
           width: fit-content;
           margin: 0 auto;
@@ -4902,14 +5133,46 @@
       this.hudContainer = hud;
     },
 
-    makeHudDraggable(hud) {
+    applyHudPosition(hud) {
+      if (!hud) return;
       const savedPos = Storage.get('pokeskip_hud_pos', null);
-      if (savedPos && typeof savedPos.x === 'number' && typeof savedPos.y === 'number') {
-        hud.style.left = `${Math.max(10, Math.min(window.innerWidth - 120, savedPos.x))}px`;
-        hud.style.top = `${Math.max(10, Math.min(window.innerHeight - 40, savedPos.y))}px`;
-        hud.style.right = 'auto';
-        hud.style.transform = 'none';
+      if (!savedPos) return;
+
+      const hudW = hud.offsetWidth || 120;
+      const hudH = hud.offsetHeight || 40;
+      const maxLeft = Math.max(10, window.innerWidth - hudW - 10);
+      const maxTop = Math.max(10, window.innerHeight - hudH - 10);
+
+      let targetLeft, targetTop;
+
+      if (typeof savedPos.ratioX === 'number' && typeof savedPos.ratioY === 'number') {
+        const rX = Math.max(0, Math.min(1, savedPos.ratioX));
+        const rY = Math.max(0, Math.min(1, savedPos.ratioY));
+        targetLeft = 10 + rX * (maxLeft - 10);
+        targetTop = 10 + rY * (maxTop - 10);
+      } else if (typeof savedPos.x === 'number' && typeof savedPos.y === 'number') {
+        targetLeft = Math.max(10, Math.min(maxLeft, savedPos.x));
+        targetTop = Math.max(10, Math.min(maxTop, savedPos.y));
+        const rX = maxLeft > 10 ? (targetLeft - 10) / (maxLeft - 10) : 1;
+        const rY = maxTop > 10 ? (targetTop - 10) / (maxTop - 10) : 0.5;
+        Storage.set('pokeskip_hud_pos', {
+          ratioX: Math.max(0, Math.min(1, rX)),
+          ratioY: Math.max(0, Math.min(1, rY)),
+          x: targetLeft,
+          y: targetTop
+        });
+      } else {
+        return;
       }
+
+      hud.style.left = `${Math.round(targetLeft)}px`;
+      hud.style.top = `${Math.round(targetTop)}px`;
+      hud.style.right = 'auto';
+      hud.style.transform = 'none';
+    },
+
+    makeHudDraggable(hud) {
+      this.applyHudPosition(hud);
 
       let isDragging = false;
       let startX = 0, startY = 0;
@@ -4940,8 +5203,13 @@
           hasMoved = true;
         }
 
-        const newX = Math.max(10, Math.min(window.innerWidth - hud.offsetWidth - 10, initialLeft + dx));
-        const newY = Math.max(10, Math.min(window.innerHeight - hud.offsetHeight - 10, initialTop + dy));
+        const hudW = hud.offsetWidth || 120;
+        const hudH = hud.offsetHeight || 40;
+        const maxLeft = Math.max(10, window.innerWidth - hudW - 10);
+        const maxTop = Math.max(10, window.innerHeight - hudH - 10);
+
+        const newX = Math.max(10, Math.min(maxLeft, initialLeft + dx));
+        const newY = Math.max(10, Math.min(maxTop, initialTop + dy));
 
         hud.style.left = `${newX}px`;
         hud.style.top = `${newY}px`;
@@ -4956,7 +5224,28 @@
 
         if (hasMoved) {
           const rect = hud.getBoundingClientRect();
-          Storage.set('pokeskip_hud_pos', { x: rect.left, y: rect.top });
+          const hudW = hud.offsetWidth || rect.width || 120;
+          const hudH = hud.offsetHeight || rect.height || 40;
+          const maxLeft = Math.max(10, window.innerWidth - hudW - 10);
+          const maxTop = Math.max(10, window.innerHeight - hudH - 10);
+
+          const clampedLeft = Math.max(10, Math.min(maxLeft, rect.left));
+          const clampedTop = Math.max(10, Math.min(maxTop, rect.top));
+
+          const ratioX = maxLeft > 10 ? (clampedLeft - 10) / (maxLeft - 10) : 1;
+          const ratioY = maxTop > 10 ? (clampedTop - 10) / (maxTop - 10) : 0.5;
+
+          Storage.set('pokeskip_hud_pos', {
+            ratioX: Math.max(0, Math.min(1, ratioX)),
+            ratioY: Math.max(0, Math.min(1, ratioY)),
+            x: clampedLeft,
+            y: clampedTop
+          });
+
+          hud.style.left = `${Math.round(clampedLeft)}px`;
+          hud.style.top = `${Math.round(clampedTop)}px`;
+          hud.style.right = 'auto';
+          hud.style.transform = 'none';
         }
       });
 
@@ -5408,7 +5697,7 @@
               <span class="legend-badge neutral">—</span> <span>×1 Neutre</span>
             </div>
             <div style="font-size: 10px; color: #94a3b8;">
-              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> Maintenir / Masquer
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> ou <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Échap</kbd> Fermer
             </div>
           </div>
         `;
@@ -5482,7 +5771,7 @@
               <span style="color: #86efac; font-weight: 700;">➔ Forces</span> <span>Types auxquels il inflige ×2</span>
             </div>
             <div style="font-size: 10px; color: #94a3b8;">
-              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> Maintenir / Masquer
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> ou <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Échap</kbd> Fermer
             </div>
           </div>
         `;
@@ -5546,8 +5835,7 @@
       box.style.setProperty('--pks-tc-scale', scale.toFixed(2));
     },
 
-    showTypeChart(viaKey = false) {
-      this.typeChartOpenedViaKey = viaKey;
+    showTypeChart() {
       if (!this.typeChartContainer) {
         this.createTypeChartContainer();
       }
@@ -5556,21 +5844,18 @@
       this.updateTypeChartResponsiveScale();
     },
 
-    hideTypeChart(viaKey = false) {
-      if (viaKey && !this.typeChartOpenedViaKey) {
-        return;
-      }
+    hideTypeChart() {
       if (this.typeChartContainer) {
         this.typeChartContainer.style.display = 'none';
       }
       this.typeChartOpenedViaKey = false;
     },
 
-    toggleTypeChart(viaKey = false) {
+    toggleTypeChart() {
       if (this.typeChartContainer && this.typeChartContainer.style.display === 'flex') {
-        this.hideTypeChart(viaKey);
+        this.hideTypeChart();
       } else {
-        this.showTypeChart(viaKey);
+        this.showTypeChart();
       }
     },
 
@@ -5584,22 +5869,18 @@
           this.toggleModal();
         } else if (e.key === 't' || e.key === 'T') {
           if (e.repeat) return;
-          this.showTypeChart(true);
+          this.toggleTypeChart();
         } else if (e.key === 'Escape') {
-          this.hideTypeChart(false);
-          this.closeModal();
-        }
-      });
-
-      window.addEventListener('keyup', (e) => {
-        if (e.key === 't' || e.key === 'T') {
-          if (this.typeChartOpenedViaKey) {
-            this.hideTypeChart(true);
+          if (this.typeChartContainer && this.typeChartContainer.style.display === 'flex') {
+            this.hideTypeChart();
+          } else {
+            this.closeModal();
           }
         }
       });
 
       window.addEventListener('resize', () => {
+        this.applyHudPosition(this.hudContainer || document.getElementById('pokeskip-hud'));
         if (this.typeChartContainer && this.typeChartContainer.style.display === 'flex') {
           this.updateTypeChartResponsiveScale();
         }
@@ -5704,7 +5985,7 @@
                   ${isMega ? '<span class="pokeskip-mega-badge">🧬 MÉGA</span>' : ''}
                 </h3>
                 <div style="font-size: 12px; color: #94a3b8;">
-                  Actuel : <b style="color: #f8fafc;">${currentName}</b> • Les capacités sélectionnées s'appliquent à tous les membres et formes de cette lignée.
+                  Actuel : <b style="color: #f8fafc;">${currentName}</b> • Affiche toutes les attaques à venir de la lignée (${familyInfo.lineageName}). Les capacités sélectionnées s'appliquent à tous les membres et formes de cette lignée.
                 </div>
               </div>
             </div>
@@ -5718,7 +5999,7 @@
           <div id="pokeskip-pokemon-replacements-slot"></div>
 
           <div style="display: flex; gap: 10px; margin-bottom: 14px; margin-top: 14px;">
-            <input type="text" id="pokeskip-move-filter" placeholder="Filtrer une attaque par nom..." style="background:#111a2e; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; flex:1;">
+            <input type="text" id="pokeskip-move-filter" placeholder="Filtrer une attaque par nom ou espèce..." style="background:#111a2e; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; flex:1;">
           </div>
 
           <div class="pokeskip-moves-container" id="pokeskip-moves-grid-el"></div>
@@ -5731,7 +6012,11 @@
         grid.innerHTML = '';
         const currentRule = PokeSkip.getFamilyRule(familyInfo.familyKey) || { skippedMoves: {} };
 
-        const filtered = learnable.filter(m => !filter || m.name.toLowerCase().includes(filter.toLowerCase()));
+        const filtered = learnable.filter(m => {
+          if (!filter) return true;
+          const f = filter.toLowerCase();
+          return m.name.toLowerCase().includes(f) || (m.evolutionSpecies && m.evolutionSpecies.toLowerCase().includes(f));
+        });
 
         if (filtered.length === 0) {
           grid.innerHTML = `<div style="color: #64748b; font-size: 13px; text-align: center; padding: 20px;">Aucune capacité trouvée.</div>`;
@@ -5743,11 +6028,22 @@
           const isKept = !isSkipped;
           const cardEl = document.createElement('div');
           cardEl.className = `pokeskip-move-card ${isSkipped ? 'skipped' : ''}`;
+
+          let lvlStyle = '';
+          if (moveItem.level === 'Actuelle') {
+            lvlStyle = 'style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);"';
+          } else if (moveItem.level === 'Évolution') {
+            lvlStyle = 'style="background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);"';
+          }
+
+          const lvlLabel = typeof moveItem.level === 'number' ? `Niv. ${moveItem.level}` : moveItem.level;
+
           cardEl.innerHTML = `
             <div class="pokeskip-move-top">
               <div class="pokeskip-move-left">
-                <span class="pokeskip-move-lvl-pill">${typeof moveItem.level === 'number' ? `Niv. ${moveItem.level}` : moveItem.level}</span>
+                <span class="pokeskip-move-lvl-pill" ${lvlStyle}>${lvlLabel}</span>
                 <span class="pokeskip-move-name-txt">${moveItem.name}</span>
+                ${moveItem.evolutionSpecies ? `<span class="pokeskip-evo-tag" title="Capacité apprise par ${moveItem.evolutionSpecies} dans cette lignée">🧬 ${moveItem.evolutionSpecies}</span>` : ''}
                 <span class="pokeskip-type-tag" style="background:${moveItem.type.bg}; color:${moveItem.type.color};">${moveItem.type.name}</span>
                 <span class="pokeskip-cat-tag" style="color:${moveItem.category.color};">${moveItem.category.icon} ${moveItem.category.name}</span>
               </div>
@@ -6063,7 +6359,8 @@
       });
 
       if (PokeSkip.settings.advancedMode) {
-        const activePartyMember = teamIdx !== -1 ? PokeSkip.activeParty[teamIdx] : null;
+        const rootId = LineageManager.getRootId(famKey);
+        const activePartyMember = teamIdx !== -1 ? PokeSkip.activeParty[teamIdx] : (rootId ? { speciesId: rootId } : null);
         let partyCurrentMoves = [];
         let partyLearnable = [];
         if (activePartyMember) {
@@ -6125,14 +6422,16 @@
           const key = name.toLowerCase();
           const level = typeof item === 'object' && item.level !== undefined ? item.level : null;
           const weight = getMoveLevelWeight(level);
+          const evolutionSpecies = (typeof item === 'object' && item.evolutionSpecies) ? item.evolutionSpecies : null;
 
           if (!moveMap.has(key)) {
-            moveMap.set(key, { name, level, isCurrent: false, weight });
+            moveMap.set(key, { name, level, isCurrent: false, weight, evolutionSpecies });
           } else {
             const existing = moveMap.get(key);
             if (existing.weight === 999 && weight !== 999) {
               existing.level = level;
               existing.weight = weight;
+              if (evolutionSpecies) existing.evolutionSpecies = evolutionSpecies;
             }
           }
         }
@@ -6204,8 +6503,9 @@
           prefix = '[Actuelle] ';
         }
 
+        const evoSuffix = m.evolutionSpecies ? ` (${m.evolutionSpecies})` : '';
         const suffix = (m.isCurrent && showCurrentBadge && prefix !== '[Actuelle] ') ? ' (Actuelle)' : '';
-        return `${prefix}${m.name}${suffix}`;
+        return `${prefix}${m.name}${evoSuffix}${suffix}`;
       };
 
       const uniqueRand = Math.random().toString(36).substring(2, 6);

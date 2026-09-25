@@ -5,6 +5,55 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.8.0] - 2026-09-25
+
+### 🧬 Capacités à Venir de la Lignée Évolutive Complète ("Mes Pokémon" & Équipe Actuelle)
+
+- **Vision Globale de la Lignée** :
+  - Dans la section **Mes Pokémon** (Équipe Actuelle), les attaques affichées ne se limitent plus à l'espèce courante : elles regroupent désormais **toutes les capacités à venir de sa lignée évolutive** (ex : un Salamèche affiche également les capacités exclusives de Reptincel et Dracaufeu, un Évoli affiche les capacités des 8 évolutions).
+  - Résout le problème où les capacités clés acquises uniquement lors d'une évolution ultérieure (ex : Cru-Ailes ou Lame d'Air pour Dracaufeu, Hydrocanon pour Aquali, etc.) ne pouvaient pas être pré-configurées dans la règle de lignée.
+- **Badges d'Espèce Évolutive Dédiés (`🧬 Nom`)** :
+  - Chaque capacité issue d'une évolution porte un badge violet stylisé `🧬 <Espèce>` (ex : `🧬 Reptincel`, `🧬 Dracaufeu`) pour distinguer instantanément à quel stade de l'évolution l'attaque devient disponible.
+  - Les attaques apprenables par l'espèce courante conservent leur affichage direct sans surcharge visuelle.
+- **Tri Chronologique & Harmonieux par Niveau** :
+  - Les attaques sont ordonnées logiquement :
+    1. Attaques actuellement équipées (`Actuelle`)
+    2. Attaques de base (`Départ`)
+    3. Attaques apprises à l'évolution (`Évolution`)
+    4. Progression par niveau croissant (Niv. 1 à Niv. 100)
+  - En cas d'attaque apprise à la fois par l'espèce de base et une évolution, l'obtention la plus précoce par l'espèce courante prime sans doublon.
+- **Filtre Instantané par Nom & Espèce** :
+  - Le champ de recherche en direct permet désormais de filtrer aussi bien par nom de capacité (ex : *"Flamme"*, *"Cru"*) que par nom d'évolution dans la lignée (ex : taper *"Dracaufeu"* affiche directement toutes les capacités spécifiques à Dracaufeu).
+- **Intégration au Mode Avancé (Remplacements Automatiques)** :
+  - Les capacités à venir de toute la lignée sont désormais également répertoriées dans les listes déroulantes du **Mode Avancé**, permettant de planifier à l'avance les remplacements d'anciennes attaques par de futures capacités d'évolution.
+
+### ⚔️ Raccourci Touche `T` : Mode Bascule (Toggle) & Interaction Souris Complète
+
+- **Passage en Bascule Persistante (`Toggle`)** :
+  - La touche **`T`** fonctionne désormais en mode bascule (on/off), exactement comme la touche **`P`** pour la fenêtre principale.
+  - Plus besoin de garder physiquement la touche enfoncée : un simple appui ouvre le tableau et le laisse ouvert.
+  - Vos mains restent totalement libres pour utiliser la souris sans aucune contrainte : cliquer sur les boutons de mode (`⚡ Simplifié` / `📊 Tableau 18×18`), survoler les types et les cellules pour lire les infobulles, scroller, etc.
+  - Un nouvel appui sur `T`, sur `Échap`, un clic sur la croix `✕` ou un clic sur l'arrière-plan referme instantanément le tableau.
+- **Suppression du Conflit de Maintien / Relâchement (`keyup`)** :
+  - La fermeture forcée lors du relâchement de la touche a été supprimée, éliminant la disparition brutale du tableau dès qu'on déplaçait la main vers la souris.
+- **Fluidité & Ergonomie Souris Améliorées** :
+  - Activation du défilement vertical (`overflow-y: auto`) sur la vue synthétique.
+  - Ajout d'un survol visuel blanc (`outline`) sur chaque cellule du tableau 18×18 pour repérer immédiatement la position du curseur de la souris.
+  - Mise à jour du texte d'aide du pied de page : `<kbd>T</kbd> ou <kbd>Échap</kbd> Fermer`.
+
+### 🎈 Bulle Flottante HUD : Maintien dans la Fenêtre & Positionnement Relatif Responsive
+
+- **Positionnement Proportionnel aux Dimensions de l'Écran (`ratioX` / `ratioY`)** :
+  - La position de la bulle flottante est désormais enregistrée sous forme de ratios relatifs par rapport à l'espace utile de la fenêtre.
+  - Si vous placez la bulle à droite ou à une certaine hauteur, elle **conserve exactement sa position proportionnelle** lorsque vous redimensionnez ou déplacez la fenêtre du navigateur.
+- **Garantie Anti-Perte lors du Redimensionnement (`window.resize`)** :
+  - Branchement d'un recalcul automatique de la position lors de chaque événement de redimensionnement de la fenêtre.
+  - La bulle est automatiquement maintenue et bridée avec une marge de sécurité de 10 px par rapport aux 4 bords de l'écran : elle ne peut plus jamais sortir du cadre ni devenir inaccessible lors d'un passage en petit écran, d'un basculement en mode fenêtré ou de l'ouverture des outils de développement.
+- **Rétrocompatibilité Totale** :
+  - Les anciennes coordonnées absolues en pixels stockées localement sont automatiquement converties en ratios relatifs et bridées dans le champ visible dès le premier affichage.
+
+---
+
 ## [v1.7.0] - 2026-09-24
 
 ### ⚔️ Table des Types Rapide (Mode Simplifié & Tableau 18 × 18) avec Détection Adversaire
