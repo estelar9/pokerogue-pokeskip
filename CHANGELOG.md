@@ -5,6 +5,31 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.9.0] - 2026-09-26
+
+### ⚔️ Refonte Complète du Modal Forces & Faiblesses (Tableau des Types)
+
+- **Navigation & Changement d'Onglet Fluide (Zero Clignotement)** :
+  - Le passage d'un mode à l'autre ne remplace plus l'intégralité du modal ni de l'écran : le cadre et l'en-tête restent parfaitement stables et immobiles.
+  - Seul le contenu intérieur effectue une transition douce et moderne (`pks-tab-fade`).
+  - Les onglets ont été renommés avec clarté : **`⚡ Simplifié`** (anciennement *Synthèse Tactique*) et **`📊 Complet`** (anciennement *Matrice 18×18*).
+
+- **Mode `⚡ Simplifié` : Épuré, 100% Lisible sans Défilement** :
+  - **Suppression Totale de la Carte de Combat** : Retrait du bloc d'analyse multi-types (×4, ×2, ×0.5...) pour un affichage direct et immédiat des 18 types.
+  - **Suppression Complète des Filtres** : Disparition de la barre de boutons de filtrage pour une interface légère et épurée.
+  - **Aucun Défilement Vertical** : Hauteur précisément calibrée pour afficher les 18 types d'un seul coup d'œil sans barre de scroll (`overflow: hidden`).
+  - **Suppression des Effets de Survol Intrusifs** : Retrait de toute surbrillance et zoom de pastilles au survol de la souris.
+  - **Interrupteur (Toggle Switch) des Immunités (`🛡️ Immunités (×0)`)** : Ajout d'un commutateur stylisé et réactif dans l'en-tête de la colonne des faiblesses pour afficher ou masquer instantanément les immunités avec sauvegarde automatique des préférences.
+  - **Bulle de Surbrillance Unifiée pour les Types Adverses Consécutifs** : Lorsque le Pokémon adverse possède deux types superposés (l'un au-dessus de l'autre dans la liste), ils sont enveloppés dans **une seule et même bulle continue**, supprimant tout effet de bordures collées ou coupées.
+
+- **Mode `📊 Complet` (Matrice 18×18) : Focus & Propreté Visuelle** :
+  - **Suppression des Effets Parasites** : Retrait du survol agressif des cases individuelles, du survol de colonnes et du pavé de résumé en bas.
+  - **Surbrillance Sobre au Survol** : Seule la ligne survolée (`tr:hover`) bénéficie d'un éclaircissement subtil et d'un liseré élégant pour faciliter la lecture.
+  - **Bulle Continue sur les Colonnes des Types Adverses** : Le ou les types de l'adversaire sont entourés d'une bulle néon prenant toute la hauteur de la colonne (de l'en-tête jusqu'au bas du tableau).
+  - **Fusion des Colonnes Adjacentes** : Si les deux types adverses sont côte à côte, une **bulle unique et continue** englobe les deux colonnes ensemble.
+
+---
+
 ## [v1.8.0] - 2026-09-25
 
 ### 🧬 Capacités à Venir de la Lignée Évolutive Complète ("Mes Pokémon" & Équipe Actuelle)

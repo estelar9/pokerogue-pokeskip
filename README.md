@@ -5,7 +5,7 @@
 **L'extension & userscript sélectif qui automatise le refus des capacités indésirables dans PokéRogue.**  
 *Ne perdez plus votre temps à refuser manuellement Mimi-Queue ou Rugissement à chaque niveau !*
 
-[![Version](https://img.shields.io/badge/version-1.4.1-38bdf8.svg?style=for-the-badge)](https://github.com)
+[![Version](https://img.shields.io/badge/version-1.9.0-38bdf8.svg?style=for-the-badge)](https://github.com)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-10b981.svg?style=for-the-badge)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 [![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Compatible-f59e0b.svg?style=for-the-badge)](https://www.tampermonkey.net/)
 [![PokéRogue](https://img.shields.io/badge/PokéRogue-pokerogue.net-ef4444.svg?style=for-the-badge)](https://pokerogue.net/)
