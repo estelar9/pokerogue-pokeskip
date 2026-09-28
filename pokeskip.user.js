@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
 // @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.9.0
+// @version      1.10.0
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -4100,6 +4100,91 @@
       }
       return { rootId, familyKey, lineageName };
     },
+    getCurrentFormName(pokemon) {
+      if (!pokemon) return 'Pokémon';
+      const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId);
+      const isMega = this.isPokemonMega(pokemon);
+      if (sid && !isNaN(sid)) {
+        let name = this.getSpeciesName(sid);
+        if (name) {
+          if (isMega && !name.toLowerCase().includes('méga') && !name.toLowerCase().includes('mega')) {
+            name = `Méga-${name}`;
+          }
+          return name;
+        }
+      }
+      if (typeof pokemon.getName === 'function') {
+        try {
+          const n = pokemon.getName();
+          if (n && typeof n === 'string') return n;
+        } catch (_) {}
+      }
+      if (pokemon.name && typeof pokemon.name === 'string') return pokemon.name;
+      if (pokemon.species?.name && typeof pokemon.species.name === 'string') return pokemon.species.name;
+      const fam = this.getFamilyInfo(pokemon);
+      return fam.lineageName || 'Pokémon';
+    },
+    getMoveDetails(move, moveId, pokemon) {
+      let moveObj = (move && typeof move === 'object') ? move : null;
+      const mId = moveId || moveObj?.id || moveObj?.moveId;
+
+      if ((!moveObj || moveObj.type === undefined || moveObj.category === undefined) && mId) {
+        let getMoveFn = null;
+        if (pokemon?.moveset && pokemon.moveset.length > 0 && typeof pokemon.moveset[0].getMove === 'function') {
+          getMoveFn = pokemon.moveset[0].getMove;
+        } else if (PokeSkip.activeParty && Array.isArray(PokeSkip.activeParty)) {
+          for (const p of PokeSkip.activeParty) {
+            if (p?.moveset && p.moveset.length > 0 && typeof p.moveset[0].getMove === 'function') {
+              getMoveFn = p.moveset[0].getMove;
+              break;
+            }
+          }
+        }
+        if (getMoveFn) {
+          try {
+            const resolved = getMoveFn.call({ moveId: mId });
+            if (resolved) {
+              moveObj = Object.assign({}, resolved, moveObj || {});
+            }
+          } catch (_) {}
+        }
+      }
+
+      const name = moveObj?.name || (move && typeof move === 'string' ? move : null) || (mId ? PokeSkip.knownMovesCache[mId] : null) || `Capacité #${mId || '?'}`;
+
+      let typeIdx = 0;
+      if (moveObj && moveObj.type !== undefined) {
+        if (typeof moveObj.type === 'number') {
+          typeIdx = moveObj.type;
+        } else if (typeof moveObj.type === 'string') {
+          const idx = POKEMON_TYPES.findIndex(t => t.name.toLowerCase() === moveObj.type.toLowerCase() || t.code.toLowerCase() === moveObj.type.toLowerCase());
+          if (idx !== -1) typeIdx = idx;
+        } else if (typeof moveObj.type === 'object' && moveObj.type.name) {
+          const idx = POKEMON_TYPES.findIndex(t => t.name.toLowerCase() === moveObj.type.name.toLowerCase());
+          if (idx !== -1) typeIdx = idx;
+        }
+      }
+
+      let catIdx = 2;
+      if (moveObj && moveObj.category !== undefined) {
+        if (typeof moveObj.category === 'number') {
+          catIdx = moveObj.category;
+        } else if (typeof moveObj.category === 'string') {
+          const idx = MOVE_CATEGORIES.findIndex(c => c.name.toLowerCase() === moveObj.category.toLowerCase());
+          if (idx !== -1) catIdx = idx;
+        } else if (typeof moveObj.category === 'object' && moveObj.category.name) {
+          const idx = MOVE_CATEGORIES.findIndex(c => c.name.toLowerCase() === moveObj.category.name.toLowerCase());
+          if (idx !== -1) catIdx = idx;
+        }
+      }
+
+      return {
+        moveId: mId,
+        name,
+        type: POKEMON_TYPES[typeIdx] || POKEMON_TYPES[0],
+        category: MOVE_CATEGORIES[catIdx] || MOVE_CATEGORIES[2]
+      };
+    },
     getLineageMemberSprites(target, isShiny = false, pokemon = null, variant = 0) {
       const rootId = this.getRootId(pokemon || target);
       const fam = this.families[rootId];
@@ -4266,16 +4351,20 @@
   // --- STATE & STORE ---
   const PokeSkip = {
     rules: Storage.get(STORAGE_KEY, {}),
-    settings: Object.assign({
-      enabled: true,
-      showToasts: true,
-      toastDuration: 2800,
-      soundFeedback: false,
-      showQuickPrompt: true,
-      quickPromptDuration: 15,
-      showHudCount: true,
-      advancedMode: false
-    }, Storage.get(SETTINGS_KEY, {})),
+    settings: (() => {
+      const s = Object.assign({
+        enabled: true,
+        showToasts: true,
+        toastDuration: 2800,
+        soundFeedback: false,
+        showQuickPrompt: true,
+        quickPromptDuration: 15,
+        showHudCount: true,
+        advancedMode: false
+      }, Storage.get(SETTINGS_KEY, {}));
+      if (s.toastDuration === 4000) s.toastDuration = 2800;
+      return s;
+    })(),
     stats: Storage.get(STATS_KEY, {
       totalSkipped: 0,
       currentSeed: null,
@@ -4712,10 +4801,23 @@
           PokeSkip.recordSkip();
 
           if (PokeSkip.settings.showToasts) {
+            const pokemonName = LineageManager.getCurrentFormName(pokemon);
+            const moveDetails = LineageManager.getMoveDetails(move, this.moveId, pokemon);
+            const typeColor = (moveDetails.type && moveDetails.type.bg) ? (
+              moveDetails.type.name === 'Combat' ? '#ea580c' :
+              moveDetails.type.name === 'Ténèbres' ? '#c4a482' :
+              moveDetails.type.name === 'Poison' ? '#a855f7' :
+              moveDetails.type.bg
+            ) : '#38bdf8';
+            const catIcon = moveDetails.category?.icon || '🌀';
+            const catName = moveDetails.category?.name || '';
+            const typeName = moveDetails.type?.name || '';
+            const tooltip = [typeName, catName].filter(Boolean).join(' • ');
+
             UI.showToast(
-              `⏭️ <b>${familyInfo.lineageName}</b> a ignoré <i>${moveName}</i> (Règle mémorisée)`,
+              `⏭️ <b>${pokemonName}</b> a ignoré <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveDetails.name}</b></span>`,
               'info',
-              PokeSkip.settings.toastDuration
+              PokeSkip.settings.toastDuration || 2800
             );
           }
 
@@ -4757,10 +4859,28 @@
               if (replaceIndex !== -1) {
                 console.log(`⚡ [PokeSkip] Remplacement auto : ${moveName} remplace ${foundOldName} (slot ${replaceIndex})`);
                 if (PokeSkip.settings.showToasts) {
+                  const pokemonName = LineageManager.getCurrentFormName(pokemon);
+                  const newMoveDetails = LineageManager.getMoveDetails(move, this.moveId, pokemon);
+                  const oldMoveDetails = LineageManager.getMoveDetails(currentMoveset[replaceIndex], replRule.oldMoveId || null, pokemon);
+
+                  const getMoveTypeColor = (m) => (m.type && m.type.bg) ? (
+                    m.type.name === 'Combat' ? '#ea580c' :
+                    m.type.name === 'Ténèbres' ? '#c4a482' :
+                    m.type.name === 'Poison' ? '#a855f7' :
+                    m.type.bg
+                  ) : '#38bdf8';
+
+                  const newTypeColor = getMoveTypeColor(newMoveDetails);
+                  const oldTypeColor = getMoveTypeColor(oldMoveDetails);
+                  const newCatIcon = newMoveDetails.category?.icon || '💥';
+                  const oldCatIcon = oldMoveDetails.category?.icon || '🌀';
+                  const newTooltip = [newMoveDetails.type?.name, newMoveDetails.category?.name].filter(Boolean).join(' • ');
+                  const oldTooltip = [oldMoveDetails.type?.name, oldMoveDetails.category?.name].filter(Boolean).join(' • ');
+
                   UI.showToast(
-                    `⚡ [PokéSkip] <b>${moveName}</b> a remplacé <i>${foundOldName}</i> sur <b>${familyInfo.lineageName}</b> !`,
-                    'success',
-                    PokeSkip.settings.toastDuration || 3500
+                    `⚡ <span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name}</b></span> a remplacé <span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${foundOldName || oldMoveDetails.name}</b></span> sur <b style="color: #38bdf8 !important;">${pokemonName}</b> !`,
+                    'advanced',
+                    PokeSkip.settings.toastDuration || 2800
                   );
                 }
 
@@ -4984,6 +5104,159 @@
       return null;
     }
 
+    function getRawEggMovesForSpecies(targetSpeciesId) {
+      if (!targetSpeciesId) return null;
+      const targetNum = Number(targetSpeciesId);
+      if (!targetNum) return null;
+
+      // 1. Si espèce courante, tenter les méthodes et propriétés directes du Pokémon
+      if (targetNum === currentSpeciesId && pokemon) {
+        try {
+          if (typeof pokemon.getEggMoves === 'function') {
+            const res = pokemon.getEggMoves();
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+          if (Array.isArray(pokemon.eggMoves) && pokemon.eggMoves.length > 0) {
+            return pokemon.eggMoves;
+          }
+          if (Array.isArray(pokemon.compatibleEggMoves) && pokemon.compatibleEggMoves.length > 0) {
+            return pokemon.compatibleEggMoves;
+          }
+          if (typeof pokemon.getSpeciesForm === 'function') {
+            const sf = pokemon.getSpeciesForm(true);
+            if (sf) {
+              if (typeof sf.getEggMoves === 'function') {
+                const res = sf.getEggMoves();
+                if (res && Array.isArray(res) && res.length > 0) return res;
+              }
+              if (Array.isArray(sf.eggMoves) && sf.eggMoves.length > 0) {
+                return sf.eggMoves;
+              }
+            }
+          }
+          if (pokemon.species) {
+            if (typeof pokemon.species.getEggMoves === 'function') {
+              const res = pokemon.species.getEggMoves();
+              if (res && Array.isArray(res) && res.length > 0) return res;
+            }
+            if (Array.isArray(pokemon.species.eggMoves) && pokemon.species.eggMoves.length > 0) {
+              return pokemon.species.eggMoves;
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 2. Recherche dans l'équipe active
+      if (PokeSkip.activeParty && Array.isArray(PokeSkip.activeParty)) {
+        for (const p of PokeSkip.activeParty) {
+          const pSid = Number(p?.species?.speciesId ?? p?.speciesId);
+          if (pSid === targetNum) {
+            try {
+              if (typeof p.getEggMoves === 'function') {
+                const res = p.getEggMoves();
+                if (res && Array.isArray(res) && res.length > 0) return res;
+              }
+              if (Array.isArray(p.eggMoves) && p.eggMoves.length > 0) return p.eggMoves;
+              if (Array.isArray(p.compatibleEggMoves) && p.compatibleEggMoves.length > 0) return p.compatibleEggMoves;
+              if (p.species) {
+                if (typeof p.species.getEggMoves === 'function') {
+                  const res = p.species.getEggMoves();
+                  if (res && Array.isArray(res) && res.length > 0) return res;
+                }
+                if (Array.isArray(p.species.eggMoves) && p.species.eggMoves.length > 0) {
+                  return p.species.eggMoves;
+                }
+              }
+            } catch (_) {}
+          }
+        }
+      }
+
+      // 3. Tenter via le speciesDataRegistry du jeu
+      try {
+        const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+        const scene = PokeSkip.scene || win.globalScene;
+        const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry
+                    || (scene && scene.speciesDataRegistry)
+                    || (scene && scene.gameData && scene.gameData.speciesDataRegistry);
+        if (sdr) {
+          if (typeof sdr.getEggMoves === 'function') {
+            const res = sdr.getEggMoves(targetNum);
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+          const sp = sdr.data ? sdr.data[targetNum] : (typeof sdr.get === 'function' ? sdr.get(targetNum) : null);
+          if (sp) {
+            if (typeof sp.getEggMoves === 'function') {
+              const res = sp.getEggMoves();
+              if (res && Array.isArray(res) && res.length > 0) return res;
+            }
+            if (Array.isArray(sp.eggMoves) && sp.eggMoves.length > 0) {
+              return sp.eggMoves;
+            }
+          }
+        }
+      } catch (_) {}
+
+      // 4. Invoquer getEggMoves via prototypes d'espèces si disponibles
+      let sp = pokemon?.species || (typeof pokemon?.getSpeciesForm === 'function' ? pokemon.getSpeciesForm(true) : null);
+      if (!sp && PokeSkip.activeParty && PokeSkip.activeParty.length > 0) {
+        for (const p of PokeSkip.activeParty) {
+          const cand = p?.species || (typeof p?.getSpeciesForm === 'function' ? p.getSpeciesForm(true) : null);
+          if (cand && (typeof cand.getEggMoves === 'function' || cand.eggMoves)) {
+            sp = cand;
+            break;
+          }
+        }
+      }
+
+      if (sp) {
+        try {
+          const proto = Object.getPrototypeOf(sp);
+          const superProto = proto ? Object.getPrototypeOf(proto) : null;
+          if (superProto && typeof superProto.getEggMoves === 'function') {
+            const res = superProto.getEggMoves.call({ speciesId: targetNum });
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+        } catch (_) {}
+
+        try {
+          const proto = Object.getPrototypeOf(sp);
+          if (proto && typeof proto.getEggMoves === 'function') {
+            const ctx = Object.create(proto);
+            ctx.speciesId = targetNum;
+            ctx.formIndex = 0;
+            ctx.getFormKey = () => undefined;
+            const res = proto.getEggMoves.call(ctx);
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+        } catch (_) {}
+
+        try {
+          if (typeof sp.getEggMoves === 'function') {
+            const ctx = Object.create(sp);
+            ctx.speciesId = targetNum;
+            ctx.formIndex = 0;
+            ctx.getFormKey = () => undefined;
+            const res = sp.getEggMoves.call(ctx);
+            if (res && Array.isArray(res) && res.length > 0) return res;
+          }
+        } catch (_) {}
+      }
+
+      // 5. Registres ou dictionnaires globaux possibles
+      try {
+        const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+        if (win.pokemonSpecies && Array.isArray(win.pokemonSpecies[targetNum]?.eggMoves)) {
+          return win.pokemonSpecies[targetNum].eggMoves;
+        }
+        if (win.allSpecies && Array.isArray(win.allSpecies[targetNum]?.eggMoves)) {
+          return win.allSpecies[targetNum].eggMoves;
+        }
+      } catch (_) {}
+
+      return null;
+    }
+
     // 1. Récupérer TOUTES les attaques apprenables de l'espèce courante
     const currentMovesRaw = getRawLevelMovesForSpecies(currentSpeciesId);
     if (currentMovesRaw && Array.isArray(currentMovesRaw)) {
@@ -5029,7 +5302,46 @@
       }
     }
 
-    // 4. Trier les attaques apprises par niveau croissant
+    // 4. Récupérer les capacités œuf de toute la lignée (racine, espèce courante, et autres membres)
+    const rootId = LineageManager.getRootId(pokemon);
+    const eggSpeciesCandidates = [rootId, currentSpeciesId, ...(lineage.allMembers || []), ...(lineage.otherMemberIds || []), ...(lineage.futureEvoIds || [])];
+    const checkedEggSpecies = new Set();
+
+    if (pokemon) {
+      try {
+        const directEggMoves = (typeof pokemon.getEggMoves === 'function' ? pokemon.getEggMoves() : null)
+          || (Array.isArray(pokemon.eggMoves) ? pokemon.eggMoves : null)
+          || (Array.isArray(pokemon.compatibleEggMoves) ? pokemon.compatibleEggMoves : null);
+        if (directEggMoves && Array.isArray(directEggMoves)) {
+          for (const entry of directEggMoves) {
+            const moveId = (typeof entry === 'object' && entry !== null) ? Number(entry.moveId ?? entry.id ?? entry) : Number(entry);
+            if (moveId && !isNaN(moveId) && moveId > 0 && !seenMoveIds.has(moveId)) {
+              seenMoveIds.add(moveId);
+              moves.push(resolveMove(moveId, 'Œuf', null));
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    for (const sid of eggSpeciesCandidates) {
+      if (!sid || checkedEggSpecies.has(sid)) continue;
+      checkedEggSpecies.add(sid);
+
+      const eggMovesRaw = getRawEggMovesForSpecies(sid);
+      if (eggMovesRaw && Array.isArray(eggMovesRaw)) {
+        const sourceName = sid !== currentSpeciesId ? LineageManager.getSpeciesName(sid) : null;
+        for (const entry of eggMovesRaw) {
+          const moveId = (typeof entry === 'object' && entry !== null) ? Number(entry.moveId ?? entry.id ?? entry) : Number(entry);
+          if (moveId && !isNaN(moveId) && moveId > 0 && !seenMoveIds.has(moveId)) {
+            seenMoveIds.add(moveId);
+            moves.push(resolveMove(moveId, 'Œuf', sourceName));
+          }
+        }
+      }
+    }
+
+    // 5. Trier les attaques apprises par niveau croissant
     const getLevelWeight = (lvl) => {
       if (typeof lvl === 'number') {
         if (lvl < 0) return 0;
@@ -5037,6 +5349,7 @@
         return lvl;
       }
       if (lvl === 'Départ') return 0;
+      if (lvl === 'Œuf') return 0.2;
       if (lvl === 'Évolution') return 0.5;
       if (lvl === 'Actuelle') return -1;
       return 999;
@@ -6344,6 +6657,7 @@
           align-items: center;
           gap: 12px;
           color: #fff;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           font-size: 13px;
           animation: pokeskipSlideDown 0.25s ease-out;
           pointer-events: auto;
@@ -6354,9 +6668,16 @@
         }
         .pokeskip-quick-text {
           white-space: nowrap;
+          font-family: inherit;
           font-size: 13px;
         }
+        .pokeskip-quick-text b,
+        .pokeskip-quick-text strong {
+          color: #38bdf8;
+          font-weight: 700;
+        }
         .pokeskip-quick-btn {
+          font-family: inherit;
           background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
           color: #fff;
           border: none;
@@ -6374,6 +6695,7 @@
           filter: brightness(1.1);
         }
         .pokeskip-quick-close {
+          font-family: inherit;
           background: transparent;
           border: none;
           color: #94a3b8;
@@ -6449,6 +6771,11 @@
         .pokeskip-toast.error b,
         .pokeskip-toast.error strong {
           color: #f87171;
+        }
+        .pokeskip-toast.advanced,
+        .pokeskip-toast.purple {
+          border-left-color: #a855f7;
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 18px rgba(168, 85, 247, 0.3);
         }
         @keyframes pokeskipToastIn {
           from {
@@ -7168,7 +7495,7 @@
       this.toastContainer = el;
     },
 
-    showToast(message, type = 'info', duration = 2800) {
+    showToast(message, type = 'info', duration = (PokeSkip.settings?.toastDuration || 2800)) {
       this.createToastContainer();
       const toast = document.createElement('div');
       toast.className = `pokeskip-toast ${type}`;
@@ -7468,6 +7795,14 @@
                   Afficher les notifications toast lors d'un auto-skip
                 </label>
 
+                <div id="pokeskip-opt-toast-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.showToasts ? '1' : '0.4'};">
+                  <span>Durée d'affichage des notifications :</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <input type="number" id="pokeskip-opt-toast-duration" min="1" max="15" step="0.5" value="${((PokeSkip.settings.toastDuration || 2800) / 1000)}" ${!PokeSkip.settings.showToasts ? 'disabled' : ''} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
+                    <span>secondes</span>
+                  </div>
+                </div>
+
                 <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
                   <input type="checkbox" id="pokeskip-opt-hud-count" ${PokeSkip.settings.showHudCount !== false ? 'checked' : ''} style="accent-color: #38bdf8;">
                   Afficher le compteur de capacités passées sur la pastille
@@ -7562,7 +7897,34 @@
       document.getElementById('pokeskip-opt-toasts').addEventListener('change', (e) => {
         PokeSkip.settings.showToasts = e.target.checked;
         PokeSkip.saveSettings();
+        const toastDurContainer = document.getElementById('pokeskip-opt-toast-duration-container');
+        const toastDurInput = document.getElementById('pokeskip-opt-toast-duration');
+        if (toastDurContainer) {
+          toastDurContainer.style.opacity = e.target.checked ? '1' : '0.4';
+        }
+        if (toastDurInput) {
+          toastDurInput.disabled = !e.target.checked;
+        }
       });
+
+      const optToastDuration = document.getElementById('pokeskip-opt-toast-duration');
+      if (optToastDuration) {
+        optToastDuration.addEventListener('input', (e) => {
+          const val = parseFloat(e.target.value);
+          if (!isNaN(val) && val >= 1 && val <= 30) {
+            PokeSkip.settings.toastDuration = Math.round(val * 1000);
+            PokeSkip.saveSettings();
+          }
+        });
+        optToastDuration.addEventListener('change', (e) => {
+          let val = parseFloat(e.target.value);
+          if (isNaN(val) || val < 1) val = 1;
+          if (val > 30) val = 30;
+          e.target.value = val;
+          PokeSkip.settings.toastDuration = Math.round(val * 1000);
+          PokeSkip.saveSettings();
+        });
+      }
 
       const optHudCount = document.getElementById('pokeskip-opt-hud-count');
       if (optHudCount) {
@@ -8375,7 +8737,10 @@
         const filtered = learnable.filter(m => {
           if (!filter) return true;
           const f = filter.toLowerCase();
-          return m.name.toLowerCase().includes(f) || (m.evolutionSpecies && m.evolutionSpecies.toLowerCase().includes(f));
+          const isEggFilter = f.includes('oeuf') || f.includes('œuf') || f.includes('egg');
+          return m.name.toLowerCase().includes(f)
+            || (m.evolutionSpecies && m.evolutionSpecies.toLowerCase().includes(f))
+            || (isEggFilter && m.level === 'Œuf');
         });
 
         if (filtered.length === 0) {
@@ -8394,9 +8759,14 @@
             lvlStyle = 'style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);"';
           } else if (moveItem.level === 'Évolution') {
             lvlStyle = 'style="background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);"';
+          } else if (moveItem.level === 'Œuf') {
+            lvlStyle = 'style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);"';
           }
 
-          const lvlLabel = typeof moveItem.level === 'number' ? `Niv. ${moveItem.level}` : moveItem.level;
+          let lvlLabel = typeof moveItem.level === 'number' ? `Niv. ${moveItem.level}` : moveItem.level;
+          if (moveItem.level === 'Œuf') {
+            lvlLabel = '🥚 Œuf';
+          }
 
           cardEl.innerHTML = `
             <div class="pokeskip-move-top">
@@ -8763,6 +9133,7 @@
         if (typeof lvl === 'string') {
           const s = lvl.trim().toLowerCase();
           if (s.includes('départ') || s.includes('depart')) return 0;
+          if (s.includes('œuf') || s.includes('oeuf') || s.includes('egg')) return 0.2;
           if (s.includes('évol') || s.includes('evol')) return 0.5;
           if (s.includes('actuelle')) return 0.1;
           const match = s.match(/\d+/);
@@ -8852,6 +9223,7 @@
           } else {
             const s = String(m.level).trim();
             if (/^\d+$/.test(s)) prefix = `[Niv. ${s}] `;
+            else if (/œuf|oeuf|egg/i.test(s)) prefix = '[🥚 Œuf] ';
             else if (/évol/i.test(s)) prefix = '[Évolution] ';
             else if (/départ|depart/i.test(s)) prefix = '[Départ] ';
             else if (/actuelle/i.test(s)) prefix = '[Actuelle] ';
@@ -8991,7 +9363,55 @@
         PokeSkip.addReplacementRule(target, newM, oldM, null, null);
         PokeSkip.setMoveSkipped(target, null, newM, null, false);
 
-        UI.showToast(`Règle enregistrée : Toujours remplacer <b>${oldM}</b> par <b>${newM}</b> sur <b>${familyInfo.lineageName}</b>`, 'success');
+        const resolveMoveInfo = (moveName) => {
+          if (!moveName) return { name: '', type: null, category: null };
+          const lower = moveName.trim().toLowerCase();
+          if (Array.isArray(defaultLearnable)) {
+            const found = defaultLearnable.find(m => m && m.name && m.name.trim().toLowerCase() === lower);
+            if (found) {
+              return {
+                name: found.name || moveName,
+                type: found.type || null,
+                category: found.category || null
+              };
+            }
+          }
+          let foundId = null;
+          if (PokeSkip.knownMovesCache) {
+            for (const [idStr, mName] of Object.entries(PokeSkip.knownMovesCache)) {
+              if (mName && mName.trim().toLowerCase() === lower) {
+                foundId = Number(idStr);
+                break;
+              }
+            }
+          }
+          const pokemonRef = (target && typeof target === 'object') ? target : null;
+          return LineageManager.getMoveDetails(moveName, foundId, pokemonRef);
+        };
+
+        const oldMoveDetails = resolveMoveInfo(oldM);
+        const newMoveDetails = resolveMoveInfo(newM);
+
+        const getMoveTypeColor = (m) => (m && m.type && m.type.bg) ? (
+          m.type.name === 'Combat' ? '#ea580c' :
+          m.type.name === 'Ténèbres' ? '#c4a482' :
+          m.type.name === 'Poison' ? '#a855f7' :
+          m.type.bg
+        ) : '#38bdf8';
+
+        const oldTypeColor = getMoveTypeColor(oldMoveDetails);
+        const newTypeColor = getMoveTypeColor(newMoveDetails);
+        const oldCatIcon = oldMoveDetails?.category?.icon || '🌀';
+        const newCatIcon = newMoveDetails?.category?.icon || '💥';
+        const oldTooltip = [oldMoveDetails?.type?.name, oldMoveDetails?.category?.name].filter(Boolean).join(' • ');
+        const newTooltip = [newMoveDetails?.type?.name, newMoveDetails?.category?.name].filter(Boolean).join(' • ');
+        const pokemonName = LineageManager.getCurrentFormName(target) || familyInfo.lineageName;
+
+        UI.showToast(
+          `⚡ Règle enregistrée : remplacer <span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${oldMoveDetails.name || oldM}</b></span> par <span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name || newM}</b></span> sur <b style="color: #38bdf8 !important;">${pokemonName}</b> !`,
+          'advanced',
+          PokeSkip.settings.toastDuration || 2800
+        );
         if (typeof onUpdate === 'function') {
           onUpdate();
         }
@@ -9065,15 +9485,25 @@
         document.getElementById('pokeskip-quick-prompt').remove();
       }
 
-      const familyInfo = LineageManager.getFamilyInfo(pokemon);
-      const moveName = move?.name || `Move #${phaseInstance.moveId}`;
+      const pokemonName = LineageManager.getCurrentFormName(pokemon);
+      const moveDetails = LineageManager.getMoveDetails(move, phaseInstance.moveId, pokemon);
+      const typeColor = (moveDetails.type && moveDetails.type.bg) ? (
+        moveDetails.type.name === 'Combat' ? '#ea580c' :
+        moveDetails.type.name === 'Ténèbres' ? '#c4a482' :
+        moveDetails.type.name === 'Poison' ? '#a855f7' :
+        moveDetails.type.bg
+      ) : '#38bdf8';
+      const catIcon = moveDetails.category?.icon || '🌀';
+      const catName = moveDetails.category?.name || '';
+      const typeName = moveDetails.type?.name || '';
+      const tooltip = [typeName, catName].filter(Boolean).join(' • ');
 
       const el = document.createElement('div');
       el.id = 'pokeskip-quick-prompt';
       el.innerHTML = `
-        <span class="pokeskip-quick-text">⚡ Ignorer <b>${moveName}</b> pour <b>${familyInfo.lineageName}</b> ?</span>
+        <span class="pokeskip-quick-text">⚡ Ignorer <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveDetails.name}</b></span> sur <b>${pokemonName}</b> ?</span>
         <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">Toujours ignorer</button>
-        <button class="pokeskip-quick-close" id="pokeskip-quick-close">&times;</button>
+        <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="Fermer">&times;</button>
       `;
 
       document.body.appendChild(el);
@@ -9089,10 +9519,10 @@
 
       el.querySelector('#pokeskip-quick-skip-always').addEventListener('click', (e) => {
         e.stopPropagation();
-        PokeSkip.setMoveSkipped(pokemon, pokemon?.species?.name, moveName, phaseInstance.moveId, true);
+        PokeSkip.setMoveSkipped(pokemon, pokemon?.species?.name, moveDetails.name, phaseInstance.moveId, true);
         PokeSkip.recordSkip();
 
-        this.showToast(`✅ Règle enregistrée : <b>${familyInfo.lineageName}</b> ignorera <b>${moveName}</b> !`, 'success');
+        this.showToast(`✅ Règle enregistrée : <b>${pokemonName}</b> ignorera <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveDetails.name}</b></span> !`, 'success');
         dismiss();
 
         // 1. Marquer la phase comme ignorée par PokéSkip

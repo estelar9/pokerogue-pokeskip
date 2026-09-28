@@ -5,6 +5,32 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.10.0] - 2026-09-28
+
+### 🥚 Intégration des Capacités Œuf (Egg Moves)
+- **Support Complet de la Lignée Évolutive** :
+  - Les capacités œuf (Egg Moves) sont désormais interrogées et intégrées pour toute la lignée dans la liste des capacités ("Mes Pokémon" / Équipe Actuelle).
+  - Détection dynamique sur l'espèce de départ/racine, l'espèce actuelle et les évolutions via le `speciesDataRegistry` et les données d'espèces.
+  - Attribution d'un badge distinctif ambré `🥚 Œuf` et tag de l'espèce source si apprise par un autre stade évolutif (ex: `🧬 Salamèche`).
+  - Prise en charge dans le filtre de recherche rapide (taper `oeuf`, `œuf` ou `egg` filtre instantanément toutes les capacités œuf).
+  - Intégration complète dans les listes déroulantes du **Mode Avancé** (*"Toujours remplacer :"* et *"Par la nouvelle :"*) avec préfixe `[🥚 Œuf]`.
+
+### 🔔 Notifications Toasts & Invites Visuelles Épurées et Harmoniques
+- **Toast d'Auto-Skip** :
+  - Affiche uniquement le nom du Pokémon sous sa forme actuelle en bleu ciel (`#38bdf8`), sans encombrer avec toute la lignée.
+  - Suppression de la mention superflue `(règle mémorisée)`.
+  - Nom de la capacité coloré selon son type élémentaire avec icône de catégorie (💥 Physique, ✨ Spéciale, 🌀 Statut) et infobulle détaillée.
+- **Bouton Toast d'Apprentissage Rapide (Quick Prompt)** :
+  - Harmonisation de la typographie avec le reste de l'interface (`system-ui`).
+  - Affichage simplifié du Pokémon actuel avec type et catégorie de l'attaque.
+- **Toasts de Remplacement Automatique (Mode Avancé)** :
+  - Style violet dédié (`advanced`), nom du Pokémon en bleu ciel et capacités formatées avec leurs types et emojis de catégorie.
+  - Toast confirmant l'enregistrement d'une règle de remplacement harmonisé avec le même design élégant.
+- **Durée des Notifications Paramétrable** :
+  - Ajout d'un curseur de réglage dans les Paramètres pour ajuster la durée d'affichage des toasts de 1 à 15 secondes (valeur par défaut : 2,8s).
+
+---
+
 ## [v1.9.0] - 2026-09-26
 
 ### ⚔️ Refonte Complète du Modal Forces & Faiblesses (Tableau des Types)
