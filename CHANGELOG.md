@@ -5,6 +5,23 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.11.0] - 2026-09-28
+
+### 🏗️ Refonte Architecturale Majeure & Modularité Complète (`src/`)
+- **Découpage du Monolithe de 10 000 Lignes** :
+  - Décomposition intégrale du code en modules ES6 clairs et spécialisés dans le dossier `src/` (`constants/`, `data/`, `core/`, `game/`, `ui/`).
+  - Isolation des dictionnaires de données volumineux (`families.js`, `branched-prevolutions.js`, `megas.js`, `species-names.js`) dégageant plus de 3 000 lignes du cœur de calcul.
+  - Extraction de plus de 1 900 lignes de styles CSS dans un fichier dédié [src/ui/styles.css](file:///d:/esteb/Documents/%21dev/Antigravity/Pokeskip/src/ui/styles.css).
+  - Découpage de l'interface en modules distincts pour chaque composant et onglet (`hud.js`, `modal.js`, `type-chart.js`, `hotkeys.js`, `team-tab.js`, `saved-species-tab.js`, `replacements-tab.js`, `settings-tab.js`).
+- **Pipeline de Compilation Automatisé avec esbuild** :
+  - Création de `build.js` générant simultanément [pokeskip.user.js](file:///d:/esteb/Documents/%21dev/Antigravity/Pokeskip/pokeskip.user.js) et [extension/inject.js](file:///d:/esteb/Documents/%21dev/Antigravity/Pokeskip/extension/inject.js) en moins de 50 ms.
+  - Fin définitive de la duplication manuelle : une source de vérité unique garantissant la synchronisation parfaite des deux distributions.
+  - Nouvelles commandes développeur ajoutées : `npm run build`, `npm run dev` (watch), `npm run lint` et `npm run build:zip`.
+- **Zéro Régression & Parité Fonctionnelle Totale** :
+  - Conservation intégrale de tous les comportements, règles enregistrées, isolation du clavier Phaser et fonctionnalités du jeu.
+
+---
+
 ## [v1.10.2] - 2026-09-28
 
 ### ⌨️ Isolation Totale des Touches Clavier (Filtre, Listes Déroulantes & Saisie)

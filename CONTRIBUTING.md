@@ -6,38 +6,50 @@ Merci de vous intéresser à **PokéSkip** ! Les contributions, suggestions d'am
 
 ## 📁 Architecture du Projet
 
-Le projet est conçu pour être à la fois une **extension de navigateur native** (Manifest V3) et un **Userscript autonome** (Tampermonkey / Violentmonkey) :
+Le projet est structuré selon une **architecture modulaire moderne** avec une source de vérité unique dans le dossier `src/` :
 
-- **`extension/`** : Code source de l'extension native WebExtension (Manifest V3).
-  - `manifest.json` : Déclaration de l'extension et permissions.
-  - `content.js` : Script de contenu injectant `inject.js` dans le contexte de la page PokéRogue.
-  - `inject.js` : Cœur logique du plugin (hook de la phase d'apprentissage `LearnMovePhase`, UI du HUD, modal, stockage).
-  - `popup.html` / `popup.js` / `popup.css` : Interface de la popup de la barre d'outils navigateur.
-  - `icons/` : Icônes aux formats 16x16, 48x48 et 128x128.
-- **`pokeskip.user.js`** : Version Userscript prête à l'emploi avec en-têtes `// ==UserScript==` pour Tampermonkey.
-- **`pokeskip-extension.zip`** : Archive compressée du dossier `extension/` pour installation directe en un clic.
+- **`src/`** : Code source modulaire ES6.
+  - **`constants/`** : Référentiels types (`types.js`), catégories (`categories.js`), clés de stockage (`storage-keys.js`).
+  - **`data/`** : Dictionnaires volumineux séparés (`families.js`, `branched-prevolutions.js`, `megas.js`, `species-names.js`).
+  - **`core/`** : Services métier (`storage.js`, `asset-loader.js`, `lineage-manager.js`, `state.js`, `moves-resolver.js`, `battle-analyzer.js`).
+  - **`game/`** : Intégration moteur PokéRogue Phaser (`phaser-hook.js`, `input-blocker.js`).
+  - **`ui/`** : Interface utilisateur découpée (`styles.css`, `hud.js`, `modal.js`, `type-chart.js`, `hotkeys.js`, `quick-prompt.js`, et les sous-onglets dans `tabs/`).
+  - **`index.js`** : Orchestrateur et point d'entrée principal.
+- **`build.js`** : Script de compilation unifié avec **esbuild** qui génère simultanément le Userscript et l'Extension.
+- **`pokeskip.user.js`** : *(Généré automatiquement)* Version Userscript avec en-têtes Tampermonkey.
+- **`extension/`** : Extension native WebExtension (Manifest V3).
+  - `inject.js` : *(Généré automatiquement)* Bundle injecté dans le contexte du jeu.
+  - `content.js`, `manifest.json`, `popup.html`, `popup.js`, `popup.css`, `icons/`.
+- **`pokeskip-extension.zip`** : Archive compressée prête à être déployée.
 
 ---
 
 ## 🛠️ Développement Local
 
-1. Clonez le dépôt :
+1. Installez les dépendances de développement :
    ```bash
-   git clone https://github.com/votre-nom/pokeskip.git
-   cd pokeskip
+   npm install
    ```
 
-2. Validez la syntaxe des scripts JavaScript :
+2. Compilez le projet (génère `pokeskip.user.js` et `extension/inject.js` en une commande) :
+   ```bash
+   npm run build
+   ```
+
+3. Mode développement avec rechargement automatique (watch) :
+   ```bash
+   npm run dev
+   ```
+
+4. Validez la syntaxe de l'ensemble du projet :
    ```bash
    npm run lint
    ```
 
-3. Pour régénérer l'archive de l'extension après modification :
+5. Générez l'archive de déploiement de l'extension :
    ```bash
    npm run build:zip
    ```
-
-4. Pour synchroniser les modifications entre `extension/inject.js` et `pokeskip.user.js`, veillez à reporter les changements du moteur logique dans les deux fichiers (en préservant l'en-tête Userscript sur `pokeskip.user.js`).
 
 ---
 
