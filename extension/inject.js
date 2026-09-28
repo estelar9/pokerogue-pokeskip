@@ -5524,6 +5524,74 @@
     quickActionElement: null,
     selectedTeamIndex: 0,
 
+    isModalOpen() {
+      const modalActive = this.modalContainer && this.modalContainer.classList.contains('active');
+      const typeChartActive = this.typeChartContainer && this.typeChartContainer.style.display === 'flex';
+      return Boolean(modalActive || typeChartActive);
+    },
+
+    disableGameKeyboard() {
+      try {
+        const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+        const found = typeof findPhaserScene === 'function' ? findPhaserScene() : null;
+        const sc = found?.scene || PokeSkip.scene || win.globalScene;
+        const game = found?.game || sc?.game;
+
+        if (sc?.input?.keyboard) {
+          sc.input.keyboard.enabled = false;
+          if (typeof sc.input.keyboard.resetKeys === 'function') {
+            sc.input.keyboard.resetKeys();
+          }
+        }
+        if (game?.input?.keyboard) {
+          game.input.keyboard.enabled = false;
+          if (typeof game.input.keyboard.resetKeys === 'function') {
+            game.input.keyboard.resetKeys();
+          }
+        }
+      } catch (err) {
+        console.warn('[PokéSkip] Erreur désactivation clavier Phaser:', err);
+      }
+    },
+
+    enableGameKeyboard() {
+      try {
+        const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+        const found = typeof findPhaserScene === 'function' ? findPhaserScene() : null;
+        const sc = found?.scene || PokeSkip.scene || win.globalScene;
+        const game = found?.game || sc?.game;
+
+        if (sc?.input?.keyboard) {
+          sc.input.keyboard.enabled = true;
+          if (typeof sc.input.keyboard.resetKeys === 'function') {
+            sc.input.keyboard.resetKeys();
+          }
+        }
+        if (game?.input?.keyboard) {
+          game.input.keyboard.enabled = true;
+          if (typeof game.input.keyboard.resetKeys === 'function') {
+            game.input.keyboard.resetKeys();
+          }
+        }
+      } catch (err) {
+        console.warn('[PokéSkip] Erreur réactivation clavier Phaser:', err);
+      }
+    },
+
+    isolateInputs(container) {
+      if (!container) return;
+      const elements = container.querySelectorAll('input, select, textarea');
+      elements.forEach(el => {
+        if (el._pksIsolated) return;
+        el._pksIsolated = true;
+        ['keydown', 'keyup', 'keypress'].forEach(type => {
+          el.addEventListener(type, (e) => {
+            e.stopPropagation();
+          });
+        });
+      });
+    },
+
     init() {
       this.injectStyles();
       this.createToastContainer();
@@ -7852,6 +7920,21 @@
       document.body.appendChild(backdrop);
       this.modalContainer = backdrop;
 
+      // Isoler tous les événements clavier à l'intérieur du modal pour éviter toute transmission à PokéRogue
+      const stopModalKeyboard = (e) => {
+        if (e.key === 'Escape' && e.type === 'keydown') {
+          this.closeModal();
+          e.stopPropagation();
+          e.preventDefault();
+          return;
+        }
+        e.stopPropagation();
+      };
+      ['keydown', 'keyup', 'keypress'].forEach(type => {
+        backdrop.addEventListener(type, stopModalKeyboard);
+      });
+      this.isolateInputs(backdrop);
+
       backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) this.closeModal();
       });
@@ -8023,6 +8106,7 @@
     },
 
     openModal() {
+      this.disableGameKeyboard();
       this.refreshPartyFromGame();
       this.renderTeamTab();
       this.modalContainer.classList.add('active');
@@ -8031,6 +8115,9 @@
     closeModal() {
       if (this.modalContainer) {
         this.modalContainer.classList.remove('active');
+      }
+      if (!this.isModalOpen()) {
+        this.enableGameKeyboard();
       }
     },
 
@@ -8050,6 +8137,18 @@
       this.typeChartShowImmunities = Storage.get('pokeskip_typechart_show_immunities', true);
       const overlay = document.createElement('div');
       overlay.id = 'pokeskip-typechart-overlay';
+      const stopOverlayKeyboard = (e) => {
+        if (e.key === 'Escape' && e.type === 'keydown') {
+          this.hideTypeChart(false);
+          e.stopPropagation();
+          e.preventDefault();
+          return;
+        }
+        e.stopPropagation();
+      };
+      ['keydown', 'keyup', 'keypress'].forEach(type => {
+        overlay.addEventListener(type, stopOverlayKeyboard);
+      });
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) {
           this.hideTypeChart(false);
@@ -8057,6 +8156,7 @@
       });
       document.body.appendChild(overlay);
       this.typeChartContainer = overlay;
+      this.isolateInputs(overlay);
     },
 
     getTypeChartContentHtml(mode) {
@@ -8502,6 +8602,7 @@
     },
 
     showTypeChart() {
+      this.disableGameKeyboard();
       if (!this.typeChartContainer) {
         this.createTypeChartContainer();
       }
@@ -8515,6 +8616,9 @@
         this.typeChartContainer.style.display = 'none';
       }
       this.typeChartOpenedViaKey = false;
+      if (!this.isModalOpen()) {
+        this.enableGameKeyboard();
+      }
     },
 
     toggleTypeChart() {
@@ -8528,22 +8632,45 @@
     bindHotkeys() {
       window.addEventListener('keydown', (e) => {
         const activeEl = document.activeElement;
-        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) return;
+        const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT' || activeEl.isContentEditable);
 
         if (e.key === 'p' || e.key === 'P') {
+          if (isInput) return;
           if (e.repeat) return;
+          e.stopPropagation();
+          e.preventDefault();
           this.toggleModal();
         } else if (e.key === 't' || e.key === 'T') {
+          if (isInput) return;
           if (e.repeat) return;
+          e.stopPropagation();
+          e.preventDefault();
           this.toggleTypeChart();
         } else if (e.key === 'Escape') {
           if (this.typeChartContainer && this.typeChartContainer.style.display === 'flex') {
+            e.stopPropagation();
+            e.preventDefault();
             this.hideTypeChart();
-          } else {
+          } else if (this.modalContainer && this.modalContainer.classList.contains('active')) {
+            e.stopPropagation();
+            e.preventDefault();
             this.closeModal();
           }
         }
       });
+
+      document.addEventListener('focusin', (e) => {
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) {
+          this.disableGameKeyboard();
+        }
+      }, true);
+
+      document.addEventListener('focusout', (e) => {
+        if (!this.isModalOpen()) {
+          this.enableGameKeyboard();
+        }
+      }, true);
 
       window.addEventListener('resize', () => {
         this.applyHudPosition(this.hudContainer || document.getElementById('pokeskip-hud'));
@@ -8806,9 +8933,21 @@
       renderGrid();
       updateLineageToggle();
 
-      container.querySelector('#pokeskip-move-filter').addEventListener('input', (e) => {
-        renderGrid(e.target.value);
-      });
+      const filterInput = container.querySelector('#pokeskip-move-filter');
+      if (filterInput) {
+        ['keydown', 'keyup', 'keypress'].forEach(type => {
+          filterInput.addEventListener(type, (e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter' && type === 'keydown') {
+              e.preventDefault();
+            }
+          });
+        });
+        filterInput.addEventListener('input', (e) => {
+          renderGrid(e.target.value);
+        });
+      }
+      this.isolateInputs(container);
 
       if (PokeSkip.settings.advancedMode) {
         const slotEl = container.querySelector('#pokeskip-pokemon-replacements-slot');
@@ -9045,9 +9184,18 @@
         this.renderFamilyRuleEditor(container, famKey);
       };
       btnAdd.addEventListener('click', handleAdd);
-      inputAdd.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleAdd();
-      });
+      if (inputAdd) {
+        ['keydown', 'keyup', 'keypress'].forEach(type => {
+          inputAdd.addEventListener(type, (e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter' && type === 'keydown') {
+              e.preventDefault();
+              handleAdd();
+            }
+          });
+        });
+      }
+      this.isolateInputs(container);
 
       // Rétablir tout
       const btnClearAll = container.querySelector('#pokeskip-btn-clear-lineage-moves');
@@ -9405,18 +9553,31 @@
       };
 
       btnAdd?.addEventListener('click', handleAdd);
-      inputOld?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          if (!inputNew?.value.trim()) {
-            inputNew?.focus();
-            try { if (typeof inputNew.showPicker === 'function') inputNew.showPicker(); } catch (err) {}
-          } else {
-            handleAdd();
-          }
+
+      const isolateRepInput = (inp, onEnter) => {
+        if (!inp) return;
+        ['keydown', 'keyup', 'keypress'].forEach(type => {
+          inp.addEventListener(type, (e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter' && type === 'keydown') {
+              e.preventDefault();
+              if (typeof onEnter === 'function') onEnter();
+            }
+          });
+        });
+      };
+
+      isolateRepInput(inputOld, () => {
+        if (!inputNew?.value.trim()) {
+          inputNew?.focus();
+          try { if (typeof inputNew.showPicker === 'function') inputNew.showPicker(); } catch (err) {}
+        } else {
+          handleAdd();
         }
       });
-      inputNew?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleAdd();
+
+      isolateRepInput(inputNew, () => {
+        handleAdd();
       });
 
       inputOld?.addEventListener('click', () => {
@@ -9425,6 +9586,8 @@
       inputNew?.addEventListener('click', () => {
         try { if (typeof inputNew.showPicker === 'function') inputNew.showPicker(); } catch (err) {}
       });
+
+      this.isolateInputs(secEl);
 
       secEl.querySelectorAll('.pokeskip-btn-toggle-single-rep').forEach(btn => {
         btn.addEventListener('click', () => {

@@ -5,6 +5,23 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.10.2] - 2026-09-28
+
+### ⌨️ Isolation Totale des Touches Clavier (Filtre, Listes Déroulantes & Saisie)
+- **Suppression des Interactions Parasites avec PokéRogue** :
+  - Résolution d'un problème majeur où la saisie de texte dans la barre de filtre (`Filtrer une attaque...`), la navigation dans les listes déroulantes de remplacement (`Toujours remplacer / Par la nouvelle`) ou le champ d'ajout manuel transmettait les frappes au jeu en arrière-plan (déclenchant involontairement des attaques, validations ou déplacements de curseur dans les menus de combat).
+- **Isolation Multi-Couche des Événements Clavier (`stopPropagation`)** :
+  - Blocage immédiat de la propagation (`keydown`, `keyup`, `keypress`) sur tous les champs de saisie, les listes déroulantes et l'ensemble du conteneur modal de l'équipe et de l'overlay de table des types.
+  - La touche **Entrée** est interceptée avec `preventDefault()` pour valider l'action de l'interface PokéSkip sans déclencher d'attaque dans PokéRogue.
+  - Les touches de déplacement (flèches haut/bas, gauche/droite, espace, effacement) fonctionnent normalement dans les champs de texte et les listes de suggestions natives (datalist) sans impacter le jeu.
+- **Désactivation Intelligente du Clavier Phaser (`disableGameKeyboard` / `enableGameKeyboard`)** :
+  - Le clavier Phaser du jeu est désactivé et l'état des touches est automatiquement réinitialisé (`resetKeys()`) à l'ouverture de la modal ou lors de la prise de focus sur un champ de texte.
+  - Le clavier de PokéRogue est réactivé proprement à la fermeture de la fenêtre ou à la perte de focus.
+- **Fermeture Sécurisée via la Touche Échap** :
+  - L'appui sur Échap depuis la modal ou un champ de saisie ferme PokéSkip sans ouvrir le menu de paramètres/pause de PokéRogue.
+
+---
+
 ## [v1.10.1] - 2026-09-28
 
 ### 🛡️ Détection Stricte de l'Environnement PokéRogue & Zéro Faux Positif en Local
