@@ -5,6 +5,19 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
+## [v1.10.1] - 2026-09-28
+
+### 🛡️ Détection Stricte de l'Environnement PokéRogue & Zéro Faux Positif en Local
+- **Filtrage Intelligent sur Localhost & 127.0.0.1** :
+  - PokéSkip vérifie désormais activement la signature de la page avant d'injecter la moindre interface (titre contenant *PokéRogue*, conteneur `#app` ou canvas Phaser du jeu).
+  - Si un développeur travaille sur un projet web local (React, Vue, Next.js, etc.), PokéSkip reste **100% silencieux** : aucune pastille flottante, aucun style injecté et aucune capture de raccourci clavier (`P`, `T`, `Échap`).
+  - Détection préservée pour les instances locales de PokéRogue (dev du jeu ou version hors-ligne).
+  - Exclusion explicite du simulateur de présentation intégré (`demo/index.html`) pour éviter toute superposition d'UI.
+- **Sécurisation des Boucles de Scan** :
+  - Arrêt automatique des tentatives d'accrochage (`initGameHook`) après ~48 secondes sur localhost en l'absence de Phaser pour économiser les ressources de la machine.
+
+---
+
 ## [v1.10.0] - 2026-09-28
 
 ### 🥚 Intégration des Capacités Œuf (Egg Moves)

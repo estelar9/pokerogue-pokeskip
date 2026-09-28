@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
 // @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.10.0
+// @version      1.10.1
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -4702,12 +4702,19 @@
       return null;
     }
 
+    let hookAttempts = 0;
+    const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes((window.location.hostname || '').toLowerCase());
+    const maxHookAttempts = isLocal ? 60 : Infinity;
+
     function checkAndHook() {
       if (PokeSkip.hooked) return;
+      hookAttempts++;
 
       const found = findPhaserScene();
       if (!found) {
-        setTimeout(checkAndHook, 800);
+        if (hookAttempts < maxHookAttempts) {
+          setTimeout(checkAndHook, 800);
+        }
         return;
       }
 
@@ -9607,15 +9614,88 @@
     }
   };
 
+  // --- DÉTECTION DE L'ENVIRONNEMENT POKÉROGUE ---
+  function isPokerogueEnvironment() {
+    // 1. Exclure la page de démo / simulateur intégrée de PokéSkip si ouverte en local
+    if (document.getElementById('demo-team-tabs') || document.getElementById('demo-stats-counter')) {
+      return false;
+    }
+
+    const host = (window.location.hostname || '').toLowerCase();
+    const href = (window.location.href || '').toLowerCase();
+    const title = (document.title || '').toLowerCase();
+
+    // 2. Domaines officiels PokéRogue
+    if (host === 'pokerogue.net' || host.endsWith('.pokerogue.net')) {
+      return true;
+    }
+
+    // 3. Exclure explicitement les moteurs de recherche et sites tiers
+    if (host.includes('google.') || host.includes('bing.') || host.includes('duckduckgo.') || host.includes('github.com')) {
+      return false;
+    }
+
+    // 4. Sur localhost / 127.0.0.1 (développement ou jeu local)
+    if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+      if (title.includes('pokerogue')) return true;
+      const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+      if (win.Phaser || document.querySelector('#app canvas')) return true;
+      return false;
+    }
+
+    // 5. Autre domaine personnalisé ou miroir local (ex: pokerogue.local, pokerogue.lan)
+    if (host.includes('pokerogue')) {
+      return true;
+    }
+
+    // 6. Chemin ou titre contenant pokerogue
+    if (href.includes('pokerogue') && title.includes('pokerogue')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  let pokeSkipStarted = false;
+  function startPokeSkip() {
+    if (pokeSkipStarted) return;
+    pokeSkipStarted = true;
+    UI.init();
+    initGameHook();
+  }
+
+  function setupAutoDetection() {
+    if (isPokerogueEnvironment()) {
+      startPokeSkip();
+      return;
+    }
+
+    // Si on est sur localhost/127.0.0.1 mais que le DOM/Phaser n'était pas encore prêt à l'instant T,
+    // on effectue une brève surveillance (max 8 secondes) avant d'abandonner définitivement.
+    const host = (window.location.hostname || '').toLowerCase();
+    if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+      let attempts = 0;
+      const maxAttempts = 8;
+      const checkInterval = setInterval(() => {
+        attempts++;
+        if (isPokerogueEnvironment()) {
+          clearInterval(checkInterval);
+          startPokeSkip();
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkInterval);
+          // Cette page localhost n'est pas PokéRogue : PokéSkip reste complètement éteint.
+        }
+      }, 1000);
+    }
+  }
+
   // --- INITIALISATION AU CHARGEMENT ---
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      UI.init();
-      initGameHook();
+      setupAutoDetection();
     });
   } else {
-    UI.init();
-    initGameHook();
+    setupAutoDetection();
   }
 
 })();
