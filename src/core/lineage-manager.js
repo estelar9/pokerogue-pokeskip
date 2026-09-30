@@ -666,6 +666,30 @@ export const LineageManager = {
         category: MOVE_CATEGORIES[catIdx] || MOVE_CATEGORIES[2]
       };
     },
+    getMoveName(moveId, pokemon = null) {
+      if (moveId === undefined || moveId === null) return '';
+      const numId = Number(moveId);
+      if (PokeSkip.knownMovesCache && PokeSkip.knownMovesCache[numId]) {
+        return PokeSkip.knownMovesCache[numId];
+      }
+      const details = this.getMoveDetails(null, numId, pokemon);
+      if (details && details.name && !details.name.startsWith('Capacité #')) {
+        return details.name;
+      }
+      return PokeSkip.knownMovesCache?.[numId] || `Move #${numId}`;
+    },
+    findMoveIdByName(name) {
+      if (!name) return null;
+      const norm = (name || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
+      if (PokeSkip.knownMovesCache) {
+        for (const [idStr, mName] of Object.entries(PokeSkip.knownMovesCache)) {
+          if (mName && mName.toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '') === norm) {
+            return Number(idStr);
+          }
+        }
+      }
+      return null;
+    },
     getLineageMemberSprites(target, isShiny = false, pokemon = null, variant = 0) {
       const rootId = this.getRootId(pokemon || target);
       const fam = this.families[rootId];

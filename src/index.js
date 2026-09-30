@@ -5,6 +5,7 @@
 
 import { AssetLoader } from './core/asset-loader.js';
 import { LineageManager } from './core/lineage-manager.js';
+import { PokeSkip } from './core/state.js';
 import { UI } from './ui/index.js';
 import { initGameHook } from './game/phaser-hook.js';
 
@@ -16,6 +17,8 @@ import { initGameHook } from './game/phaser-hook.js';
     return;
   }
   window.__POKESKIP_INJECTED__ = true;
+  window.PokeSkip = PokeSkip;
+  window.PokeSkipUI = UI;
 
   // Initialisation des données et caches
   AssetLoader.init();

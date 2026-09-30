@@ -14,7 +14,7 @@ export const PokeSkip = {
         showQuickPrompt: true,
         quickPromptDuration: 15,
         showHudCount: true,
-        advancedMode: false
+        advancedMode: true
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4000) s.toastDuration = 2800;
       return s;
@@ -177,6 +177,22 @@ export const PokeSkip = {
       return false;
     },
 
+    shouldSkip(target, moveName, moveId) {
+      return this.isMoveSkipped(target, moveName, moveId);
+    },
+
+    isMoveCandidateToSkip(target, moveName, moveId) {
+      return this.isMoveSkipped(target, moveName, moveId);
+    },
+
+    isMoveAutoReplaced(target, moveName, moveId) {
+      return Boolean(this.findActiveReplacement(target, moveName, moveId));
+    },
+
+    addMoveToSkip(target, moveName, moveId) {
+      return this.setMoveSkipped(target, null, moveName, moveId, true);
+    },
+
     setMoveSkipped(target, speciesName, moveName, moveId, isSkipped) {
       const familyInfo = LineageManager.getFamilyInfo(target, speciesName);
       const familyKey = familyInfo.familyKey;
@@ -240,6 +256,12 @@ export const PokeSkip = {
 
       if (!newMoveName || !oldMoveName) return null;
 
+      // Auto-activer le mode avancé si l'utilisateur ajoute une règle de remplacement
+      if (!this.settings.advancedMode) {
+        this.settings.advancedMode = true;
+        this.saveSettings();
+      }
+
       const familyInfo = LineageManager.getFamilyInfo(target);
       const famKey = familyInfo.familyKey;
       if (!this.rules[famKey]) {
@@ -256,17 +278,20 @@ export const PokeSkip = {
         this.rules[famKey].replacements = [];
       }
 
+      const normalize = s => (s || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
+      const newNorm = normalize(newMoveName);
+
       // Supprimer une éventuelle règle déjà existante sur la même nouvelle attaque
       this.rules[famKey].replacements = this.rules[famKey].replacements.filter(
-        r => r.newMoveName.trim().toLowerCase() !== newMoveName.trim().toLowerCase()
+        r => normalize(r.newMoveName) !== newNorm
       );
 
       const ruleObj = {
         id: 'rep_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
         newMoveName: newMoveName.trim(),
-        newMoveId: newMoveId || null,
+        newMoveId: newMoveId || LineageManager.findMoveIdByName(newMoveName) || null,
         oldMoveName: oldMoveName.trim(),
-        oldMoveId: oldMoveId || null,
+        oldMoveId: oldMoveId || LineageManager.findMoveIdByName(oldMoveName) || null,
         enabled: true,
         createdAt: Date.now()
       };
@@ -309,16 +334,20 @@ export const PokeSkip = {
     },
 
     findActiveReplacement(target, incomingMoveName, incomingMoveId) {
-      if (!this.settings.enabled || !this.settings.advancedMode) return null;
+      if (!this.settings.enabled) return null;
+      if (this.settings.advancedMode === false) return null;
       const rule = this.getFamilyRule(target);
-      if (!rule || !Array.isArray(rule.replacements)) return null;
+      if (!rule || !Array.isArray(rule.replacements) || rule.replacements.length === 0) return null;
       if (rule.enabled === false) return null; // Paramétrage suspendu / en pause pour cette lignée
 
-      const incName = incomingMoveName ? incomingMoveName.trim().toLowerCase() : '';
+      const normalize = s => (s || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
+      const incNorm = normalize(incomingMoveName);
+      const incId = (incomingMoveId !== undefined && incomingMoveId !== null) ? Number(incomingMoveId) : null;
+
       return rule.replacements.find(r => {
         if (!r.enabled) return false;
-        if (incName && r.newMoveName.trim().toLowerCase() === incName) return true;
-        if (incomingMoveId && r.newMoveId && r.newMoveId === incomingMoveId) return true;
+        if (incId && r.newMoveId && Number(r.newMoveId) === incId) return true;
+        if (incNorm && normalize(r.newMoveName) === incNorm) return true;
         return false;
       }) || null;
     }

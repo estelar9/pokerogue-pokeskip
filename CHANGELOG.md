@@ -3,6 +3,25 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.12.0] - 2026-09-30
+
+### 🔄 Automatisation Robuste des Remplacements & Résolution Intelligente des Capacités
+- **Résolution Hybride ID / Nom Normalisé** :
+  - Détection automatique et mise en cache des identifiants numériques de capacités (`moveId`) lors de la création de règles de remplacement.
+  - Normalisation insensible à la casse, aux espaces et aux accents pour la comparaison de noms de capacités.
+  - Recherche bidirectionnelle dans le moveset actuel du Pokémon via `LineageManager.findMoveIdByName`, `PokeSkip.knownMovesCache` et les accesseurs PokéRogue (`getMoveset()`, `getName()`, `getMove()`).
+- **Exécution Sécurisée du Remplacement en Combat** :
+  - Support multi-version pour l'apprentissage automatique : exécution via `phase.learnMove()`, `pokemon.setMove()` ou `pokemon.learnMove()` avec gestion d'erreurs et reprise sécurisée.
+  - Clôture propre des phases sans blocage du flux de combat et sans perte des dialogues annexes (évolutions, passages de niveau).
+  - Activation automatique transparente du Mode Avancé dès l'ajout d'une règle de remplacement.
+- **Améliorations UI & Affichage des Toasts** :
+  - Correction de l'appel `UI.showToast` dans l'onglet des espèces enregistrées.
+  - Initialisation différée et sécurisée du conteneur de toasts si le DOM n'est pas encore prêt.
+  - Nettoyage automatique des préfixes textuels redondants dans les notifications.
+  - Rehaussement des `z-index` des overlays de notification et du prompt rapide (`10000004`+) pour garantir leur visibilité au-dessus de tous les éléments du jeu.
+- **Interception & Débogage Globaux** :
+  - Exposition des objets `window.PokeSkip` et `window.PokeSkipUI` facilitant les diagnostics et l'interopérabilité.
+
 ---
 
 ## [v1.11.0] - 2026-09-28

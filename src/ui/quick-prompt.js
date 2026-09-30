@@ -16,28 +16,52 @@ export const QuickPrompt = {
       }
     },
 
-    showQuickSkipPrompt(phaseInstance, pokemon, move) {
+    showQuickSkipPrompt(arg1, arg2, arg3) {
+      if (!document.body) return;
+
+      let phaseInstance, pokemon, move;
+      if (arg1 && typeof arg1.end === 'function') {
+        phaseInstance = arg1;
+        pokemon = arg2;
+        move = arg3;
+      } else if (arg3 && typeof arg3.end === 'function') {
+        pokemon = arg1;
+        move = arg2;
+        phaseInstance = arg3;
+      } else if (arg1?.species || arg1?.speciesId) {
+        pokemon = arg1;
+        move = arg2;
+        phaseInstance = arg3;
+      } else {
+        phaseInstance = arg1;
+        pokemon = arg2;
+        move = arg3;
+      }
+
       if (document.getElementById('pokeskip-quick-prompt')) {
         document.getElementById('pokeskip-quick-prompt').remove();
       }
 
       const pokemonName = LineageManager.getCurrentFormName(pokemon);
-      const moveDetails = LineageManager.getMoveDetails(move, phaseInstance.moveId, pokemon);
-      const typeColor = (moveDetails.type && moveDetails.type.bg) ? (
+      const moveDetails = LineageManager.getMoveDetails(move, phaseInstance?.moveId, pokemon);
+      const moveName = moveDetails?.name || move?.name || (phaseInstance?.moveId !== undefined ? LineageManager.getMoveName(phaseInstance.moveId) : 'Capacité');
+      const finalMoveId = phaseInstance?.moveId ?? moveDetails?.moveId ?? move?.id;
+
+      const typeColor = (moveDetails?.type && moveDetails.type.bg) ? (
         moveDetails.type.name === 'Combat' ? '#ea580c' :
         moveDetails.type.name === 'Ténèbres' ? '#c4a482' :
         moveDetails.type.name === 'Poison' ? '#a855f7' :
         moveDetails.type.bg
       ) : '#38bdf8';
-      const catIcon = moveDetails.category?.icon || '🌀';
-      const catName = moveDetails.category?.name || '';
-      const typeName = moveDetails.type?.name || '';
+      const catIcon = moveDetails?.category?.icon || '🌀';
+      const catName = moveDetails?.category?.name || '';
+      const typeName = moveDetails?.type?.name || '';
       const tooltip = [typeName, catName].filter(Boolean).join(' • ');
 
       const el = document.createElement('div');
       el.id = 'pokeskip-quick-prompt';
       el.innerHTML = `
-        <span class="pokeskip-quick-text">⚡ Ignorer <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveDetails.name}</b></span> sur <b>${pokemonName}</b> ?</span>
+        <span class="pokeskip-quick-text">⚡ Ignorer <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> sur <b>${pokemonName}</b> ?</span>
         <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">Toujours ignorer</button>
         <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="Fermer">&times;</button>
       `;
@@ -55,16 +79,18 @@ export const QuickPrompt = {
 
       el.querySelector('#pokeskip-quick-skip-always').addEventListener('click', (e) => {
         e.stopPropagation();
-        PokeSkip.setMoveSkipped(pokemon, pokemon?.species?.name, moveDetails.name, phaseInstance.moveId, true);
+        PokeSkip.setMoveSkipped(pokemon, pokemon?.species?.name, moveName, finalMoveId, true);
         PokeSkip.recordSkip();
 
-        this.showToast(`✅ Règle enregistrée : <b>${pokemonName}</b> ignorera <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveDetails.name}</b></span> !`, 'success');
+        UI.showToast(`✅ Règle enregistrée : <b>${pokemonName}</b> ignorera <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> !`, 'success');
         dismiss();
 
         // 1. Marquer la phase comme ignorée par PokéSkip
-        phaseInstance._pokeskipIgnored = true;
+        if (phaseInstance) {
+          phaseInstance._pokeskipIgnored = true;
+        }
 
-        const scene = phaseInstance.scene || PokeSkip.scene || window.globalScene;
+        const scene = phaseInstance?.scene || PokeSkip.scene || window.globalScene;
         const pm = scene?.phaseManager;
         const currentPhase = pm ? (typeof pm.getCurrentPhase === 'function' ? pm.getCurrentPhase() : pm.currentPhase) : null;
         const ui = scene?.ui;
@@ -98,13 +124,15 @@ export const QuickPrompt = {
             }
           } catch (err) {}
 
-          const targetMode = phaseInstance.messageMode ?? 0;
+          const targetMode = phaseInstance?.messageMode ?? 0;
           let ended = false;
           const safeEnd = () => {
             if (ended) return;
             ended = true;
             try {
-              phaseInstance.end();
+              if (phaseInstance && typeof phaseInstance.end === 'function') {
+                phaseInstance.end();
+              }
             } catch (err) {
               console.warn('[PokeSkip] Erreur clôture phase:', err);
             }
@@ -120,19 +148,17 @@ export const QuickPrompt = {
           } else {
             safeEnd();
           }
-        } else if (!isOtherNatureMessage && currentPhase && (currentPhase === phaseInstance || currentPhase.phaseName === 'LearnMovePhase')) {
+        } else if (!isOtherNatureMessage && (!currentPhase || currentPhase === phaseInstance || currentPhase.phaseName === 'LearnMovePhase')) {
           // Si ce n'est PAS un message d'une autre nature et qu'on est déjà dans LearnMovePhase,
           // on peut clôturer la phase en toute sécurité
           try {
-            phaseInstance.end();
+            if (phaseInstance && typeof phaseInstance.end === 'function') {
+              phaseInstance.end();
+            }
           } catch (err) {
             console.warn('[PokeSkip] Erreur clôture phase:', err);
           }
         }
-        // NOTE : Si isOtherNatureMessage est vrai, on NE TOUCHE PAS au texte et on ne force pas end() immédiatement.
-        // Le joueur peut lire tranquillement son message d'évolution ou de niveau sans le perdre.
-        // Dès que ce message d'une autre nature se terminera, l'intercepteur dans replaceMoveCheck
-        // verra que _pokeskipIgnored est vrai et sautera automatiquement la demande Oui/Non !
       });
 
       // Reste selon la durée configurée (par défaut 15s) pour laisser le temps de décider

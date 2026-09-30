@@ -254,8 +254,29 @@ export const ReplacementsTab = {
           return;
         }
 
-        PokeSkip.addReplacementRule(target, newM, oldM, null, null);
-        PokeSkip.setMoveSkipped(target, null, newM, null, false);
+        const findMoveId = (mName) => {
+          const norm = mName.trim().toLowerCase();
+          if (Array.isArray(defaultCurrent)) {
+            const found = defaultCurrent.find(m => m && typeof m === 'object' && (m.name || '').trim().toLowerCase() === norm);
+            if (found && (found.moveId || found.id)) return found.moveId || found.id;
+          }
+          if (Array.isArray(defaultLearnable)) {
+            const found = defaultLearnable.find(m => m && typeof m === 'object' && (m.name || '').trim().toLowerCase() === norm);
+            if (found && (found.moveId || found.id)) return found.moveId || found.id;
+          }
+          if (PokeSkip.knownMovesCache) {
+            for (const [idStr, name] of Object.entries(PokeSkip.knownMovesCache)) {
+              if (name && name.trim().toLowerCase() === norm) return Number(idStr);
+            }
+          }
+          return LineageManager.findMoveIdByName ? LineageManager.findMoveIdByName(mName) : null;
+        };
+
+        const oldId = findMoveId(oldM);
+        const newId = findMoveId(newM);
+
+        PokeSkip.addReplacementRule(target, newM, oldM, newId, oldId);
+        PokeSkip.setMoveSkipped(target, null, newM, newId, false);
 
         const resolveMoveInfo = (moveName) => {
           if (!moveName) return { name: '', type: null, category: null };

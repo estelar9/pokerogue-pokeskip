@@ -84,7 +84,7 @@ export const SavedSpeciesTab = {
             if (confirm(`Supprimer les règles enregistrées pour ${rule.lineageName} ?`)) {
               PokeSkip.deleteFamilyRule(famKey);
               this.renderSavedSpeciesTab();
-              this.showToast(`Règle supprimée pour ${rule.lineageName}`, 'info');
+              UI.showToast(`Règle supprimée pour ${rule.lineageName}`, 'info');
             }
             return;
           }
@@ -216,7 +216,7 @@ export const SavedSpeciesTab = {
         const val = inputAdd.value.trim();
         if (!val) return;
         PokeSkip.setMoveSkipped(famKey, rule.lineageName, val, null, true);
-        this.showToast(`Capacité <b>${val}</b> ignorée pour <b>${rule.lineageName}</b>`, 'warning');
+        UI.showToast(`Capacité <b>${val}</b> ignorée pour <b>${rule.lineageName}</b>`, 'warning');
         this.renderFamilyRuleEditor(container, famKey);
       };
       btnAdd.addEventListener('click', handleAdd);
@@ -240,7 +240,7 @@ export const SavedSpeciesTab = {
           rule.skippedMoves = {};
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          this.showToast(`Toutes les capacités sont rétablies pour <b>${rule.lineageName}</b>`, 'info');
+          UI.showToast(`Toutes les capacités sont rétablies pour <b>${rule.lineageName}</b>`, 'info');
           this.renderFamilyRuleEditor(container, famKey);
         });
       }
@@ -252,7 +252,7 @@ export const SavedSpeciesTab = {
           delete rule.skippedMoves[moveKey];
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          this.showToast(`Capacité <b>${moveKey}</b> rétablie pour <b>${rule.lineageName}</b>`, 'success');
+          UI.showToast(`Capacité <b>${moveKey}</b> rétablie pour <b>${rule.lineageName}</b>`, 'success');
           this.renderFamilyRuleEditor(container, famKey);
         });
       });
