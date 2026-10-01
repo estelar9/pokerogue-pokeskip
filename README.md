@@ -19,6 +19,7 @@
 [🎮 Utilisation en Jeu](#-comment-lutiliser-en-jeu) •
 [📱 Mobile / Android](#-compatibilité-mobile-android) •
 [📦 Releases](CHANGELOG.md) •
+[🔒 Confidentialité](PRIVACY.md) •
 [🤝 Contribuer](CONTRIBUTING.md)
 
 </div>
