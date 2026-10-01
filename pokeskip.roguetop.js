@@ -9668,6 +9668,10 @@ canvas:focus-visible,
             e.preventDefault();
             this.closeModal();
           }
+        } else if (this.isModalOpen()) {
+          if (!isInput) {
+            e.stopPropagation();
+          }
         }
       });
       const isPokeSkipElement = (el) => {

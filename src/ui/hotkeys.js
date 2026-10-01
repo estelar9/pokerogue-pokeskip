@@ -30,6 +30,11 @@ export const Hotkeys = {
             e.preventDefault();
             this.closeModal();
           }
+        } else if (this.isModalOpen()) {
+          // Sécurité absolue : empêcher toute fuite de touches vers PokéRogue quand PokéSkip est ouvert
+          if (!isInput) {
+            e.stopPropagation();
+          }
         }
       });
 
