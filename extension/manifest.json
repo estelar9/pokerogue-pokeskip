@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PokéSkip — Auto-Skip Capacités PokéRogue",
-  "version": "1.14.1",
+  "version": "1.14.2",
   "description": "Auto-skip sélectif de capacités pour PokéRogue. Ignorez automatiquement les attaques obsolètes et affichez la table des types.",
   "icons": {
     "16": "icons/icon16.png",

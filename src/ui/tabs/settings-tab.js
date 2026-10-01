@@ -73,9 +73,10 @@ export const SettingsTab = {
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
           <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #38bdf8;">Exportation / Importation</h4>
           <p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8;">Transférez vos règles de skip vers un autre navigateur ou ordinateur.</p>
-          <div style="display: flex; gap: 10px;">
+          <div style="display: flex; gap: 10px; align-items: center;">
             <button id="pokeskip-btn-export" style="background:#0284c7; color:#fff; border:1px solid #38bdf8; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">📤 Exporter (JSON)</button>
             <button id="pokeskip-btn-import" style="background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">📥 Importer (JSON)</button>
+            <input type="file" id="pokeskip-file-import" accept=".json,application/json" style="display: none;" />
           </div>
         </div>
 
@@ -219,21 +220,40 @@ export const SettingsTab = {
     }
 
     const btnImport = container.querySelector('#pokeskip-btn-import');
-    if (btnImport) {
+    const fileImport = container.querySelector('#pokeskip-file-import');
+    if (btnImport && fileImport) {
       btnImport.addEventListener('click', () => {
-        const json = prompt('Collez ici le contenu JSON de vos règles :');
-        if (!json) return;
-        try {
-          const parsed = JSON.parse(json);
-          if (typeof parsed === 'object') {
-            PokeSkip.rules = { ...PokeSkip.rules, ...parsed };
-            PokeSkip.saveRules();
-            ui.showToast('Règles importées avec succès !', 'success');
-            ui.renderTeamTab();
+        fileImport.value = '';
+        fileImport.click();
+      });
+
+      fileImport.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const parsed = JSON.parse(event.target.result);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+              const count = Object.keys(parsed).length;
+              PokeSkip.rules = { ...PokeSkip.rules, ...parsed };
+              PokeSkip.saveRules();
+              ui.showToast(`Succès : ${count} règle(s) importée(s) !`, 'success');
+              if (typeof ui.renderTeamTab === 'function') ui.renderTeamTab();
+              if (typeof ui.renderReplacementsTab === 'function') ui.renderReplacementsTab();
+              if (typeof ui.renderSavedSpeciesTab === 'function') ui.renderSavedSpeciesTab();
+            } else {
+              ui.showToast('Erreur : le fichier JSON est invalide ou vide.', 'error');
+            }
+          } catch (err) {
+            ui.showToast('Erreur : impossible de lire ou parser ce fichier JSON.', 'error');
           }
-        } catch (err) {
-          alert('Erreur : le format JSON est invalide.');
-        }
+        };
+        reader.onerror = () => {
+          ui.showToast('Erreur lors de la lecture du fichier.', 'error');
+        };
+        reader.readAsText(file);
       });
     }
 

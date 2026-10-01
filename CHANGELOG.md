@@ -3,6 +3,19 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.14.2] - 2026-10-01
+
+### ✨ Amélioration de l'Importation de Règles & UX RogueTop
+- **Importation de Règles Intuitive via Sélecteur de Fichier Natif** :
+  - Remplacement de la boîte de dialogue textuelle (`prompt`) par l'ouverture directe du sélecteur de fichiers de votre système d'exploitation (`<input type="file" accept=".json">`).
+  - Sélection simple de votre fichier `pokeskip-rules-*.json` sauvegardé.
+  - Validation et fusion sécurisée des règles en local avec notification du nombre exact de règles importées.
+  - Rafraîchissement dynamique et immédiat des listes d'équipes et de remplacements.
+- **Précision du Toast de Mise à Jour RogueTop** :
+  - Recommandation explicite de redémarrage de l'application de bureau RogueTop pour une application immédiate de la version mise en cache.
+
+---
+
 ## [v1.14.1] - 2026-10-01
 
 ### 🛡️ Correctifs d'Isolation Clavier & Écran de Connexion

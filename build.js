@@ -133,7 +133,7 @@ async function build() {
                 localStorage.setItem(CACHE_VER_KEY, remoteVer);
                 console.log('[PokéSkip RogueTop] Mis à jour avec succès en v' + remoteVer + ' !');
                 if (window.PokeSkipUI?.showToast) {
-                  window.PokeSkipUI.showToast('🚀 PokéSkip a été mis à jour en v' + remoteVer + ' ! Appuyez sur Ctrl+R pour appliquer.', 'success', 8000);
+                  window.PokeSkipUI.showToast('🚀 PokéSkip a été mis à jour en v' + remoteVer + ' ! Redémarrez RogueTop (ou Ctrl+R) pour appliquer.', 'success', 8000);
                 }
               }
             }
