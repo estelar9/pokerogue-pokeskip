@@ -28,6 +28,7 @@ scratch/
 *.tmp
 *.temp
 test_*.html
+*.zip
 
 # Local demo & test environment
 demo/
