@@ -42,3 +42,21 @@ jobs:
             pokeskip.user.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package source code for Mozilla review
+        run: |
+          zip -r source-code.zip src/ package.json package-lock.json build.js README.md LICENSE -x "node_modules/*"
+
+      - name: Deploy to Firefox Add-ons (AMO)
+        if: env.AMO_JWT_ISSUER != '' && env.AMO_JWT_SECRET != ''
+        uses: kewisch/action-web-ext@v2
+        with:
+          cmd: sign
+          source: extension
+          apiKey: ${{ secrets.AMO_JWT_ISSUER }}
+          apiSecret: ${{ secrets.AMO_JWT_SECRET }}
+          channel: ${{ secrets.AMO_CHANNEL || 'listed' }}
+          sourceCode: source-code.zip
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}

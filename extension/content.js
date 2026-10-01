@@ -2,8 +2,9 @@
 (function () {
   'use strict';
   try {
+    const api = (typeof browser !== 'undefined' && browser.runtime) ? browser : chrome;
     const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('inject.js');
+    script.src = api.runtime.getURL('inject.js');
     script.onload = function () {
       this.remove();
     };
