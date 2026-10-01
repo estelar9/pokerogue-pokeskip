@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PokéSkip — Auto-Skip Capacités PokéRogue",
   "version": "1.14.0",
-  "description": "Widget natif pour choisir quelles capacités ignorer automatiquement par Pokémon dans PokéRogue. Sauvegarde éternelle par espèce, zéro outil tiers !",
+  "description": "Auto-skip sélectif de capacités pour PokéRogue. Ignorez automatiquement les attaques obsolètes et affichez la table des types.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
