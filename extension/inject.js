@@ -11170,6 +11170,9 @@
         if (win.Phaser || document.querySelector("#app canvas")) return true;
         return false;
       }
+      if (typeof window !== "undefined" && (window.__TAURI__ || window.__TAURI_INTERNALS__)) {
+        return true;
+      }
       if (host.includes("pokerogue")) {
         return true;
       }

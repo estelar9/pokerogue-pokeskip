@@ -1,19 +1,45 @@
-// ==UserScript==
-// @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
-// @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.13.0
-// @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
-// @author       PokéSkip Team
-// @match        https://pokerogue.net/*
-// @match        https://beta.pokerogue.net/*
-// @match        http://localhost:*/*
-// @match        *://*/*pokerogue*
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @grant        unsafeWindow
-// @run-at       document-start
-// @icon         https://pokerogue.net/favicon.ico
-// ==/UserScript==
+// ==PokéSkip RogueTop Plugin==
+// Auto-updating plugin loader for RogueTop Desktop Client v1.13.0
+(function () {
+  'use strict';
+  const EMBEDDED_VERSION = '1.13.0';
+  const CACHE_KEY = 'pokeskip_roguetop_cached_code';
+  const CACHE_VER_KEY = 'pokeskip_roguetop_cached_version';
+
+  function compareSemver(v1, v2) {
+    if (!v1 || !v2) return 0;
+    const p1 = v1.replace(/^v/, '').split('.').map(Number);
+    const p2 = v2.replace(/^v/, '').split('.').map(Number);
+    for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
+      const a = p1[i] || 0;
+      const b = p2[i] || 0;
+      if (a > b) return 1;
+      if (a < b) return -1;
+    }
+    return 0;
+  }
+
+  const cachedVer = localStorage.getItem(CACHE_VER_KEY);
+  const cachedCode = localStorage.getItem(CACHE_KEY);
+
+  let executed = false;
+  if (cachedCode && cachedVer && compareSemver(cachedVer, EMBEDDED_VERSION) > 0) {
+    try {
+      console.log('[PokéSkip RogueTop] Lancement de la version en cache v' + cachedVer);
+      (new Function(cachedCode))();
+      executed = true;
+    } catch (err) {
+      console.error('[PokéSkip RogueTop] Échec lancement version cache, repli sur version intégrée :', err);
+      try {
+        localStorage.removeItem(CACHE_KEY);
+        localStorage.removeItem(CACHE_VER_KEY);
+      } catch (_) {}
+    }
+  }
+
+  if (!executed) {
+    console.log('[PokéSkip RogueTop] Lancement de la version intégrée v' + EMBEDDED_VERSION);
+    // PokéSkip RogueTop Bundle v1.13.0
 
 (() => {
   // src/data/megas.js
@@ -11231,4 +11257,36 @@
       setupAutoDetection();
     }
   })();
+})();
+
+  }
+
+  // Recherche de mise à jour automatique en arrière-plan
+  setTimeout(() => {
+    try {
+      fetch('https://raw.githubusercontent.com/estelar9/pokerogue-pokeskip/main/package.json', { cache: 'no-store' })
+        .then(r => r.json())
+        .then(async (pkg) => {
+          const remoteVer = pkg?.version;
+          const activeVer = (cachedVer && compareSemver(cachedVer, EMBEDDED_VERSION) > 0) ? cachedVer : EMBEDDED_VERSION;
+
+          if (remoteVer && compareSemver(remoteVer, activeVer) > 0) {
+            console.log('[PokéSkip RogueTop] Nouvelle version v' + remoteVer + ' disponible. Téléchargement...');
+            const codeRes = await fetch('https://raw.githubusercontent.com/estelar9/pokerogue-pokeskip/main/pokeskip.roguetop.bundle.js', { cache: 'no-store' });
+            if (codeRes.ok) {
+              const newCode = await codeRes.text();
+              if (newCode && newCode.length > 500) {
+                localStorage.setItem(CACHE_KEY, newCode);
+                localStorage.setItem(CACHE_VER_KEY, remoteVer);
+                console.log('[PokéSkip RogueTop] Mis à jour avec succès en v' + remoteVer + ' !');
+                if (window.PokeSkipUI?.showToast) {
+                  window.PokeSkipUI.showToast('🚀 PokéSkip a été mis à jour en v' + remoteVer + ' ! Appuyez sur Ctrl+R pour appliquer.', 'success', 8000);
+                }
+              }
+            }
+          }
+        })
+        .catch(() => {});
+    } catch (_) {}
+  }, 4000);
 })();

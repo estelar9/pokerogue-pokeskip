@@ -53,12 +53,17 @@ import { initGameHook } from './game/phaser-hook.js';
       return false;
     }
 
-    // 5. Autre domaine personnalisé ou miroir local (ex: pokerogue.local, pokerogue.lan)
+    // 5. Client Desktop Tauri / RogueTop
+    if (typeof window !== 'undefined' && (window.__TAURI__ || window.__TAURI_INTERNALS__)) {
+      return true;
+    }
+
+    // 6. Autre domaine personnalisé ou miroir local (ex: pokerogue.local, pokerogue.lan)
     if (host.includes('pokerogue')) {
       return true;
     }
 
-    // 6. Chemin ou titre contenant pokerogue
+    // 7. Chemin ou titre contenant pokerogue
     if (href.includes('pokerogue') && title.includes('pokerogue')) {
       return true;
     }

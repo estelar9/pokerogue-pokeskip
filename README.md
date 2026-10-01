@@ -52,7 +52,7 @@ Compatible avec **Google Chrome, Mozilla Firefox, Microsoft Edge, Opera, Brave, 
 
 ### Option 2 : Extension Navigateur Directe *(Sans Outil Tiers)*
 
-Compatible avec **Chrome, Edge, Brave, Opera, Opera GX, Vivaldi**.
+Compatible avec **Chrome, Edge, Brave, Opera, Opera GX, Vivaldi** (et bientôt disponible sur le store officiel **Firefox AMO**).
 
 1. Téléchargez la dernière archive **[`pokeskip-extension.zip`](https://github.com/estelar9/pokerogue-pokeskip/releases/latest/download/pokeskip-extension.zip)** depuis la page des [Releases](https://github.com/estelar9/pokerogue-pokeskip/releases) et décompressez-la dans un dossier permanent.
 2. Ouvrez la page de gestion des extensions de votre navigateur :
@@ -63,6 +63,17 @@ Compatible avec **Chrome, Edge, Brave, Opera, Opera GX, Vivaldi**.
 3. Activez le bouton **« Mode Développeur »** (en haut à droite).
 4. Cliquez sur **« Charger l'extension non empaquetée »** et sélectionnez le dossier `extension` extrait.
 5. Lancez [PokéRogue](https://pokerogue.net/) : c'est prêt !
+
+---
+
+### Option 3 : Client Desktop RogueTop *(Mises à Jour Automatiques Incluses)*
+
+Compatible avec l'application de bureau [RogueTop](https://github.com/SpikeHD/RogueTop) (Windows, macOS, Linux).
+
+1. Téléchargez le fichier **[`pokeskip.roguetop.js`](https://raw.githubusercontent.com/estelar9/pokerogue-pokeskip/main/pokeskip.roguetop.js)** (ou depuis la page des [Releases](https://github.com/estelar9/pokerogue-pokeskip/releases)).
+2. Lancez **RogueTop** et, dans le menu principal, cliquez sur **« Open Mods Folder »** (ou ouvrez le sous-dossier `mods/plugins/`).
+3. Glissez-y simplement **`pokeskip.roguetop.js`**.
+4. Démarrez votre partie de PokéRogue dans RogueTop : le HUD PokéSkip apparaît et vos futures mises à jour se téléchargeront **automatiquement en tâche de fond** dès qu'une nouvelle version sortira !
 
 ---
 

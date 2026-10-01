@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node build.js",
     "dev": "node build.js --watch",
-    "lint": "npm run build && node -c extension/inject.js pokeskip.user.js extension/content.js extension/popup.js",
+    "lint": "npm run build && node -c extension/inject.js pokeskip.user.js pokeskip.roguetop.js extension/content.js extension/popup.js",
     "build:zip": "npm run build && powershell -Command \"Compress-Archive -Path 'extension\\*' -DestinationPath 'pokeskip-extension.zip' -Force\""
   },
   "keywords": [

@@ -1,19 +1,4 @@
-// ==UserScript==
-// @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
-// @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.13.0
-// @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
-// @author       PokéSkip Team
-// @match        https://pokerogue.net/*
-// @match        https://beta.pokerogue.net/*
-// @match        http://localhost:*/*
-// @match        *://*/*pokerogue*
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @grant        unsafeWindow
-// @run-at       document-start
-// @icon         https://pokerogue.net/favicon.ico
-// ==/UserScript==
+// PokéSkip RogueTop Bundle v1.13.0
 
 (() => {
   // src/data/megas.js

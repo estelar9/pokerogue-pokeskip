@@ -40,6 +40,7 @@ jobs:
           files: |
             pokeskip-extension.zip
             pokeskip.user.js
+            pokeskip.roguetop.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
