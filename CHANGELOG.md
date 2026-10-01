@@ -3,6 +3,16 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.14.3] - 2026-10-01
+
+### 💾 Sauvegarde & Importation Complète (Règles + Paramètres)
+- **Exportation et Importation Unifiées** :
+  - Le fichier de sauvegarde JSON inclut désormais l'ensemble des options et paramètres utilisateur (durées de notifications, affichage HUD, mode avancé de remplacement, alertes rapides).
+  - Prise en charge universelle : rétrocompatibilité totale avec les anciens fichiers contenant uniquement des règles de combat.
+  - Mise à jour visuelle instantanée des cases à cocher et réglages dans l'onglet Paramètres dès l'importation.
+
+---
+
 ## [v1.14.2] - 2026-10-01
 
 ### ✨ Amélioration de l'Importation de Règles & UX RogueTop

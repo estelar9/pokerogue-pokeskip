@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
 // @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.14.2
+// @version      1.14.3
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -8738,7 +8738,7 @@ canvas:focus-visible,
 
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
           <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #38bdf8;">Exportation / Importation</h4>
-          <p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8;">Transf\xE9rez vos r\xE8gles de skip vers un autre navigateur ou ordinateur.</p>
+          <p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8;">Transf\xE9rez vos r\xE8gles de skip et vos param\xE8tres d'options vers un autre navigateur ou ordinateur.</p>
           <div style="display: flex; gap: 10px; align-items: center;">
             <button id="pokeskip-btn-export" style="background:#0284c7; color:#fff; border:1px solid #38bdf8; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">\u{1F4E4} Exporter (JSON)</button>
             <button id="pokeskip-btn-import" style="background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">\u{1F4E5} Importer (JSON)</button>
@@ -8862,14 +8862,20 @@ canvas:focus-visible,
       const btnExport = container.querySelector("#pokeskip-btn-export");
       if (btnExport) {
         btnExport.addEventListener("click", () => {
-          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(PokeSkip.rules, null, 2));
+          const backupData = {
+            _format: "pokeskip_backup_v1",
+            exportedAt: (/* @__PURE__ */ new Date()).toISOString(),
+            settings: PokeSkip.settings,
+            rules: PokeSkip.rules
+          };
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
           const a = document.createElement("a");
           a.setAttribute("href", dataStr);
-          a.setAttribute("download", `pokeskip-rules-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`);
+          a.setAttribute("download", `pokeskip-backup-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`);
           document.body.appendChild(a);
           a.click();
           a.remove();
-          ui.showToast("R\xE8gles export\xE9es en fichier JSON", "success");
+          ui.showToast("R\xE8gles et param\xE8tres export\xE9s en fichier JSON", "success");
         });
       }
       const btnImport = container.querySelector("#pokeskip-btn-import");
@@ -8886,16 +8892,40 @@ canvas:focus-visible,
           reader.onload = (event) => {
             try {
               const parsed = JSON.parse(event.target.result);
-              if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-                const count = Object.keys(parsed).length;
+              if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+                ui.showToast("Erreur : le fichier JSON est invalide ou vide.", "error");
+                return;
+              }
+              let importedRulesCount = 0;
+              let importedSettingsCount = 0;
+              if (parsed._format === "pokeskip_backup_v1" || parsed.rules !== void 0 || parsed.settings !== void 0) {
+                if (parsed.rules && typeof parsed.rules === "object" && !Array.isArray(parsed.rules)) {
+                  importedRulesCount = Object.keys(parsed.rules).length;
+                  PokeSkip.rules = { ...PokeSkip.rules, ...parsed.rules };
+                  PokeSkip.saveRules();
+                }
+                if (parsed.settings && typeof parsed.settings === "object" && !Array.isArray(parsed.settings)) {
+                  importedSettingsCount = Object.keys(parsed.settings).length;
+                  PokeSkip.settings = { ...PokeSkip.settings, ...parsed.settings };
+                  PokeSkip.saveSettings();
+                }
+              } else {
+                importedRulesCount = Object.keys(parsed).length;
                 PokeSkip.rules = { ...PokeSkip.rules, ...parsed };
                 PokeSkip.saveRules();
-                ui.showToast(`Succ\xE8s : ${count} r\xE8gle(s) import\xE9e(s) !`, "success");
-                if (typeof ui.renderTeamTab === "function") ui.renderTeamTab();
-                if (typeof ui.renderReplacementsTab === "function") ui.renderReplacementsTab();
-                if (typeof ui.renderSavedSpeciesTab === "function") ui.renderSavedSpeciesTab();
+              }
+              if (typeof ui.renderSettingsTab === "function") ui.renderSettingsTab();
+              if (typeof ui.updateHudBadge === "function") ui.updateHudBadge();
+              if (typeof ui.renderTeamTab === "function") ui.renderTeamTab();
+              if (typeof ui.renderReplacementsTab === "function") ui.renderReplacementsTab();
+              if (typeof ui.renderSavedSpeciesTab === "function") ui.renderSavedSpeciesTab();
+              const details = [];
+              if (importedRulesCount > 0) details.push(`${importedRulesCount} r\xE8gle(s)`);
+              if (importedSettingsCount > 0) details.push(`${importedSettingsCount} param\xE8tre(s)`);
+              if (details.length > 0) {
+                ui.showToast(`Succ\xE8s : ${details.join(" et ")} import\xE9(s) !`, "success");
               } else {
-                ui.showToast("Erreur : le fichier JSON est invalide ou vide.", "error");
+                ui.showToast("Aucune r\xE8gle ou param\xE8tre trouv\xE9 dans ce fichier.", "warning");
               }
             } catch (err) {
               ui.showToast("Erreur : impossible de lire ou parser ce fichier JSON.", "error");
@@ -8917,6 +8947,16 @@ canvas:focus-visible,
             ui.renderTeamTab();
           }
         });
+      }
+    },
+    renderSettingsTab() {
+      const settingsBody = document.getElementById("pokeskip-body-settings");
+      if (settingsBody) {
+        settingsBody.innerHTML = this.getSettingsTabHtml();
+        this.bindSettingsTabEvents(settingsBody, this);
+        if (typeof this.isolateInputs === "function") {
+          this.isolateInputs(settingsBody);
+        }
       }
     }
   };
