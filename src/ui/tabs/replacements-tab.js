@@ -320,7 +320,7 @@ export const ReplacementsTab = {
         const newCatIcon = newMoveDetails?.category?.icon || '💥';
         const oldTooltip = [oldMoveDetails?.type?.name, oldMoveDetails?.category?.name].filter(Boolean).join(' • ');
         const newTooltip = [newMoveDetails?.type?.name, newMoveDetails?.category?.name].filter(Boolean).join(' • ');
-        const pokemonName = LineageManager.getCurrentFormName(target) || familyInfo.lineageName;
+        const pokemonName = LineageManager.getSinglePokemonName(target);
 
         UI.showToast(
           `⚡ Règle enregistrée : remplacer <span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${oldMoveDetails.name || oldM}</b></span> par <span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name || newM}</b></span> sur <b style="color: #38bdf8 !important;">${pokemonName}</b> !`,
@@ -391,7 +391,8 @@ export const ReplacementsTab = {
         btnClear.addEventListener('click', () => {
           if (confirm(`Supprimer toutes les règles de remplacement pour ${familyInfo.lineageName} ?`)) {
             PokeSkip.clearAllReplacements(target);
-            UI.showToast(`Toutes les règles de remplacement supprimées pour ${familyInfo.lineageName}.`, 'info');
+            const targetName = LineageManager.getSinglePokemonName(target);
+            UI.showToast(`Toutes les règles de remplacement supprimées pour <b>${targetName}</b>.`, 'info');
             if (typeof onUpdate === 'function') onUpdate();
           }
         });

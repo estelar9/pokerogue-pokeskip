@@ -14,7 +14,8 @@ export const PokeSkip = {
         showQuickPrompt: true,
         quickPromptDuration: 15,
         showHudCount: true,
-        advancedMode: false
+        advancedMode: false,
+        promptAutoReplacement: true
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4000) s.toastDuration = 2800;
       return s;
@@ -85,6 +86,7 @@ export const PokeSkip = {
             familyId: rule.familyId,
             lineageName: rule.lineageName,
             skippedMoves: Object.assign({}, rule.skippedMoves || {}),
+            doNotPromptMoves: Object.assign({}, rule.doNotPromptMoves || {}),
             skipAll: !!rule.skipAll,
             enabled: rule.enabled !== false,
             replacements: Array.isArray(rule.replacements) ? rule.replacements.slice() : [],
@@ -201,6 +203,7 @@ export const PokeSkip = {
           familyId: familyInfo.rootId,
           lineageName: familyInfo.lineageName,
           skippedMoves: {},
+          doNotPromptMoves: {},
           skipAll: false,
           enabled: true,
           replacements: [],
@@ -208,6 +211,7 @@ export const PokeSkip = {
         };
       }
       const rule = this.rules[familyKey];
+      if (!rule.doNotPromptMoves) rule.doNotPromptMoves = {};
       if (familyInfo.lineageName) rule.lineageName = familyInfo.lineageName;
 
       const key = moveName ? moveName.trim().toLowerCase() : `id_${moveId}`;
@@ -220,6 +224,74 @@ export const PokeSkip = {
       }
       rule.updatedAt = Date.now();
       this.saveRules();
+    },
+
+    setMovePromptSuppressed(target, speciesName, moveName, moveId, isSuppressed) {
+      const familyInfo = LineageManager.getFamilyInfo(target, speciesName);
+      const familyKey = familyInfo.familyKey;
+      if (!this.rules[familyKey]) {
+        this.rules[familyKey] = {
+          familyId: familyInfo.rootId,
+          lineageName: familyInfo.lineageName,
+          skippedMoves: {},
+          doNotPromptMoves: {},
+          skipAll: false,
+          enabled: true,
+          replacements: [],
+          updatedAt: Date.now()
+        };
+      }
+      const rule = this.rules[familyKey];
+      if (!rule.doNotPromptMoves) rule.doNotPromptMoves = {};
+      if (familyInfo.lineageName) rule.lineageName = familyInfo.lineageName;
+
+      const key = moveName ? moveName.trim().toLowerCase() : `id_${moveId}`;
+      if (isSuppressed) {
+        rule.doNotPromptMoves[key] = true;
+        if (moveId) rule.doNotPromptMoves[`id_${moveId}`] = true;
+      } else {
+        delete rule.doNotPromptMoves[key];
+        if (moveId) delete rule.doNotPromptMoves[`id_${moveId}`];
+      }
+      rule.updatedAt = Date.now();
+      this.saveRules();
+    },
+
+    isMoveAutoReplacementTarget(target, moveName, moveId) {
+      if (!this.settings.advancedMode) return false;
+      const rule = this.getFamilyRule(target);
+      if (!rule || !Array.isArray(rule.replacements) || rule.replacements.length === 0) return false;
+      if (rule.enabled === false) return false;
+
+      const normalize = s => (s || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
+      const normName = normalize(moveName);
+      const numId = (moveId !== undefined && moveId !== null) ? Number(moveId) : null;
+
+      return rule.replacements.some(r => {
+        if (!r.enabled) return false;
+        if (numId && r.newMoveId && Number(r.newMoveId) === numId) return true;
+        if (normName && normalize(r.newMoveName) === normName) return true;
+        return false;
+      });
+    },
+
+    isMovePromptSuppressed(target, moveName, moveId) {
+      // 1. Si l'attaque remplace automatiquement une autre en Mode Avancé, le prompt d'ignorance est TOUJOURS supprimé
+      if (this.isMoveAutoReplacementTarget(target, moveName, moveId)) {
+        return true;
+      }
+
+      const rule = this.getFamilyRule(target);
+      if (!rule || !rule.doNotPromptMoves) return false;
+
+      if (moveName) {
+        const key = moveName.trim().toLowerCase();
+        if (rule.doNotPromptMoves[key]) return true;
+      }
+      if (moveId && rule.doNotPromptMoves[`id_${moveId}`]) {
+        return true;
+      }
+      return false;
     },
 
     deleteFamilyRule(familyKey) {

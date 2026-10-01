@@ -998,7 +998,7 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  padding-right: 130px;
+  padding-right: 285px;
   box-sizing: border-box;
   min-height: 28px;
 }
@@ -1114,6 +1114,56 @@
   user-select: none;
   letter-spacing: 0.2px;
 }
+.pokeskip-silence-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+}
+.pokeskip-silence-label.disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+.pokeskip-silence-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #64748b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.15s;
+}
+.pokeskip-silence-badge.silenced {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+}
+.pokeskip-silence-badge.auto {
+  background: rgba(168, 85, 247, 0.25);
+  color: #d8b4fe;
+  border: 1px dashed rgba(168, 85, 247, 0.6);
+}
+.pokeskip-silence-checkbox {
+  accent-color: #a855f7 !important;
+  width: 17px !important;
+  height: 17px !important;
+  cursor: pointer;
+}
+.pokeskip-silence-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.pokeskip-keep-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 
 .pokeskip-move-desc {
   font-size: 12px;
@@ -1178,6 +1228,19 @@
 .pokeskip-quick-btn:hover {
   transform: scale(1.04);
   filter: brightness(1.1);
+}
+.pokeskip-quick-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+.pokeskip-quick-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.04);
+  filter: none;
 }
 .pokeskip-quick-close {
   font-family: inherit;
@@ -1261,6 +1324,56 @@
 .pokeskip-toast.purple {
   border-left-color: #a855f7;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 18px rgba(168, 85, 247, 0.3);
+}
+.pokeskip-toast.advanced b,
+.pokeskip-toast.advanced strong,
+.pokeskip-toast.purple b,
+.pokeskip-toast.purple strong {
+  color: #d8b4fe;
+}
+.pokeskip-toast-action-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.pokeskip-toast-btn-action {
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.45);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pokeskip-toast-btn-action:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.65);
+}
+.pokeskip-toast-btn-close {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 9px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+.pokeskip-toast-btn-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
 }
 @keyframes pokeskipToastIn {
   from {

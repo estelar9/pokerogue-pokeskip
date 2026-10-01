@@ -1,5 +1,6 @@
 // Détection des types des Pokémon ennemis en combat (simple ou double)
 import { PokeSkip } from './state.js';
+import { LineageManager } from './lineage-manager.js';
 import { POKEMON_TYPES, TYPE_CHART } from '../constants/types.js';
 
 export   function getActiveEnemyTypes() {
@@ -117,10 +118,7 @@ export   function getActiveEnemyTypes() {
 
       // Helper pour extraire le nom d'un Pokémon
       const getNameFromPokemon = (poke) => {
-        if (typeof poke.getName === 'function') return poke.getName();
-        if (poke.name) return poke.name;
-        if (poke.species?.name) return poke.species.name;
-        return 'Adversaire';
+        return LineageManager.getPokemonDisplayName(poke) || 'Adversaire';
       };
 
       const enemies = [];

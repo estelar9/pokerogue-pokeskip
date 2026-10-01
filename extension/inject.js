@@ -1,4 +1,4 @@
-// PokéSkip Extension Inject Script v1.12.1
+// PokéSkip Extension Inject Script v1.13.0
 
 (() => {
   // src/data/megas.js
@@ -3334,56 +3334,382 @@
 
   // src/data/species-names.js
   var staticSpeciesNames = {
-    // Gen 1
+    1: "Bulbizarre",
+    2: "Herbizarre",
+    3: "Florizarre",
+    4: "Salam\xE8che",
+    5: "Reptincel",
+    6: "Dracaufeu",
+    7: "Carapuce",
+    8: "Carabaffe",
+    9: "Tortank",
+    10: "Chenipan",
+    11: "Chrysacier",
+    12: "Papilusion",
+    13: "Aspicot",
+    14: "Coconfort",
+    15: "Dardargnan",
+    16: "Roucool",
+    17: "Roucoups",
+    18: "Roucarnage",
+    19: "Rattata",
+    20: "Rattatac",
+    21: "Piafabec",
+    22: "Rapasdepic",
+    23: "Abo",
+    24: "Arbok",
+    25: "Pikachu",
+    26: "Raichu",
+    27: "Sabelette",
+    28: "Sablaireau",
+    29: "Nidoran\u2640",
+    30: "Nidorina",
+    31: "Nidoqueen",
+    32: "Nidoran\u2642",
+    33: "Nidorino",
+    34: "Nidoking",
+    35: "M\xE9lof\xE9e",
+    36: "M\xE9lodelfe",
+    37: "Goupix",
+    38: "Feunard",
+    39: "Rondoudou",
+    40: "Grodoudou",
+    41: "Nosferapti",
+    42: "Nosferalto",
+    43: "Mystherbe",
+    44: "Ortide",
+    45: "Rafflesia",
+    46: "Paras",
+    47: "Parasect",
+    48: "Mimitoss",
+    49: "A\xE9romite",
+    50: "Taupiqueur",
+    51: "Triopikeur",
+    52: "Miaouss",
+    53: "Persian",
+    54: "Psykokwak",
+    55: "Akwakwak",
+    56: "F\xE9rosinge",
+    57: "Colossinge",
+    58: "Caninos",
+    59: "Arcanin",
+    60: "Ptitard",
+    61: "T\xEAtarte",
+    62: "Tartard",
+    63: "Abra",
+    64: "Kadabra",
+    65: "Alakazam",
+    66: "Machoc",
+    67: "Machopeur",
+    68: "Mackogneur",
+    69: "Ch\xE9tiflor",
+    70: "Boustiflor",
+    71: "Empiflor",
+    72: "Tentacool",
+    73: "Tentacruel",
+    74: "Racaillou",
+    75: "Gravalanch",
+    76: "Grolem",
+    77: "Ponyta",
+    78: "Galopa",
+    79: "Ramoloss",
+    80: "Flagadoss",
+    81: "Magn\xE9ti",
+    82: "Magn\xE9ton",
     83: "Canarticho",
+    84: "Doduo",
+    85: "Dodrio",
+    86: "Otaria",
+    87: "Lamantine",
+    88: "Tadmorv",
+    89: "Grotadmorv",
+    90: "Kokiyas",
+    91: "Crustabri",
+    92: "Fantominus",
+    93: "Spectrum",
+    94: "Ectoplasma",
+    95: "Onix",
+    96: "Soporifik",
+    97: "Hypnomade",
+    98: "Krabby",
+    99: "Krabboss",
+    100: "Voltorbe",
+    101: "\xC9lectrode",
+    102: "Noeunoeuf",
+    103: "Noadkoko",
+    104: "Osselait",
+    105: "Ossatueur",
+    106: "Kicklee",
+    107: "Tygnon",
+    108: "Excelangue",
+    109: "Smogo",
+    110: "Smogogo",
+    111: "Rhinocorne",
+    112: "Rhinof\xE9ros",
+    113: "Leveinard",
+    114: "Saquedeneu",
     115: "Kangourex",
+    116: "Hypotrempe",
+    117: "Hypoc\xE9an",
+    118: "Poissir\xE8ne",
+    119: "Poissoroy",
+    120: "Stari",
+    121: "Staross",
+    122: "M. Mime",
+    123: "Ins\xE9cateur",
+    124: "Lippoutou",
+    125: "\xC9lektek",
+    126: "Magmar",
     127: "Scarabrute",
     128: "Tauros",
+    129: "Magicarpe",
+    130: "L\xE9viator",
     131: "Lokhlass",
     132: "M\xE9tamorph",
+    133: "\xC9voli",
+    134: "Aquali",
+    135: "Voltali",
+    136: "Pyroli",
+    137: "Porygon",
+    138: "Amonita",
+    139: "Amonistar",
+    140: "Kabuto",
+    141: "Kabutops",
     142: "Pt\xE9ra",
     143: "Ronflex",
     144: "Artikodin",
     145: "\xC9lecthor",
     146: "Sulfura",
+    147: "Minidraco",
+    148: "Draco",
+    149: "Dracolosse",
     150: "Mewtwo",
     151: "Mew",
-    // Gen 2
+    152: "Germignon",
+    153: "Macronium",
+    154: "M\xE9ganium",
+    155: "H\xE9ricendre",
+    156: "Feurisson",
+    157: "Typhlosion",
+    158: "Kaiminus",
+    159: "Crocrodil",
+    160: "Aligatueur",
+    161: "Fouinette",
+    162: "Fouinar",
+    163: "Hoothoot",
+    164: "Noarfang",
+    165: "Coxy",
+    166: "Coxyclaque",
+    167: "Mimigal",
+    168: "Migalos",
+    169: "Nostenfer",
+    170: "Loupio",
+    171: "Lanturn",
+    172: "Pichu",
+    173: "M\xE9lo",
+    174: "Toudoudou",
+    175: "Togepi",
+    176: "Togetic",
+    177: "Natu",
+    178: "Xatu",
+    179: "Wattouat",
+    180: "Lainergie",
+    181: "Pharamp",
+    182: "Joliflor",
+    183: "Marill",
+    184: "Azumarill",
+    185: "Simularbre",
+    186: "Tarpaud",
+    187: "Granivol",
+    188: "Floravol",
+    189: "Cotovol",
+    190: "Capumain",
+    191: "Tournegrin",
+    192: "H\xE9liatronc",
+    193: "Yanma",
+    194: "Axoloto",
+    195: "Maraiste",
+    196: "Mentali",
+    197: "Noctali",
+    198: "Corn\xE8bre",
+    199: "Roigada",
+    200: "Feufor\xEAve",
+    201: "Zarbi",
+    202: "Qulbutok\xE9",
+    203: "Girafarig",
+    204: "Pomdepik",
+    205: "Foretress",
     206: "Insolourdo",
+    207: "Scorplane",
+    208: "Steelix",
+    209: "Snubbull",
+    210: "Granbull",
     211: "Qwilfish",
+    212: "Cizayox",
     213: "Caratroc",
     214: "Scarhino",
+    215: "Farfuret",
+    216: "Teddiursa",
+    217: "Ursaring",
+    218: "Limagma",
+    219: "Volcaropod",
+    220: "Marcacrin",
+    221: "Cochignon",
     222: "Corayon",
+    223: "R\xE9moraid",
+    224: "Octillery",
     225: "Cadoizo",
+    226: "D\xE9manta",
     227: "Airmure",
+    228: "Malosse",
+    229: "D\xE9molosse",
+    230: "Hyporoi",
+    231: "Phanpy",
+    232: "Donphan",
+    233: "Porygon2",
+    234: "Cerfrousse",
     235: "Queulorior",
+    236: "Debugant",
+    237: "Kapoera",
+    238: "Lippouti",
+    239: "\xC9lekid",
+    240: "Magby",
     241: "\xC9cr\xE9meuh",
+    242: "Leuphorie",
     243: "Raikou",
     244: "Entei",
     245: "Suicune",
+    246: "Embrylex",
+    247: "Ymphect",
+    248: "Tyranocif",
     249: "Lugia",
     250: "Ho-Oh",
     251: "Celebi",
-    // Gen 3
+    252: "Arcko",
+    253: "Massko",
+    254: "Jungko",
+    255: "Poussifeu",
+    256: "Galifeu",
+    257: "Bras\xE9gali",
+    258: "Gobou",
+    259: "Flobio",
+    260: "Laggron",
+    261: "Medhy\xE8na",
+    262: "Grahy\xE8na",
+    263: "Zigzaton",
+    264: "Lin\xE9on",
+    265: "Chenipotte",
+    266: "Armulys",
+    267: "Charmillon",
+    268: "Blindalys",
+    269: "Papinox",
+    270: "N\xE9nupiot",
+    271: "Lombre",
+    272: "Ludicolo",
+    273: "Grainipiot",
+    274: "Pifeuil",
+    275: "Tengalice",
+    276: "Nirondelle",
+    277: "H\xE9l\xE9delle",
+    278: "Go\xE9lise",
+    279: "Bekipan",
+    280: "Tarsal",
+    281: "Kirlia",
+    282: "Gardevoir",
+    283: "Arakdo",
+    284: "Maskadra",
+    285: "Balignon",
+    286: "Chapignon",
+    287: "Parecool",
+    288: "Vigoroth",
+    289: "Monafl\xE8mit",
+    290: "Ningale",
+    291: "Ninjask",
+    292: "Munja",
+    293: "Chuchmur",
+    294: "Ramboum",
+    295: "Brouhabam",
+    296: "Makuhita",
+    297: "Hariyama",
+    298: "Azurill",
+    299: "Tarinor",
+    300: "Skitty",
+    301: "Delcatty",
     302: "T\xE9n\xE9fix",
     303: "Mysdibule",
+    304: "Galekid",
+    305: "Galegon",
+    306: "Galeking",
+    307: "M\xE9ditikka",
+    308: "Charmina",
+    309: "Dynavolt",
+    310: "\xC9lecsprint",
     311: "Posipi",
     312: "N\xE9gapi",
     313: "Muciole",
     314: "Lumivole",
+    315: "Ros\xE9lia",
+    316: "Gloupti",
+    317: "Avaltout",
+    318: "Carvanha",
+    319: "Sharpedo",
+    320: "Wailmer",
+    321: "Wailord",
+    322: "Chamallot",
+    323: "Cam\xE9rupt",
     324: "Chartor",
+    325: "Spoink",
+    326: "Groret",
     327: "Spinda",
+    328: "Kraknoix",
+    329: "Vibraninf",
+    330: "Lib\xE9gon",
+    331: "Cacnea",
+    332: "Cacturne",
+    333: "Tylton",
+    334: "Altaria",
     335: "Mangriff",
     336: "S\xE9viper",
     337: "S\xE9l\xE9roc",
     338: "Solaroc",
-    351: "Morpheo",
-    352: "K\xE9k\xE9on",
+    339: "Barloche",
+    340: "Barbicha",
+    341: "\xC9crapince",
+    342: "Colhomard",
+    343: "Balbuto",
+    344: "Kaorine",
+    345: "Lilia",
+    346: "Vacilys",
+    347: "Anorith",
+    348: "Armaldo",
+    349: "Barpau",
+    350: "Milobellus",
+    351: "Morph\xE9o",
+    352: "Kecleon",
+    353: "Polichombr",
+    354: "Branette",
+    355: "Skel\xE9nox",
+    356: "T\xE9raclope",
     357: "Tropius",
     358: "\xC9oko",
     359: "Absol",
+    360: "Ok\xE9ok\xE9",
+    361: "Stalgamin",
+    362: "Oniglali",
+    363: "Obalie",
+    364: "Phogleur",
+    365: "Kaimorse",
+    366: "Coquiperl",
+    367: "Serpang",
+    368: "Rosabyss",
     369: "Relicanth",
     370: "Lovdisc",
+    371: "Draby",
+    372: "Drackhaus",
+    373: "Drattak",
+    374: "Terhal",
+    375: "M\xE9tang",
+    376: "M\xE9talosse",
     377: "Regirock",
     378: "Regice",
     379: "Registeel",
@@ -3394,11 +3720,98 @@
     384: "Rayquaza",
     385: "Jirachi",
     386: "Deoxys",
-    // Gen 4
+    387: "Tortipouss",
+    388: "Boskara",
+    389: "Torterra",
+    390: "Ouisticram",
+    391: "Chimpenfeu",
+    392: "Simiabraz",
+    393: "Tiplouf",
+    394: "Prinplouf",
+    395: "Pingol\xE9on",
+    396: "\xC9tourmi",
+    397: "\xC9tourvol",
+    398: "\xC9touraptor",
+    399: "Keunotor",
+    400: "Castorno",
+    401: "Crikzik",
+    402: "M\xE9lokrik",
+    403: "Lixy",
+    404: "Luxio",
+    405: "Luxray",
+    406: "Rozbouton",
+    407: "Roserade",
+    408: "Kranidos",
+    409: "Charkos",
+    410: "Dinoclier",
+    411: "Bastiodon",
+    412: "Cheniti",
+    413: "Cheniselle",
+    414: "Papilord",
+    415: "Apitrini",
+    416: "Apireine",
     417: "Pachirisu",
+    418: "Must\xE9bou\xE9e",
+    419: "Must\xE9flott",
+    420: "Ceribou",
+    421: "Ceriflor",
+    422: "Sancoki",
+    423: "Tritosor",
+    424: "Capidextre",
+    425: "Baudrive",
+    426: "Grodrive",
+    427: "Laporeille",
+    428: "Lockpin",
+    429: "Magir\xEAve",
+    430: "Corboss",
+    431: "Chaglam",
+    432: "Chaffreux",
+    433: "Korillon",
+    434: "Moufouette",
+    435: "Moufflair",
+    436: "Arch\xE9omire",
+    437: "Arch\xE9odong",
+    438: "Manza\xEF",
+    439: "Mime Jr.",
+    440: "Ptiravi",
     441: "Pijako",
     442: "Spiritomb",
+    443: "Griknot",
+    444: "Carmache",
+    445: "Carchacrok",
+    446: "Goinfrex",
+    447: "Riolu",
+    448: "Lucario",
+    449: "Hippopotas",
+    450: "Hippodocus",
+    451: "Rapion",
+    452: "Drascore",
+    453: "Cradopaud",
+    454: "Coatox",
     455: "Vortente",
+    456: "\xC9cayon",
+    457: "Lumin\xE9on",
+    458: "Babimanta",
+    459: "Blizzi",
+    460: "Blizzaroi",
+    461: "Dimoret",
+    462: "Magn\xE9zone",
+    463: "Coudlangue",
+    464: "Rhinastoc",
+    465: "Bouldeneu",
+    466: "\xC9lekable",
+    467: "Maganon",
+    468: "Togekiss",
+    469: "Yanmega",
+    470: "Phyllali",
+    471: "Givrali",
+    472: "Scorvol",
+    473: "Mammochon",
+    474: "Porygon-Z",
+    475: "Gallame",
+    476: "Tarinorme",
+    477: "Noctunoir",
+    478: "Momartik",
     479: "Motisma",
     480: "Cr\xE9helf",
     481: "Cr\xE9follet",
@@ -3414,19 +3827,150 @@
     491: "Darkrai",
     492: "Shaymin",
     493: "Arceus",
-    // Gen 5
     494: "Victini",
+    495: "Vip\xE9lierre",
+    496: "Lianaja",
+    497: "Majaspic",
+    498: "Gruikui",
+    499: "Grotichon",
+    500: "Roitiflam",
+    501: "Moustillon",
+    502: "Mateloutre",
+    503: "Clamiral",
+    504: "Ratentif",
+    505: "Miradar",
+    506: "Ponchiot",
+    507: "Ponchien",
+    508: "Mastouffe",
+    509: "Chacripan",
+    510: "L\xE9opardus",
+    511: "Feuillajou",
+    512: "Feuiloutan",
+    513: "Flamajou",
+    514: "Flamoutan",
+    515: "Flotajou",
+    516: "Flotoutan",
+    517: "Munna",
+    518: "Mushana",
+    519: "Poichigeon",
+    520: "Colombeau",
+    521: "D\xE9flaisan",
+    522: "Z\xE9bibron",
+    523: "Z\xE9blitz",
+    524: "Nodulithe",
+    525: "G\xE9olithe",
+    526: "Gigalithe",
+    527: "Chovsourir",
+    528: "Rhinolove",
+    529: "Rototaupe",
+    530: "Minotaupe",
     531: "Nanm\xE9ou\xEFe",
+    532: "Charpenti",
+    533: "Ouvrifier",
+    534: "B\xE9tochef",
+    535: "Tritonde",
+    536: "Batracn\xE9",
+    537: "Crapustule",
     538: "Judokrak",
     539: "Karacl\xE9e",
+    540: "Larveyette",
+    541: "Couverdure",
+    542: "Manternel",
+    543: "Venipatte",
+    544: "Scobolide",
+    545: "Brutapode",
+    546: "Doudouvet",
+    547: "Farfaduvet",
+    548: "Chlorobule",
+    549: "Fragilady",
     550: "Bargantua",
+    551: "Masca\xEFman",
+    552: "Escroco",
+    553: "Crocorible",
+    554: "Darumarond",
+    555: "Darumacho",
     556: "Maracachi",
+    557: "Crabicoque",
+    558: "Crabaraque",
+    559: "Baggiguane",
+    560: "Bagga\xEFd",
     561: "Crypt\xE9ro",
-    587: "\xC9molga",
+    562: "Tutafeh",
+    563: "Tutankafer",
+    564: "Carapagos",
+    565: "M\xE9gapagos",
+    566: "Ark\xE9apti",
+    567: "A\xE9ropt\xE9ryx",
+    568: "Miamiasme",
+    569: "Miasmax",
+    570: "Zorua",
+    571: "Zoroark",
+    572: "Chinchidou",
+    573: "Pashmilla",
+    574: "Scrutella",
+    575: "Mesm\xE9rella",
+    576: "Sid\xE9rella",
+    577: "Nucl\xE9os",
+    578: "M\xE9ios",
+    579: "Symbios",
+    580: "Couaneton",
+    581: "Lakm\xE9cygne",
+    582: "Sorb\xE9b\xE9",
+    583: "Sorboul",
+    584: "Sorbouboul",
+    585: "Vivaldaim",
+    586: "Haydaim",
+    587: "Emolga",
+    588: "Carabing",
+    589: "Lan\xE7argot",
+    590: "Trompignon",
+    591: "Gaulet",
+    592: "Viskuse",
+    593: "Moyade",
     594: "Mamanbo",
+    595: "Statitik",
+    596: "Mygavolt",
+    597: "Grindur",
+    598: "Noacier",
+    599: "Tic",
+    600: "Clic",
+    601: "Cliticlic",
+    602: "Anchwatt",
+    603: "Lamp\xE9roie",
+    604: "Ohmassacre",
+    605: "Lewsor",
+    606: "Neitram",
+    607: "Fun\xE9cire",
+    608: "M\xE9lancolux",
+    609: "Lugulabre",
+    610: "Coupenotte",
+    611: "Incisache",
+    612: "Tranchodon",
+    613: "Polarhume",
+    614: "Polagriffe",
+    615: "Hexagel",
+    616: "Escargaume",
+    617: "Limaspeed",
+    618: "Limonde",
+    619: "Kungfouine",
+    620: "Shaofouine",
+    621: "Drakkarmin",
+    622: "Gringolem",
+    623: "Golemastoc",
+    624: "Scalpion",
+    625: "Scalproie",
     626: "Frison",
+    627: "Furaiglon",
+    628: "Gueriaigle",
+    629: "Vostourno",
+    630: "Vaututrice",
     631: "Aflamanoir",
     632: "Fermite",
+    633: "Solochi",
+    634: "Diamat",
+    635: "Trioxhydre",
+    636: "Pyronille",
+    637: "Pyrax",
     638: "Cobaltium",
     639: "Terrakium",
     640: "Viridium",
@@ -3439,23 +3983,127 @@
     647: "Keldeo",
     648: "Meloetta",
     649: "Genesect",
-    // Gen 6
+    650: "Marisson",
+    651: "Bogu\xE9risse",
+    652: "Blind\xE9pique",
+    653: "Feunnec",
+    654: "Roussil",
+    655: "Goupelin",
+    656: "Grenousse",
+    657: "Cro\xE2poral",
+    658: "Amphinobi",
+    659: "Sapereau",
+    660: "Excavarenne",
+    661: "Passerouge",
+    662: "Braisillon",
+    663: "Flambusard",
+    664: "L\xE9pidonille",
+    665: "P\xE9r\xE9grain",
+    666: "Prismillon",
+    667: "H\xE9lionceau",
+    668: "N\xE9m\xE9lios",
+    669: "Flab\xE9b\xE9",
+    670: "Floette",
+    671: "Florges",
+    672: "Cabriolaine",
+    673: "Chevroum",
+    674: "Pandespi\xE8gle",
+    675: "Pandarbare",
     676: "Couafarel",
+    677: "Psystigri",
+    678: "Mistigrix",
+    679: "Monorpale",
+    680: "Dimocl\xE8s",
+    681: "Exagide",
+    682: "Fluvetin",
+    683: "Cocotine",
+    684: "Sucroquin",
+    685: "Cupcanaille",
+    686: "Sepiatop",
+    687: "Sepiatroce",
+    688: "Opermine",
+    689: "Golgopathe",
+    690: "Venalgue",
+    691: "Kravarech",
+    692: "Flingouste",
+    693: "Gamblast",
+    694: "Galvaran",
+    695: "Iguolta",
+    696: "Ptyranidur",
+    697: "Rexillius",
+    698: "Amagara",
+    699: "Dragmara",
+    700: "Nymphali",
     701: "Brutalibr\xE9",
+    702: "Dedenne",
     703: "Strassie",
+    704: "Mucuscule",
+    705: "Colimucus",
+    706: "Muplodocus",
     707: "Trousselin",
+    708: "Broc\xE9l\xF4me",
+    709: "Dess\xE9liande",
+    710: "Pitrouille",
+    711: "Banshitrouye",
+    712: "Grela\xE7on",
+    713: "S\xE9racrawl",
+    714: "Sonistrelle",
+    715: "Bruyverne",
     716: "Xerneas",
     717: "Yveltal",
     718: "Zygarde",
     719: "Diancie",
     720: "Hoopa",
     721: "Volcanion",
-    // Gen 7
+    722: "Brindibou",
+    723: "Effl\xE8che",
+    724: "Arch\xE9duc",
+    725: "Flamiaou",
+    726: "Matoufeu",
+    727: "F\xE9linferno",
+    728: "Otaquin",
+    729: "Otarlette",
+    730: "Oratoria",
+    731: "Picassaut",
+    732: "Piclairon",
+    733: "Bazoucan",
+    734: "Manglouton",
+    735: "Argouste",
+    736: "Larvibule",
+    737: "Chrysapile",
+    738: "Lucanon",
+    739: "Crabagarre",
+    740: "Crabominable",
     741: "Plumeline",
+    742: "Bombydou",
+    743: "Rubombelle",
+    744: "Rocabot",
+    745: "Lougaroc",
     746: "Froussardine",
+    747: "Vorast\xE9rie",
+    748: "Pr\xE9dast\xE9rie",
+    749: "Tiboudet",
+    750: "Bourrinos",
+    751: "Araqua",
+    752: "Tarenbulle",
+    753: "Mimantis",
+    754: "Floramantis",
+    755: "Spododo",
+    756: "Lampignon",
+    757: "Tritox",
+    758: "Malamandre",
+    759: "Nounourson",
+    760: "Chelours",
+    761: "Croquine",
+    762: "Candine",
+    763: "Sucreine",
     764: "Gu\xE9rilande",
     765: "Gouroutan",
     766: "Quartermac",
+    767: "Sovkipou",
+    768: "Sarmura\xEF",
+    769: "Bacabouh",
+    770: "Tr\xE9passable",
     771: "Concombaffe",
     772: "Type:0",
     773: "Silvalli\xE9",
@@ -3467,12 +4115,15 @@
     779: "Denticrisse",
     780: "Dra\xEFeul",
     781: "Sinistrail",
+    782: "B\xE9b\xE9caille",
+    783: "\xC9ca\xEFd",
+    784: "\xC9ka\xEFser",
     785: "Tokorico",
     786: "Tokopiyon",
     787: "Tokotoro",
     788: "Tokopisco",
     789: "Cosmog",
-    790: "Cosmoem",
+    790: "Cosmovum",
     791: "Solgaleo",
     792: "Lunala",
     793: "Z\xE9ro\xEFd",
@@ -3487,19 +4138,89 @@
     802: "Marshadow",
     803: "V\xE9mini",
     804: "Mandrillon",
-    805: "Pierroteknik",
-    806: "Ama-Ama",
+    805: "Ama-Ama",
+    806: "Pierroteknik",
     807: "Zeraora",
     808: "Meltan",
     809: "Melmetal",
-    // Gen 8
+    810: "Ouistempo",
+    811: "Badabouin",
+    812: "Gorythmic",
+    813: "Flambino",
+    814: "Lapyro",
+    815: "Pyrobut",
+    816: "Larm\xE9l\xE9on",
+    817: "Arrozard",
+    818: "L\xE9zargus",
+    819: "Rongourmand",
+    820: "Rongrigou",
+    821: "Minisange",
+    822: "Bleuseille",
+    823: "Corvaillus",
+    824: "Larvadar",
+    825: "Col\xE9od\xF4me",
+    826: "Astronelle",
+    827: "Goupilou",
+    828: "Roublenard",
+    829: "Tournicoton",
+    830: "Blancoton",
+    831: "Moumouton",
+    832: "Moumouflon",
+    833: "Kh\xE9locrok",
+    834: "Torgamord",
+    835: "Voltoutou",
+    836: "Fulgudog",
+    837: "Charbi",
+    838: "Wagomine",
+    839: "Monthracite",
+    840: "Verpom",
+    841: "Pomdrapi",
+    842: "Dratatin",
+    843: "Dunaja",
+    844: "Dunaconda",
     845: "Nigosier",
+    846: "Embrochet",
+    847: "Hastacuda",
+    848: "Toxizap",
+    849: "Salarsen",
+    850: "Grillepattes",
+    851: "Scolocendre",
+    852: "Poulpaf",
+    853: "Krakos",
+    854: "Th\xE9ffroi",
+    855: "Polth\xE9geist",
+    856: "Bibichut",
+    857: "Chapotus",
+    858: "Sorcilence",
+    859: "Grimalin",
+    860: "Fourbelin",
+    861: "Angoliath",
+    862: "Ixon",
+    863: "Berserkatt",
+    864: "Coray\xF4me",
+    865: "Palarticho",
+    866: "M. Glaquette",
+    867: "Tut\xE9t\xE9kri",
+    868: "Cr\xE8my",
+    869: "Charmilly",
     870: "Hexadron",
     871: "Wattapik",
+    872: "Frissonille",
+    873: "Beldeneige",
     874: "Dolman",
     875: "Bekagla\xE7on",
+    876: "Wimessir",
     877: "Morpeko",
+    878: "Charibari",
+    879: "Pachyradjah",
+    880: "Galvagon",
+    881: "Galvagla",
+    882: "Hydragon",
+    883: "Hydragla",
     884: "Duralugon",
+    885: "Fantyrm",
+    886: "Dispareptil",
+    887: "Lanssorien",
     888: "Zacian",
     889: "Zamazenta",
     890: "\xC9thernatos",
@@ -3511,18 +4232,91 @@
     896: "Blizzeval",
     897: "Spectreval",
     898: "Sylveroy",
+    899: "Cerbyllin",
+    900: "Hach\xE9cateur",
+    901: "Ursaking",
+    902: "Paragruel",
+    903: "Farfurex",
+    904: "Qwilpik",
     905: "Amov\xE9nus",
-    // Gen 9
+    906: "Poussacha",
+    907: "Matourgeon",
+    908: "Miascarade",
+    909: "Chochodile",
+    910: "Crocogril",
+    911: "Fl\xE2migator",
+    912: "Coiffeton",
+    913: "Canarbello",
+    914: "Palmaval",
+    915: "Gourmelet",
+    916: "Fragroin",
+    917: "Tissenboule",
+    918: "Filentrappe",
+    919: "Lilliterelle",
+    920: "Gambex",
+    921: "Pohm",
+    922: "Pohmotte",
+    923: "Pohmarmotte",
+    924: "Compagnol",
+    925: "Famignol",
+    926: "P\xE2tachiot",
+    927: "Briochien",
+    928: "Olivini",
+    929: "Olivado",
+    930: "Arboliva",
     931: "Tapato\xE8s",
+    932: "Selutin",
+    933: "Amassel",
+    934: "Gigansel",
+    935: "Charbambin",
+    936: "Carmadura",
+    937: "Malvalame",
+    938: "T\xEAtampoule",
+    939: "Ampibidou",
+    940: "Zap\xE9trel",
+    941: "Fulgulairo",
+    942: "Grondogue",
+    943: "Dogrino",
+    944: "Gribouraigne",
+    945: "Tag-Tag",
+    946: "Virovent",
+    947: "Virevorreur",
+    948: "Terracool",
+    949: "Terracruel",
     950: "Craparoi",
+    951: "Pimito",
+    952: "Scovilain",
+    953: "L\xE9boul\xE9rou",
+    954: "B\xE9rasca",
+    955: "Flotillon",
+    956: "Cl\xE9opsytra",
+    957: "Forgerette",
+    958: "Forgella",
+    959: "Forgelina",
+    960: "Taupikeau",
+    961: "Triopikeau",
     962: "Lestombaile",
+    963: "Dofin",
+    964: "Superdofin",
+    965: "Vrombi",
+    966: "Vrombotor",
     967: "Motorizard",
+    968: "Ferdeter",
     969: "Germ\xE9clat",
-    973: "Flamirouette",
-    976: "Delestin",
+    970: "Flor\xE9clat",
+    971: "Toutombe",
+    972: "Tomberro",
+    973: "Flamenroule",
+    974: "Pi\xE9tac\xE9",
+    975: "Balbal\xE8ze",
+    976: "D\xE9lestin",
     977: "Oyacata",
     978: "Nigirigon",
-    // Paradox
+    979: "Courrousinge",
+    980: "Terraiste",
+    981: "Farigiraf",
+    982: "Deusolourdo",
+    983: "Scalpereur",
     984: "Fort-Ivoire",
     985: "Hurle-Queue",
     986: "Fongus-Furie",
@@ -3535,22 +4329,31 @@
     993: "T\xEAtes-de-Fer",
     994: "Mite-de-Fer",
     995: "\xC9pine-de-Fer",
-    1005: "Rugit-Lune",
-    1006: "Garde-de-Fer",
-    // Légendaires Gen 9
+    996: "Frigodo",
+    997: "Cryodo",
+    998: "Glaivodo",
+    999: "Mordudor",
+    1e3: "Gromago",
     1001: "Chongjian",
     1002: "Baojian",
     1003: "Dinglu",
     1004: "Yuyu",
+    1005: "Rugit-Lune",
+    1006: "Garde-de-Fer",
     1007: "Koraidon",
     1008: "Miraidon",
     1009: "Serpente-Eau",
-    1010: "Grat-de-Fer",
+    1010: "Vert-de-Fer",
+    1011: "Pomdramour",
+    1012: "Poltchageist",
+    1013: "Th\xE9ffroyable",
     1014: "F\xE9licanis",
     1015: "Fortusimia",
     1016: "Favianos",
     1017: "Ogerpon",
-    1020: "Goulette-Feu",
+    1018: "Pondralugon",
+    1019: "Pomdorochi",
+    1020: "Feu-Per\xE7ant",
     1021: "Ire-Foudre",
     1022: "Roc-de-Fer",
     1023: "Chef-de-Fer",
@@ -3607,7 +4410,8 @@
         showQuickPrompt: true,
         quickPromptDuration: 15,
         showHudCount: true,
-        advancedMode: false
+        advancedMode: false,
+        promptAutoReplacement: true
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4e3) s.toastDuration = 2800;
       return s;
@@ -3672,6 +4476,7 @@
             familyId: rule.familyId,
             lineageName: rule.lineageName,
             skippedMoves: Object.assign({}, rule.skippedMoves || {}),
+            doNotPromptMoves: Object.assign({}, rule.doNotPromptMoves || {}),
             skipAll: !!rule.skipAll,
             enabled: rule.enabled !== false,
             replacements: Array.isArray(rule.replacements) ? rule.replacements.slice() : [],
@@ -3772,6 +4577,7 @@
           familyId: familyInfo.rootId,
           lineageName: familyInfo.lineageName,
           skippedMoves: {},
+          doNotPromptMoves: {},
           skipAll: false,
           enabled: true,
           replacements: [],
@@ -3779,6 +4585,7 @@
         };
       }
       const rule = this.rules[familyKey];
+      if (!rule.doNotPromptMoves) rule.doNotPromptMoves = {};
       if (familyInfo.lineageName) rule.lineageName = familyInfo.lineageName;
       const key = moveName ? moveName.trim().toLowerCase() : `id_${moveId}`;
       if (isSkipped) {
@@ -3790,6 +4597,65 @@
       }
       rule.updatedAt = Date.now();
       this.saveRules();
+    },
+    setMovePromptSuppressed(target, speciesName, moveName, moveId, isSuppressed) {
+      const familyInfo = LineageManager.getFamilyInfo(target, speciesName);
+      const familyKey = familyInfo.familyKey;
+      if (!this.rules[familyKey]) {
+        this.rules[familyKey] = {
+          familyId: familyInfo.rootId,
+          lineageName: familyInfo.lineageName,
+          skippedMoves: {},
+          doNotPromptMoves: {},
+          skipAll: false,
+          enabled: true,
+          replacements: [],
+          updatedAt: Date.now()
+        };
+      }
+      const rule = this.rules[familyKey];
+      if (!rule.doNotPromptMoves) rule.doNotPromptMoves = {};
+      if (familyInfo.lineageName) rule.lineageName = familyInfo.lineageName;
+      const key = moveName ? moveName.trim().toLowerCase() : `id_${moveId}`;
+      if (isSuppressed) {
+        rule.doNotPromptMoves[key] = true;
+        if (moveId) rule.doNotPromptMoves[`id_${moveId}`] = true;
+      } else {
+        delete rule.doNotPromptMoves[key];
+        if (moveId) delete rule.doNotPromptMoves[`id_${moveId}`];
+      }
+      rule.updatedAt = Date.now();
+      this.saveRules();
+    },
+    isMoveAutoReplacementTarget(target, moveName, moveId) {
+      if (!this.settings.advancedMode) return false;
+      const rule = this.getFamilyRule(target);
+      if (!rule || !Array.isArray(rule.replacements) || rule.replacements.length === 0) return false;
+      if (rule.enabled === false) return false;
+      const normalize = (s) => (s || "").toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, "");
+      const normName = normalize(moveName);
+      const numId = moveId !== void 0 && moveId !== null ? Number(moveId) : null;
+      return rule.replacements.some((r) => {
+        if (!r.enabled) return false;
+        if (numId && r.newMoveId && Number(r.newMoveId) === numId) return true;
+        if (normName && normalize(r.newMoveName) === normName) return true;
+        return false;
+      });
+    },
+    isMovePromptSuppressed(target, moveName, moveId) {
+      if (this.isMoveAutoReplacementTarget(target, moveName, moveId)) {
+        return true;
+      }
+      const rule = this.getFamilyRule(target);
+      if (!rule || !rule.doNotPromptMoves) return false;
+      if (moveName) {
+        const key = moveName.trim().toLowerCase();
+        if (rule.doNotPromptMoves[key]) return true;
+      }
+      if (moveId && rule.doNotPromptMoves[`id_${moveId}`]) {
+        return true;
+      }
+      return false;
     },
     deleteFamilyRule(familyKey) {
       if (this.rules[familyKey]) {
@@ -3996,10 +4862,14 @@
             const rawNames = fam.name.replace(/\(Méga.*?\)/g, "").split(/[→/]/).map((s) => s.trim()).filter(Boolean);
             if (rawNames.length === fam.members.length) {
               fam.members.forEach((m, i) => {
-                this.speciesNames[m] = rawNames[i];
+                if (!this.speciesNames[m]) {
+                  this.speciesNames[m] = rawNames[i];
+                }
               });
             } else if (fam.members.length === 1 && rawNames.length > 1) {
-              this.speciesNames[fam.members[0]] = rawNames[rawNames.length - 1];
+              if (!this.speciesNames[fam.members[0]]) {
+                this.speciesNames[fam.members[0]] = rawNames[rawNames.length - 1];
+              }
             }
           }
           for (const m of fam.members) {
@@ -4011,14 +4881,64 @@
         }
       }
     },
-    getSpeciesName(speciesId) {
+    getSpeciesName(speciesId, formIndex = 0, pokemon = null) {
       if (!speciesId) return "";
-      if (this.speciesNames[speciesId]) return this.speciesNames[speciesId];
       const sid = Number(speciesId);
-      if (this.speciesNames[sid]) return this.speciesNames[sid];
+      if (isNaN(sid)) return "";
+      const isMega = pokemon ? this.isPokemonMega(pokemon) : false;
+      if (this.speciesNames[sid]) {
+        let n = this.speciesNames[sid];
+        if (isMega && !n.toLowerCase().includes("m\xE9ga") && !n.toLowerCase().includes("mega")) {
+          n = `M\xE9ga-${n}`;
+        }
+        return n;
+      }
+      if (sid >= 8e3 && sid < 1e4) {
+        const base = this.getSpeciesName(sid - 8e3);
+        if (base) return `${base} de Paldea`;
+      }
+      if (sid >= 6e3 && sid < 8e3) {
+        const base = this.getSpeciesName(sid - 6e3);
+        if (base) return `${base} de Hisui`;
+      }
+      if (sid >= 4e3 && sid < 6e3) {
+        const base = this.getSpeciesName(sid - 4e3);
+        if (base) return `${base} de Galar`;
+      }
+      if (sid >= 2e3 && sid < 4e3) {
+        const base = this.getSpeciesName(sid - 2e3);
+        if (base) return `${base} d'Alola`;
+      }
+      const fIdx = formIndex !== void 0 && formIndex !== null && formIndex > 0 ? Number(formIndex) : pokemon?.formIndex ? Number(pokemon.formIndex) : 0;
+      if (fIdx > 0 && sid > 0 && sid < 1025) {
+        if (pokemon?.species && typeof pokemon.species.getName === "function") {
+          try {
+            const locName = pokemon.species.getName(fIdx);
+            if (locName && typeof locName === "string" && locName.trim()) {
+              return locName.trim();
+            }
+          } catch (_) {
+          }
+        }
+        const base = this.speciesNames[sid] || this.staticSpeciesNames && this.staticSpeciesNames[sid] || "";
+        if (base) {
+          const alolanIds = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
+          const galarianIds = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
+          const hisuianIds = [58, 59, 100, 101, 157, 211, 215, 503, 549, 550, 570, 571, 628, 706, 713, 724];
+          const paldeanIds = [128, 194];
+          if (alolanIds.includes(sid) && fIdx === 1) return `${base} d'Alola`;
+          if (galarianIds.includes(sid) && (fIdx === 1 || sid === 52 && fIdx === 2)) return `${base} de Galar`;
+          if (hisuianIds.includes(sid) && fIdx === 1) return `${base} de Hisui`;
+          if (paldeanIds.includes(sid) && fIdx === 1) return `${base} de Paldea`;
+        }
+      }
       if (this.staticSpeciesNames && this.staticSpeciesNames[sid]) {
-        this.speciesNames[sid] = this.staticSpeciesNames[sid];
-        return this.staticSpeciesNames[sid];
+        let n = this.staticSpeciesNames[sid];
+        this.speciesNames[sid] = n;
+        if (isMega && !n.toLowerCase().includes("m\xE9ga") && !n.toLowerCase().includes("mega")) {
+          n = `M\xE9ga-${n}`;
+        }
+        return n;
       }
       try {
         const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
@@ -4027,7 +4947,7 @@
         if (sdr) {
           const sp = sdr.data ? sdr.data[sid] : typeof sdr.get === "function" ? sdr.get(sid) : null;
           if (sp) {
-            const n = typeof sp.getName === "function" ? sp.getName() : sp.name || sp.speciesName;
+            const n = typeof sp.getName === "function" ? sp.getName(fIdx) : sp.name || sp.speciesName;
             if (n && typeof n === "string") {
               this.speciesNames[sid] = n;
               return n;
@@ -4042,22 +4962,6 @@
           this.speciesNames[sid] = ln;
           return ln;
         }
-      }
-      if (sid >= 4e3 && sid < 6e3) {
-        const base = this.getSpeciesName(sid - 4e3);
-        if (base) return `${base} de Galar`;
-      }
-      if (sid >= 2e3 && sid < 4e3) {
-        const base = this.getSpeciesName(sid - 2e3);
-        if (base) return `${base} d'Alola`;
-      }
-      if (sid >= 6e3 && sid < 8e3) {
-        const base = this.getSpeciesName(sid - 6e3);
-        if (base) return `${base} de Hisui`;
-      }
-      if (sid >= 8e3 && sid < 1e4) {
-        const base = this.getSpeciesName(sid - 8e3);
-        if (base) return `${base} de Paldea`;
       }
       return "";
     },
@@ -4488,12 +5392,59 @@
       }
       return { rootId, familyKey, lineageName };
     },
-    getCurrentFormName(pokemon) {
+    getPokemonDisplayName(pokemon) {
       if (!pokemon) return "Pok\xE9mon";
-      const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId);
+      if (pokemon.nickname && typeof pokemon.nickname === "string" && pokemon.nickname.trim()) {
+        return pokemon.nickname.trim();
+      }
+      const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+      const gameLang = win.i18next?.language || typeof localStorage !== "undefined" && localStorage.getItem("i18nextLng") || "fr";
+      const isFrench = !gameLang || gameLang.startsWith("fr");
+      const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? pokemon?.id);
       const isMega = this.isPokemonMega(pokemon);
+      if (isFrench && sid && !isNaN(sid)) {
+        let frName = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
+        if (frName) {
+          if (isMega && !frName.toLowerCase().includes("m\xE9ga") && !frName.toLowerCase().includes("mega")) {
+            frName = `M\xE9ga-${frName}`;
+          }
+          return frName;
+        }
+      }
+      if (typeof pokemon.getName === "function") {
+        try {
+          const n = pokemon.getName();
+          if (n && typeof n === "string" && n.trim()) {
+            if (isFrench && sid && this.speciesNames[sid]) {
+              let fr = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
+              if (isMega && !fr.toLowerCase().includes("m\xE9ga") && !fr.toLowerCase().includes("mega")) {
+                fr = `M\xE9ga-${fr}`;
+              }
+              return fr;
+            }
+            return n.trim();
+          }
+        } catch (_) {
+        }
+      }
+      if (pokemon.species && typeof pokemon.species.getName === "function") {
+        try {
+          const n = pokemon.species.getName(pokemon.formIndex);
+          if (n && typeof n === "string" && n.trim()) {
+            if (isFrench && sid && this.speciesNames[sid]) {
+              let fr = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
+              if (isMega && !fr.toLowerCase().includes("m\xE9ga") && !fr.toLowerCase().includes("mega")) {
+                fr = `M\xE9ga-${fr}`;
+              }
+              return fr;
+            }
+            return n.trim();
+          }
+        } catch (_) {
+        }
+      }
       if (sid && !isNaN(sid)) {
-        let name = this.getSpeciesName(sid);
+        let name = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
         if (name) {
           if (isMega && !name.toLowerCase().includes("m\xE9ga") && !name.toLowerCase().includes("mega")) {
             name = `M\xE9ga-${name}`;
@@ -4501,17 +5452,46 @@
           return name;
         }
       }
-      if (typeof pokemon.getName === "function") {
-        try {
-          const n = pokemon.getName();
-          if (n && typeof n === "string") return n;
-        } catch (_) {
+      if (pokemon.species?.name && typeof pokemon.species.name === "string") {
+        return pokemon.species.name;
+      }
+      if (pokemon.name && typeof pokemon.name === "string") {
+        return pokemon.name;
+      }
+      const fam = this.getFamilyInfo(pokemon);
+      if (fam.lineageName) {
+        return fam.lineageName.split(" / ")[0].trim();
+      }
+      return "Pok\xE9mon";
+    },
+    getCurrentFormName(pokemon) {
+      return this.getPokemonDisplayName(pokemon);
+    },
+    getSinglePokemonName(target, extra = null) {
+      if (!target && !extra) return "Pok\xE9mon";
+      if (target && typeof target === "object" && (target.species || target.speciesId || target.moveset || typeof target.getName === "function")) {
+        const name = this.getPokemonDisplayName(target);
+        if (name && !name.includes(" / ")) return name;
+      }
+      const famKey = typeof target === "string" ? target : extra?.familyKey || (target?.familyKey ? target.familyKey : this.getFamilyKey(target));
+      if (famKey && PokeSkip.activeParty && Array.isArray(PokeSkip.activeParty)) {
+        const partyMember = PokeSkip.activeParty.find((p) => this.getFamilyKey(p) === famKey);
+        if (partyMember) {
+          const name = this.getPokemonDisplayName(partyMember);
+          if (name && !name.includes(" / ")) return name;
         }
       }
-      if (pokemon.name && typeof pokemon.name === "string") return pokemon.name;
-      if (pokemon.species?.name && typeof pokemon.species.name === "string") return pokemon.species.name;
-      const fam = this.getFamilyInfo(pokemon);
-      return fam.lineageName || "Pok\xE9mon";
+      const rawName = extra?.lineageName || target?.lineageName || (typeof target === "string" && !target.startsWith("family_") ? target : "");
+      if (rawName && typeof rawName === "string") {
+        const single = rawName.split(" / ")[0].trim();
+        if (single) return single;
+      }
+      const rootId = this.getRootId(target || extra);
+      if (rootId) {
+        const spName = this.getSpeciesName(rootId);
+        if (spName) return spName;
+      }
+      return "Pok\xE9mon";
     },
     getMoveDetails(move, moveId, pokemon) {
       let moveObj = move && typeof move === "object" ? move : null;
@@ -4619,7 +5599,7 @@
         const mId = members[i];
         if (seen.has(mId)) continue;
         seen.add(mId);
-        const name = this.getSpeciesName(mId) || (pokemon && mId === currentSpeciesId ? pokemon.species?.name || pokemon.name : `Esp\xE8ce #${mId}`);
+        const name = pokemon && mId === currentSpeciesId ? this.getPokemonDisplayName(pokemon) : this.getSpeciesName(mId) || `Esp\xE8ce #${mId}`;
         let url = "";
         if (pokemon && (mId === currentSpeciesId || !currentSpeciesId && mId === rootId)) {
           url = this.getPokemonSpriteUrl(pokemon);
@@ -5733,7 +6713,7 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  padding-right: 130px;
+  padding-right: 285px;
   box-sizing: border-box;
   min-height: 28px;
 }
@@ -5849,6 +6829,56 @@
   user-select: none;
   letter-spacing: 0.2px;
 }
+.pokeskip-silence-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+}
+.pokeskip-silence-label.disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+.pokeskip-silence-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #64748b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.15s;
+}
+.pokeskip-silence-badge.silenced {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+}
+.pokeskip-silence-badge.auto {
+  background: rgba(168, 85, 247, 0.25);
+  color: #d8b4fe;
+  border: 1px dashed rgba(168, 85, 247, 0.6);
+}
+.pokeskip-silence-checkbox {
+  accent-color: #a855f7 !important;
+  width: 17px !important;
+  height: 17px !important;
+  cursor: pointer;
+}
+.pokeskip-silence-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.pokeskip-keep-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 
 .pokeskip-move-desc {
   font-size: 12px;
@@ -5913,6 +6943,19 @@
 .pokeskip-quick-btn:hover {
   transform: scale(1.04);
   filter: brightness(1.1);
+}
+.pokeskip-quick-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+.pokeskip-quick-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.04);
+  filter: none;
 }
 .pokeskip-quick-close {
   font-family: inherit;
@@ -5996,6 +7039,56 @@
 .pokeskip-toast.purple {
   border-left-color: #a855f7;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 18px rgba(168, 85, 247, 0.3);
+}
+.pokeskip-toast.advanced b,
+.pokeskip-toast.advanced strong,
+.pokeskip-toast.purple b,
+.pokeskip-toast.purple strong {
+  color: #d8b4fe;
+}
+.pokeskip-toast-action-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.pokeskip-toast-btn-action {
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.45);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pokeskip-toast-btn-action:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.65);
+}
+.pokeskip-toast-btn-close {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 9px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+.pokeskip-toast-btn-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
 }
 @keyframes pokeskipToastIn {
   from {
@@ -6809,18 +7902,161 @@
       for (const p of pm.phaseQueue) inspectPhase(p);
     }
   }
+  function snapshotMoveset(pokemon) {
+    if (!pokemon) return [];
+    const currentMoveset = typeof pokemon.getMoveset === "function" ? pokemon.getMoveset() : pokemon.moveset || [];
+    return currentMoveset.map((m, idx) => {
+      if (!m) return null;
+      const mId = m.moveId ?? m.id ?? (typeof m === "number" ? m : null);
+      let name = "";
+      if (typeof m.getName === "function") {
+        try {
+          name = m.getName();
+        } catch (_) {
+        }
+      }
+      if (!name && m.name) name = m.name;
+      if (!name && typeof m.getMove === "function") {
+        try {
+          const mv = m.getMove();
+          if (mv?.name) name = mv.name;
+        } catch (_) {
+        }
+      }
+      if (!name && mId) {
+        if (PokeSkip.knownMovesCache[mId]) name = PokeSkip.knownMovesCache[mId];
+        const lmName = LineageManager.getMoveName(mId, pokemon);
+        if (lmName) name = lmName;
+      }
+      return {
+        slot: idx,
+        id: mId ? Number(mId) : null,
+        name: name || (mId ? `Move #${mId}` : "")
+      };
+    });
+  }
+  function checkManualMoveReplacement(phase) {
+    if (!PokeSkip.settings.enabled || !PokeSkip.settings.advancedMode || PokeSkip.settings.promptAutoReplacement === false) return;
+    if (phase._pokeskipAutoReplaced) return;
+    if (phase._pokeskipIgnored) return;
+    const pokemon = phase._pokeskipPokemon;
+    const initialMoveset = phase._pokeskipInitialMoveset;
+    const incoming = phase._pokeskipIncomingMove;
+    if (!pokemon || !Array.isArray(initialMoveset) || initialMoveset.length < 4 || !incoming || !incoming.name) {
+      return;
+    }
+    setTimeout(() => {
+      try {
+        const postMoveset = snapshotMoveset(pokemon);
+        if (!postMoveset || postMoveset.length === 0) return;
+        const normalize = (s) => (s || "").toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, "");
+        const incNorm = normalize(incoming.name);
+        const incId = incoming.id ? Number(incoming.id) : null;
+        const learnedIncomingIndex = postMoveset.findIndex((m) => {
+          if (!m) return false;
+          if (incId && m.id && Number(m.id) === incId) return true;
+          if (incNorm && normalize(m.name) === incNorm) return true;
+          return false;
+        });
+        if (learnedIncomingIndex === -1) return;
+        let replacedMove = null;
+        const chosenSlot = phase._pokeskipChosenSlotIndex;
+        if (chosenSlot !== void 0 && chosenSlot !== null && initialMoveset[chosenSlot]) {
+          replacedMove = initialMoveset[chosenSlot];
+        } else if (initialMoveset[learnedIncomingIndex]) {
+          replacedMove = initialMoveset[learnedIncomingIndex];
+        } else {
+          replacedMove = initialMoveset.find((oldM) => {
+            if (!oldM) return false;
+            const oldNorm = normalize(oldM.name);
+            const oldId = oldM.id ? Number(oldM.id) : null;
+            const stillPresent = postMoveset.some((newM) => {
+              if (!newM) return false;
+              if (oldId && newM.id && Number(newM.id) === oldId) return true;
+              if (oldNorm && normalize(newM.name) === oldNorm) return true;
+              return false;
+            });
+            return !stillPresent;
+          });
+        }
+        if (!replacedMove || !replacedMove.name) return;
+        if (normalize(replacedMove.name) === incNorm) return;
+        const existingRules = PokeSkip.getFamilyReplacements(pokemon);
+        const repOldNorm = normalize(replacedMove.name);
+        const repOldId = replacedMove.id ? Number(replacedMove.id) : null;
+        const ruleExists = existingRules.some((r) => {
+          if (!r) return false;
+          const rNewNorm = normalize(r.newMoveName);
+          const rOldNorm = normalize(r.oldMoveName);
+          const rNewId = r.newMoveId ? Number(r.newMoveId) : null;
+          const rOldId = r.oldMoveId ? Number(r.oldMoveId) : null;
+          const newMatches = incId && rNewId && rNewId === incId || incNorm && rNewNorm === incNorm;
+          const oldMatches = repOldId && rOldId && rOldId === repOldId || repOldNorm && rOldNorm === repOldNorm;
+          return newMatches && oldMatches;
+        });
+        if (ruleExists) {
+          return;
+        }
+        const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
+        const message = `\u{1F504} Toujours remplacer <b>${replacedMove.name}</b> par <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> ?`;
+        console.log(`\u{1F4A1} [Pok\xE9Skip] Remplacement manuel d\xE9tect\xE9 : "${replacedMove.name}" -> "${incoming.name}" sur ${currentPokemonName}. Proposition d'enregistrement.`);
+        UI.showActionToast(
+          message,
+          "Enregistrer",
+          () => {
+            PokeSkip.addReplacementRule(
+              pokemon,
+              incoming.name,
+              replacedMove.name,
+              incoming.id,
+              replacedMove.id
+            );
+            UI.showToast(
+              `\u2705 R\xE8gle enregistr\xE9e : <b>${replacedMove.name}</b> \u279C <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> !`,
+              "success",
+              3500
+            );
+            UI.updateHudBadge();
+            if (UI.isModalOpen()) {
+              const teamBody = document.getElementById("pokeskip-body-team");
+              if (teamBody && teamBody.style.display !== "none" && typeof UI.renderTeamTab === "function") {
+                UI.renderTeamTab();
+              }
+              const savedBody = document.getElementById("pokeskip-body-saved");
+              if (savedBody && savedBody.style.display !== "none" && typeof UI.renderSavedSpeciesList === "function") {
+                UI.renderSavedSpeciesList();
+              }
+            }
+          },
+          1e4,
+          "advanced"
+        );
+      } catch (err) {
+        console.error("[Pok\xE9Skip] Erreur lors de la d\xE9tection du remplacement manuel :", err);
+      }
+    }, 120);
+  }
   function hookLearnMovePhasePrototype(proto) {
     if (!proto || proto._pokeskipHooked) return;
     proto._pokeskipHooked = true;
+    if (typeof proto.learnMove === "function" && !proto._pokeskipHookedLearnMove) {
+      const origLearnMove = proto.learnMove;
+      proto.learnMove = function(slotIndex, ...args) {
+        this._pokeskipChosenSlotIndex = slotIndex;
+        return origLearnMove.apply(this, arguments);
+      };
+      proto._pokeskipHookedLearnMove = true;
+    }
     const origEnd = proto.end;
     if (typeof origEnd === "function") {
       proto.end = function() {
         UI.dismissQuickSkipPrompt();
-        if (this._pokeskipEnded) return;
+        if (this._pokeskipEnded) return origEnd.apply(this, arguments);
         this._pokeskipEnded = true;
         if (typeof this._restoreUi === "function") {
           this._restoreUi();
         }
+        checkManualMoveReplacement(this);
         return origEnd.apply(this, arguments);
       };
     }
@@ -6834,10 +8070,21 @@
       if (move && move.id && move.name) {
         PokeSkip.knownMovesCache[move.id] = move.name;
       }
+      const moveName = move?.name || (moveId !== void 0 ? LineageManager.getMoveName(moveId, pokemon) : `Move #${moveId || "?"}`);
+      phase._pokeskipPokemon = pokemon;
+      phase._pokeskipIncomingMove = { id: moveId, name: moveName };
+      phase._pokeskipInitialMoveset = snapshotMoveset(pokemon);
+      if (typeof phase.learnMove === "function" && !phase._pokeskipHookedInstanceLearnMove) {
+        const origInstLearnMove = phase.learnMove;
+        phase.learnMove = function(slotIndex, ...args) {
+          phase._pokeskipChosenSlotIndex = slotIndex;
+          return origInstLearnMove.apply(this, arguments);
+        };
+        phase._pokeskipHookedInstanceLearnMove = true;
+      }
       const isLevelUpMove = phase.learnMoveType === 0 || phase.learnMoveType === void 0;
       if (PokeSkip.settings.enabled && isLevelUpMove && pokemon) {
         const familyInfo = LineageManager.getFamilyInfo(pokemon);
-        const moveName = move?.name || (moveId !== void 0 ? LineageManager.getMoveName(moveId, pokemon) : `Move #${moveId || "?"}`);
         const replacement = PokeSkip.findActiveReplacement(pokemon, moveName, moveId);
         if (replacement) {
           const currentMoveset = typeof pokemon.getMoveset === "function" ? pokemon.getMoveset() : pokemon.moveset || [];
@@ -6874,13 +8121,15 @@
             return false;
           });
           if (targetMoveIndex !== -1) {
+            phase._pokeskipAutoReplaced = true;
             console.log(`\u{1F504} [Pok\xE9Skip] Remplacement auto : "${replacement.oldMoveName}" -> "${moveName}" sur ${familyInfo.lineageName} (slot ${targetMoveIndex})`);
             if (typeof UI.dismissQuickSkipPrompt === "function") {
               UI.dismissQuickSkipPrompt();
             }
             PokeSkip.recordSkip();
             if (PokeSkip.settings.showToasts) {
-              UI.showToast(`\u{1F504} <b>${moveName}</b> a automatiquement remplac\xE9 <b>${replacement.oldMoveName}</b> !`, "info", PokeSkip.settings.toastDuration || 3e3);
+              const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
+              UI.showToast(`\u{1F504} <b>${moveName}</b> a automatiquement remplac\xE9 <b>${replacement.oldMoveName}</b> sur <b>${currentPokemonName}</b> !`, "info", PokeSkip.settings.toastDuration || 3e3);
             }
             UI.updateHudBadge();
             const effectiveMove = move || { id: moveId, name: moveName };
@@ -6920,10 +8169,12 @@
           }
         }
         if (PokeSkip.isMoveSkipped(pokemon, moveName, moveId)) {
+          phase._pokeskipIgnored = true;
           console.log(`\u{1F6E1}\uFE0F [Pok\xE9Skip] Auto-Skip activ\xE9 pour "${moveName}" sur ${familyInfo.lineageName} !`);
           PokeSkip.recordSkip();
           if (PokeSkip.settings.showToasts) {
-            UI.showToast(`\u{1F6E1}\uFE0F Capacit\xE9 <b>${moveName}</b> ignor\xE9e pour <b>${familyInfo.lineageName}</b> !`, "info", PokeSkip.settings.toastDuration);
+            const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
+            UI.showToast(`\u{1F6E1}\uFE0F Capacit\xE9 <b>${moveName}</b> ignor\xE9e pour <b>${currentPokemonName}</b> !`, "info", PokeSkip.settings.toastDuration);
           }
           UI.updateHudBadge();
           phase.end();
@@ -6981,6 +8232,16 @@
       const found = typeof findPhaserScene === "function" ? findPhaserScene() : null;
       const sc = found?.scene || PokeSkip.scene || win.globalScene;
       const game = found?.game || sc?.game;
+      if (game?.scene?.scenes && Array.isArray(game.scene.scenes)) {
+        game.scene.scenes.forEach((s) => {
+          if (s?.input?.keyboard) {
+            s.input.keyboard.enabled = false;
+            if (typeof s.input.keyboard.resetKeys === "function") {
+              s.input.keyboard.resetKeys();
+            }
+          }
+        });
+      }
       if (sc?.input?.keyboard) {
         sc.input.keyboard.enabled = false;
         if (typeof sc.input.keyboard.resetKeys === "function") {
@@ -7003,6 +8264,16 @@
       const found = typeof findPhaserScene === "function" ? findPhaserScene() : null;
       const sc = found?.scene || PokeSkip.scene || win.globalScene;
       const game = found?.game || sc?.game;
+      if (game?.scene?.scenes && Array.isArray(game.scene.scenes)) {
+        game.scene.scenes.forEach((s) => {
+          if (s?.input?.keyboard) {
+            s.input.keyboard.enabled = true;
+            if (typeof s.input.keyboard.resetKeys === "function") {
+              s.input.keyboard.resetKeys();
+            }
+          }
+        });
+      }
       if (sc?.input?.keyboard) {
         sc.input.keyboard.enabled = true;
         if (typeof sc.input.keyboard.resetKeys === "function") {
@@ -7013,6 +8284,16 @@
         game.input.keyboard.enabled = true;
         if (typeof game.input.keyboard.resetKeys === "function") {
           game.input.keyboard.resetKeys();
+        }
+      }
+      const canvas = document.querySelector("#app canvas") || document.querySelector("canvas");
+      if (canvas) {
+        if (!canvas.hasAttribute("tabindex")) {
+          canvas.setAttribute("tabindex", "0");
+        }
+        try {
+          canvas.focus();
+        } catch (_) {
         }
       }
     } catch (err) {
@@ -7053,9 +8334,16 @@
       }
       const container = this.createToastContainer() || document.getElementById("pokeskip-toasts");
       if (!container) return;
+      let cleanMsg = typeof message === "string" ? message.replace(/\[PokéSkip\]\s*/gi, "") : message;
+      if (typeof cleanMsg === "string" && cleanMsg.includes(" / ")) {
+        cleanMsg = cleanMsg.replace(/<b>([^<]*?\s*\/\s*[^<]*?)<\/b>/g, (match, p1) => {
+          const first = p1.split(/\s*\/\s*/)[0].trim();
+          return `<b>${first}</b>`;
+        });
+      }
       const toast = document.createElement("div");
       toast.className = `pokeskip-toast ${type}`;
-      toast.innerHTML = typeof message === "string" ? message.replace(/\[PokéSkip\]\s*/gi, "") : message;
+      toast.innerHTML = cleanMsg;
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = "0";
@@ -7064,6 +8352,77 @@
           if (toast && toast.parentNode) toast.remove();
         }, 250);
       }, duration);
+    },
+    showActionToast(message, actionLabel, onAction, duration = 1e4, type = "advanced") {
+      if (!document.body) {
+        document.addEventListener("DOMContentLoaded", () => this.showActionToast(message, actionLabel, onAction, duration, type), { once: true });
+        return;
+      }
+      const container = this.createToastContainer() || document.getElementById("pokeskip-toasts");
+      if (!container) return;
+      let cleanMsg = typeof message === "string" ? message.replace(/\[PokéSkip\]\s*/gi, "") : message;
+      if (typeof cleanMsg === "string" && cleanMsg.includes(" / ")) {
+        cleanMsg = cleanMsg.replace(/<b>([^<]*?\s*\/\s*[^<]*?)<\/b>/g, (match, p1) => {
+          const first = p1.split(/\s*\/\s*/)[0].trim();
+          return `<b>${first}</b>`;
+        });
+      }
+      const toast = document.createElement("div");
+      toast.className = `pokeskip-toast ${type}`;
+      const contentWrap = document.createElement("div");
+      contentWrap.className = "pokeskip-toast-action-container";
+      const textSpan = document.createElement("span");
+      textSpan.innerHTML = cleanMsg;
+      contentWrap.appendChild(textSpan);
+      const actionBtn = document.createElement("button");
+      actionBtn.type = "button";
+      actionBtn.className = "pokeskip-toast-btn-action";
+      actionBtn.innerHTML = actionLabel || "Enregistrer";
+      const closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.className = "pokeskip-toast-btn-close";
+      closeBtn.innerHTML = "\u2715";
+      closeBtn.title = "Fermer";
+      contentWrap.appendChild(actionBtn);
+      contentWrap.appendChild(closeBtn);
+      toast.appendChild(contentWrap);
+      container.appendChild(toast);
+      let hideTimeout = null;
+      const dismiss = () => {
+        if (hideTimeout) clearTimeout(hideTimeout);
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-10px)";
+        setTimeout(() => {
+          if (toast && toast.parentNode) toast.remove();
+        }, 250);
+      };
+      const startTimer = () => {
+        if (duration > 0) {
+          hideTimeout = setTimeout(dismiss, duration);
+        }
+      };
+      startTimer();
+      toast.addEventListener("mouseenter", () => {
+        if (hideTimeout) clearTimeout(hideTimeout);
+      });
+      toast.addEventListener("mouseleave", () => {
+        startTimer();
+      });
+      actionBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dismiss();
+        if (typeof onAction === "function") {
+          try {
+            onAction();
+          } catch (err) {
+            console.error("[Pok\xE9Skip] Erreur callback action toast :", err);
+          }
+        }
+      });
+      closeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dismiss();
+      });
     }
   };
 
@@ -7335,6 +8694,16 @@
           <div id="pokeskip-advanced-status-desc" style="font-size: 11px; color: ${PokeSkip.settings.advancedMode ? "#a855f7" : "#64748b"};">
             ${PokeSkip.settings.advancedMode ? "\u2713 Actif : les sections de remplacement sont visibles dans les onglets." : "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es."}
           </div>
+
+          <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; opacity: ${PokeSkip.settings.advancedMode ? "1" : "0.4"};">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+              <input type="checkbox" id="pokeskip-opt-prompt-auto-replacement" ${PokeSkip.settings.promptAutoReplacement !== false ? "checked" : ""} ${!PokeSkip.settings.advancedMode ? "disabled" : ""} style="accent-color: #a855f7;">
+              Proposer d'enregistrer les remplacements manuels d\xE9tect\xE9s
+            </label>
+            <div style="font-size: 11px; color: #94a3b8; padding-left: 24px; line-height: 1.3;">
+              Affiche un toast interactif lorsqu'un remplacement est effectu\xE9 manuellement en jeu pour l'enregistrer dans les r\xE8gles de remplacement automatique.
+            </div>
+          </div>
         </div>
 
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
@@ -7398,6 +8767,8 @@
         });
       }
       const optAdvancedMode = container.querySelector("#pokeskip-opt-advanced-mode");
+      const optPromptAutoReplacement = container.querySelector("#pokeskip-opt-prompt-auto-replacement");
+      const promptAutoRepContainer = container.querySelector("#pokeskip-opt-prompt-auto-replacement-container");
       if (optAdvancedMode) {
         optAdvancedMode.addEventListener("change", (e) => {
           PokeSkip.settings.advancedMode = e.target.checked;
@@ -7407,10 +8778,22 @@
             statusDesc.textContent = e.target.checked ? "\u2713 Actif : les sections de remplacement sont visibles dans les onglets." : "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es.";
             statusDesc.style.color = e.target.checked ? "#a855f7" : "#64748b";
           }
+          if (optPromptAutoReplacement) {
+            optPromptAutoReplacement.disabled = !e.target.checked;
+          }
+          if (promptAutoRepContainer) {
+            promptAutoRepContainer.style.opacity = e.target.checked ? "1" : "0.4";
+          }
           ui.showToast(
             e.target.checked ? "\u26A1 Mode Avanc\xE9 activ\xE9" : "Mode Avanc\xE9 d\xE9sactiv\xE9 (r\xE8gles conserv\xE9es)",
             e.target.checked ? "success" : "info"
           );
+        });
+      }
+      if (optPromptAutoReplacement) {
+        optPromptAutoReplacement.addEventListener("change", (e) => {
+          PokeSkip.settings.promptAutoReplacement = e.target.checked;
+          PokeSkip.saveSettings();
         });
       }
       const optQuickPrompt = container.querySelector("#pokeskip-opt-quick-prompt");
@@ -7713,10 +9096,7 @@
         return indices;
       };
       const getNameFromPokemon = (poke) => {
-        if (typeof poke.getName === "function") return poke.getName();
-        if (poke.name) return poke.name;
-        if (poke.species?.name) return poke.species.name;
-        return "Adversaire";
+        return LineageManager.getPokemonDisplayName(poke) || "Adversaire";
       };
       const enemies = [];
       const allUniqueTypes = [];
@@ -8669,7 +10049,7 @@
       }
       party.forEach((pkmn, idx) => {
         const familyInfo = LineageManager.getFamilyInfo(pkmn);
-        const name = pkmn.name || pkmn.species?.name || `Pok\xE9mon #${idx + 1}`;
+        const name = LineageManager.getPokemonDisplayName(pkmn);
         const level = pkmn.level || 1;
         const shinyInfo = LineageManager.getPokemonShinyInfo(pkmn);
         const isMega = LineageManager.isPokemonMega(pkmn);
@@ -8722,7 +10102,7 @@
     },
     renderPokemonMoveConfig(container, pokemon) {
       const familyInfo = LineageManager.getFamilyInfo(pokemon);
-      const currentName = pokemon.species?.name || pokemon.name || "Pok\xE9mon";
+      const currentName = LineageManager.getPokemonDisplayName(pokemon);
       const shinyInfo = LineageManager.getPokemonShinyInfo(pokemon);
       const isMega = LineageManager.isPokemonMega(pokemon);
       const currentSpeciesId = pokemon.species?.speciesId ?? pokemon.speciesId ?? LineageManager.getRootId(pokemon);
@@ -8782,9 +10162,9 @@
           const isNowActive = PokeSkip.toggleFamilyRuleEnabled(familyInfo.familyKey);
           updateLineageToggle();
           if (isNowActive) {
-            UI.showToast(`\u2705 Param\xE9trage r\xE9activ\xE9 pour <b>${familyInfo.lineageName}</b>`, "success");
+            UI.showToast(`\u2705 Param\xE9trage r\xE9activ\xE9 pour <b>${currentName}</b>`, "success");
           } else {
-            UI.showToast(`\u23F8\uFE0F Param\xE9trage mis en pause pour <b>${familyInfo.lineageName}</b> (s\xE9lections conserv\xE9es)`, "info");
+            UI.showToast(`\u23F8\uFE0F Param\xE9trage mis en pause pour <b>${currentName}</b> (s\xE9lections conserv\xE9es)`, "info");
           }
         });
       }
@@ -8805,6 +10185,10 @@
           const isEggMove = moveItem.isEgg || moveItem.level === "\u0152uf";
           const isSkipped = !isEggMove && PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
           const isKept = !isSkipped;
+          const isAutoReplacement = !isEggMove && PokeSkip.settings.advancedMode && PokeSkip.isMoveAutoReplacementTarget(pokemon, moveItem.name, moveItem.moveId);
+          const isPromptSuppressed = isAutoReplacement || !isEggMove && PokeSkip.isMovePromptSuppressed(pokemon, moveItem.name, moveItem.moveId);
+          const isSilenceDisabled = isAutoReplacement;
+          const silenceTooltip = isAutoReplacement ? "Cette attaque remplace automatiquement une autre capacit\xE9 (Mode Avanc\xE9) : elle ne peut pas \xEAtre prompt\xE9e pour \xEAtre ignor\xE9e." : isPromptSuppressed ? "Ne plus demander d'ignorer cette attaque en combat (cliquer pour r\xE9activer le prompt)" : "Cliquer pour ne plus \xEAtre interrog\xE9 en combat pour ignorer cette attaque";
           const cardEl = document.createElement("div");
           cardEl.className = `pokeskip-move-card ${isSkipped ? "skipped" : ""}`;
           if (isEggMove) {
@@ -8827,8 +10211,14 @@
               ${isEggMove ? `
                 <span class="pokeskip-egg-badge" title="Capacit\xE9 \u0153uf obtenue au d\xE9part : le jeu ne propose jamais de l'apprendre par mont\xE9e de niveau.">\u{1F95A} Capacit\xE9 \u0152uf</span>
               ` : `
-                <span class="pokeskip-keep-badge ${isKept ? "kept" : "skip"}">${isKept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e"}</span>
-                <input type="checkbox" class="pokeskip-checkbox" ${isKept ? "checked" : ""} title="${isKept ? "Attaque gard\xE9e (d\xE9cocher pour ignorer)" : "Attaque ignor\xE9e (cocher pour garder)"}">
+                <label class="pokeskip-silence-label ${isAutoReplacement ? "disabled" : ""}" title="${silenceTooltip}">
+                  <input type="checkbox" class="pokeskip-checkbox pokeskip-silence-checkbox" ${isPromptSuppressed ? "checked" : ""} ${isSilenceDisabled ? "disabled" : ""}>
+                  <span class="pokeskip-silence-badge ${isPromptSuppressed ? "silenced" : ""} ${isAutoReplacement ? "auto" : ""}">${isAutoReplacement ? "\u{1F504} Remplacement auto" : "\u{1F515} Ne plus demander"}</span>
+                </label>
+                <div class="pokeskip-keep-action" title="${isKept ? "Attaque gard\xE9e (d\xE9cocher pour ignorer)" : "Attaque ignor\xE9e (cocher pour garder)"}">
+                  <span class="pokeskip-keep-badge ${isKept ? "kept" : "skip"}">${isKept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e"}</span>
+                  <input type="checkbox" class="pokeskip-checkbox pokeskip-keep-checkbox" ${isKept ? "checked" : ""}>
+                </div>
               `}
             </div>
             <div class="pokeskip-move-top">
@@ -8848,27 +10238,48 @@
             ${moveItem.desc ? `<div class="pokeskip-move-desc">${moveItem.desc}</div>` : ""}
           `;
           if (!isEggMove) {
-            const checkbox = cardEl.querySelector(".pokeskip-checkbox");
-            const badge = cardEl.querySelector(".pokeskip-keep-badge");
+            const keepCheckbox = cardEl.querySelector(".pokeskip-keep-checkbox");
+            const keepBadge = cardEl.querySelector(".pokeskip-keep-badge");
+            const silenceCheckbox = cardEl.querySelector(".pokeskip-silence-checkbox");
+            const silenceBadge = cardEl.querySelector(".pokeskip-silence-badge");
+            const silenceLabel = cardEl.querySelector(".pokeskip-silence-label");
             const updateCardState = (kept) => {
-              checkbox.checked = kept;
+              keepCheckbox.checked = kept;
               cardEl.classList.toggle("skipped", !kept);
-              if (badge) {
-                badge.className = `pokeskip-keep-badge ${kept ? "kept" : "skip"}`;
-                badge.textContent = kept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e";
+              if (keepBadge) {
+                keepBadge.className = `pokeskip-keep-badge ${kept ? "kept" : "skip"}`;
+                keepBadge.textContent = kept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e";
               }
               PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
               UI.updateHudBadge();
               updateLineageToggle();
             };
             cardEl.addEventListener("click", (e) => {
-              if (e.target !== checkbox) {
-                updateCardState(!checkbox.checked);
+              if (e.target.closest(".pokeskip-silence-label")) {
+                return;
+              }
+              if (e.target !== keepCheckbox) {
+                updateCardState(!keepCheckbox.checked);
               }
             });
-            checkbox.addEventListener("change", () => {
-              updateCardState(checkbox.checked);
+            keepCheckbox.addEventListener("change", () => {
+              updateCardState(keepCheckbox.checked);
             });
+            if (silenceCheckbox && !isSilenceDisabled) {
+              silenceCheckbox.addEventListener("change", (e) => {
+                e.stopPropagation();
+                const silenced = silenceCheckbox.checked;
+                PokeSkip.setMovePromptSuppressed(pokemon, currentName, moveItem.name, moveItem.moveId, silenced);
+                if (silenceBadge) {
+                  silenceBadge.className = `pokeskip-silence-badge ${silenced ? "silenced" : ""}`;
+                }
+              });
+            }
+            if (silenceLabel) {
+              silenceLabel.addEventListener("click", (e) => {
+                e.stopPropagation();
+              });
+            }
           }
           grid.appendChild(cardEl);
         });
@@ -8985,7 +10396,8 @@
             if (confirm(`Supprimer les r\xE8gles enregistr\xE9es pour ${rule.lineageName} ?`)) {
               PokeSkip.deleteFamilyRule(famKey);
               this.renderSavedSpeciesTab();
-              UI.showToast(`R\xE8gle supprim\xE9e pour ${rule.lineageName}`, "info");
+              const singleName = LineageManager.getSinglePokemonName(famKey, rule);
+              UI.showToast(`R\xE8gle supprim\xE9e pour <b>${singleName}</b>`, "info");
             }
             return;
           }
@@ -9099,13 +10511,14 @@
           if (tabBtn) tabBtn.click();
         });
       }
+      const singleName = LineageManager.getSinglePokemonName(famKey, rule);
       const inputAdd = container.querySelector("#pokeskip-input-add-move");
       const btnAdd = container.querySelector("#pokeskip-btn-add-move");
       const handleAdd = () => {
         const val = inputAdd.value.trim();
         if (!val) return;
         PokeSkip.setMoveSkipped(famKey, rule.lineageName, val, null, true);
-        UI.showToast(`Capacit\xE9 <b>${val}</b> ignor\xE9e pour <b>${rule.lineageName}</b>`, "warning");
+        UI.showToast(`Capacit\xE9 <b>${val}</b> ignor\xE9e pour <b>${singleName}</b>`, "warning");
         this.renderFamilyRuleEditor(container, famKey);
       };
       btnAdd.addEventListener("click", handleAdd);
@@ -9127,7 +10540,7 @@
           rule.skippedMoves = {};
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          UI.showToast(`Toutes les capacit\xE9s sont r\xE9tablies pour <b>${rule.lineageName}</b>`, "info");
+          UI.showToast(`Toutes les capacit\xE9s sont r\xE9tablies pour <b>${singleName}</b>`, "info");
           this.renderFamilyRuleEditor(container, famKey);
         });
       }
@@ -9137,7 +10550,7 @@
           delete rule.skippedMoves[moveKey];
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          UI.showToast(`Capacit\xE9 <b>${moveKey}</b> r\xE9tablie pour <b>${rule.lineageName}</b>`, "success");
+          UI.showToast(`Capacit\xE9 <b>${moveKey}</b> r\xE9tablie pour <b>${singleName}</b>`, "success");
           this.renderFamilyRuleEditor(container, famKey);
         });
       });
@@ -9447,7 +10860,7 @@
         const newCatIcon = newMoveDetails?.category?.icon || "\u{1F4A5}";
         const oldTooltip = [oldMoveDetails?.type?.name, oldMoveDetails?.category?.name].filter(Boolean).join(" \u2022 ");
         const newTooltip = [newMoveDetails?.type?.name, newMoveDetails?.category?.name].filter(Boolean).join(" \u2022 ");
-        const pokemonName = LineageManager.getCurrentFormName(target) || familyInfo.lineageName;
+        const pokemonName = LineageManager.getSinglePokemonName(target);
         UI.showToast(
           `\u26A1 R\xE8gle enregistr\xE9e : remplacer <span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${oldMoveDetails.name || oldM}</b></span> par <span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name || newM}</b></span> sur <b style="color: #38bdf8 !important;">${pokemonName}</b> !`,
           "advanced",
@@ -9517,7 +10930,8 @@
         btnClear.addEventListener("click", () => {
           if (confirm(`Supprimer toutes les r\xE8gles de remplacement pour ${familyInfo.lineageName} ?`)) {
             PokeSkip.clearAllReplacements(target);
-            UI.showToast(`Toutes les r\xE8gles de remplacement supprim\xE9es pour ${familyInfo.lineageName}.`, "info");
+            const targetName = LineageManager.getSinglePokemonName(target);
+            UI.showToast(`Toutes les r\xE8gles de remplacement supprim\xE9es pour <b>${targetName}</b>.`, "info");
             if (typeof onUpdate === "function") onUpdate();
           }
         });
@@ -9536,6 +10950,9 @@
         setTimeout(() => {
           if (el && el.parentNode) el.remove();
         }, 200);
+      }
+      if (typeof UI?.enableGameKeyboard === "function" && !UI.isModalOpen()) {
+        UI.enableGameKeyboard();
       }
     },
     showQuickSkipPrompt(arg1, arg2, arg3) {
@@ -9565,6 +10982,9 @@
       const moveDetails = LineageManager.getMoveDetails(move, phaseInstance?.moveId, pokemon);
       const moveName = moveDetails?.name || move?.name || (phaseInstance?.moveId !== void 0 ? LineageManager.getMoveName(phaseInstance.moveId) : "Capacit\xE9");
       const finalMoveId = phaseInstance?.moveId ?? moveDetails?.moveId ?? move?.id;
+      if (PokeSkip.isMovePromptSuppressed(pokemon, moveName, finalMoveId)) {
+        return;
+      }
       const typeColor = moveDetails?.type && moveDetails.type.bg ? moveDetails.type.name === "Combat" ? "#ea580c" : moveDetails.type.name === "T\xE9n\xE8bres" ? "#c4a482" : moveDetails.type.name === "Poison" ? "#a855f7" : moveDetails.type.bg : "#38bdf8";
       const catIcon = moveDetails?.category?.icon || "\u{1F300}";
       const catName = moveDetails?.category?.name || "";
@@ -9575,6 +10995,7 @@
       el.innerHTML = `
         <span class="pokeskip-quick-text">\u26A1 Ignorer <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> sur <b>${pokemonName}</b> ?</span>
         <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">Toujours ignorer</button>
+        <button class="pokeskip-quick-btn pokeskip-quick-btn-secondary" id="pokeskip-quick-never-ask" title="Ne plus proposer d'ignorer cette attaque pour ce Pok\xE9mon">Ne plus demander</button>
         <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="Fermer">&times;</button>
       `;
       document.body.appendChild(el);
@@ -9584,6 +11005,18 @@
       el.querySelector("#pokeskip-quick-close").addEventListener("click", (e) => {
         e.stopPropagation();
         dismiss();
+      });
+      el.querySelector("#pokeskip-quick-never-ask").addEventListener("click", (e) => {
+        e.stopPropagation();
+        PokeSkip.setMovePromptSuppressed(pokemon, pokemon?.species?.name, moveName, finalMoveId, true);
+        UI.showToast(`\u2139\uFE0F Vous ne serez plus interrog\xE9 pour <b>${moveName}</b> sur <b>${pokemonName}</b>.`, "info");
+        dismiss();
+        if (UI.isModalOpen()) {
+          const teamBody = document.getElementById("pokeskip-body-team");
+          if (teamBody && teamBody.style.display !== "none" && typeof UI.renderTeamTab === "function") {
+            UI.renderTeamTab();
+          }
+        }
       });
       el.querySelector("#pokeskip-quick-skip-always").addEventListener("click", (e) => {
         e.stopPropagation();

@@ -40,7 +40,7 @@ export const TeamTab = {
 
       party.forEach((pkmn, idx) => {
         const familyInfo = LineageManager.getFamilyInfo(pkmn);
-        const name = pkmn.name || pkmn.species?.name || `Pokémon #${idx + 1}`;
+        const name = LineageManager.getPokemonDisplayName(pkmn);
         const level = pkmn.level || 1;
         const shinyInfo = LineageManager.getPokemonShinyInfo(pkmn);
         const isMega = LineageManager.isPokemonMega(pkmn);
@@ -98,7 +98,7 @@ export const TeamTab = {
 
     renderPokemonMoveConfig(container, pokemon) {
       const familyInfo = LineageManager.getFamilyInfo(pokemon);
-      const currentName = pokemon.species?.name || pokemon.name || 'Pokémon';
+      const currentName = LineageManager.getPokemonDisplayName(pokemon);
       const shinyInfo = LineageManager.getPokemonShinyInfo(pokemon);
       const isMega = LineageManager.isPokemonMega(pokemon);
       const currentSpeciesId = pokemon.species?.speciesId ?? pokemon.speciesId ?? LineageManager.getRootId(pokemon);
@@ -164,9 +164,9 @@ export const TeamTab = {
           const isNowActive = PokeSkip.toggleFamilyRuleEnabled(familyInfo.familyKey);
           updateLineageToggle();
           if (isNowActive) {
-            UI.showToast(`✅ Paramétrage réactivé pour <b>${familyInfo.lineageName}</b>`, 'success');
+            UI.showToast(`✅ Paramétrage réactivé pour <b>${currentName}</b>`, 'success');
           } else {
-            UI.showToast(`⏸️ Paramétrage mis en pause pour <b>${familyInfo.lineageName}</b> (sélections conservées)`, 'info');
+            UI.showToast(`⏸️ Paramétrage mis en pause pour <b>${currentName}</b> (sélections conservées)`, 'info');
           }
         });
       }
@@ -193,6 +193,17 @@ export const TeamTab = {
           const isEggMove = moveItem.isEgg || moveItem.level === 'Œuf';
           const isSkipped = !isEggMove && PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
           const isKept = !isSkipped;
+
+          // État "Ne plus demander" et liaison Mode Avancé
+          const isAutoReplacement = !isEggMove && PokeSkip.settings.advancedMode && PokeSkip.isMoveAutoReplacementTarget(pokemon, moveItem.name, moveItem.moveId);
+          const isPromptSuppressed = isAutoReplacement || (!isEggMove && PokeSkip.isMovePromptSuppressed(pokemon, moveItem.name, moveItem.moveId));
+          const isSilenceDisabled = isAutoReplacement;
+          const silenceTooltip = isAutoReplacement
+            ? "Cette attaque remplace automatiquement une autre capacité (Mode Avancé) : elle ne peut pas être promptée pour être ignorée."
+            : (isPromptSuppressed
+              ? "Ne plus demander d'ignorer cette attaque en combat (cliquer pour réactiver le prompt)"
+              : "Cliquer pour ne plus être interrogé en combat pour ignorer cette attaque");
+
           const cardEl = document.createElement('div');
           cardEl.className = `pokeskip-move-card ${isSkipped ? 'skipped' : ''}`;
           if (isEggMove) {
@@ -218,8 +229,14 @@ export const TeamTab = {
               ${isEggMove ? `
                 <span class="pokeskip-egg-badge" title="Capacité œuf obtenue au départ : le jeu ne propose jamais de l'apprendre par montée de niveau.">🥚 Capacité Œuf</span>
               ` : `
-                <span class="pokeskip-keep-badge ${isKept ? 'kept' : 'skip'}">${isKept ? '✓ Gardée' : '✕ Ignorée'}</span>
-                <input type="checkbox" class="pokeskip-checkbox" ${isKept ? 'checked' : ''} title="${isKept ? 'Attaque gardée (décocher pour ignorer)' : 'Attaque ignorée (cocher pour garder)'}">
+                <label class="pokeskip-silence-label ${isAutoReplacement ? 'disabled' : ''}" title="${silenceTooltip}">
+                  <input type="checkbox" class="pokeskip-checkbox pokeskip-silence-checkbox" ${isPromptSuppressed ? 'checked' : ''} ${isSilenceDisabled ? 'disabled' : ''}>
+                  <span class="pokeskip-silence-badge ${isPromptSuppressed ? 'silenced' : ''} ${isAutoReplacement ? 'auto' : ''}">${isAutoReplacement ? '🔄 Remplacement auto' : '🔕 Ne plus demander'}</span>
+                </label>
+                <div class="pokeskip-keep-action" title="${isKept ? 'Attaque gardée (décocher pour ignorer)' : 'Attaque ignorée (cocher pour garder)'}">
+                  <span class="pokeskip-keep-badge ${isKept ? 'kept' : 'skip'}">${isKept ? '✓ Gardée' : '✕ Ignorée'}</span>
+                  <input type="checkbox" class="pokeskip-checkbox pokeskip-keep-checkbox" ${isKept ? 'checked' : ''}>
+                </div>
               `}
             </div>
             <div class="pokeskip-move-top">
@@ -240,15 +257,18 @@ export const TeamTab = {
           `;
 
           if (!isEggMove) {
-            const checkbox = cardEl.querySelector('.pokeskip-checkbox');
-            const badge = cardEl.querySelector('.pokeskip-keep-badge');
+            const keepCheckbox = cardEl.querySelector('.pokeskip-keep-checkbox');
+            const keepBadge = cardEl.querySelector('.pokeskip-keep-badge');
+            const silenceCheckbox = cardEl.querySelector('.pokeskip-silence-checkbox');
+            const silenceBadge = cardEl.querySelector('.pokeskip-silence-badge');
+            const silenceLabel = cardEl.querySelector('.pokeskip-silence-label');
 
             const updateCardState = (kept) => {
-              checkbox.checked = kept;
+              keepCheckbox.checked = kept;
               cardEl.classList.toggle('skipped', !kept);
-              if (badge) {
-                badge.className = `pokeskip-keep-badge ${kept ? 'kept' : 'skip'}`;
-                badge.textContent = kept ? '✓ Gardée' : '✕ Ignorée';
+              if (keepBadge) {
+                keepBadge.className = `pokeskip-keep-badge ${kept ? 'kept' : 'skip'}`;
+                keepBadge.textContent = kept ? '✓ Gardée' : '✕ Ignorée';
               }
               PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
               UI.updateHudBadge();
@@ -256,13 +276,34 @@ export const TeamTab = {
             };
 
             cardEl.addEventListener('click', (e) => {
-              if (e.target !== checkbox) {
-                updateCardState(!checkbox.checked);
+              if (e.target.closest('.pokeskip-silence-label')) {
+                return;
+              }
+              if (e.target !== keepCheckbox) {
+                updateCardState(!keepCheckbox.checked);
               }
             });
-            checkbox.addEventListener('change', () => {
-              updateCardState(checkbox.checked);
+
+            keepCheckbox.addEventListener('change', () => {
+              updateCardState(keepCheckbox.checked);
             });
+
+            if (silenceCheckbox && !isSilenceDisabled) {
+              silenceCheckbox.addEventListener('change', (e) => {
+                e.stopPropagation();
+                const silenced = silenceCheckbox.checked;
+                PokeSkip.setMovePromptSuppressed(pokemon, currentName, moveItem.name, moveItem.moveId, silenced);
+                if (silenceBadge) {
+                  silenceBadge.className = `pokeskip-silence-badge ${silenced ? 'silenced' : ''}`;
+                }
+              });
+            }
+
+            if (silenceLabel) {
+              silenceLabel.addEventListener('click', (e) => {
+                e.stopPropagation();
+              });
+            }
           }
 
           grid.appendChild(cardEl);

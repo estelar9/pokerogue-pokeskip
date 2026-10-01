@@ -127,20 +127,193 @@ function applyPhaseManagerHooks(scene) {
   }
 }
 
+function snapshotMoveset(pokemon) {
+  if (!pokemon) return [];
+  const currentMoveset = (typeof pokemon.getMoveset === 'function')
+    ? pokemon.getMoveset()
+    : (pokemon.moveset || []);
+
+  return currentMoveset.map((m, idx) => {
+    if (!m) return null;
+    const mId = m.moveId ?? m.id ?? (typeof m === 'number' ? m : null);
+    let name = '';
+    if (typeof m.getName === 'function') {
+      try { name = m.getName(); } catch (_) {}
+    }
+    if (!name && m.name) name = m.name;
+    if (!name && typeof m.getMove === 'function') {
+      try { const mv = m.getMove(); if (mv?.name) name = mv.name; } catch (_) {}
+    }
+    if (!name && mId) {
+      if (PokeSkip.knownMovesCache[mId]) name = PokeSkip.knownMovesCache[mId];
+      const lmName = LineageManager.getMoveName(mId, pokemon);
+      if (lmName) name = lmName;
+    }
+    return {
+      slot: idx,
+      id: mId ? Number(mId) : null,
+      name: name || (mId ? `Move #${mId}` : '')
+    };
+  });
+}
+
+function checkManualMoveReplacement(phase) {
+  // Fonctionne UNIQUEMENT si le Mode Avancé, PokéSkip et la proposition automatique sont actifs
+  if (!PokeSkip.settings.enabled || !PokeSkip.settings.advancedMode || PokeSkip.settings.promptAutoReplacement === false) return;
+
+  // Si c'est déjà un remplacement automatique effectué par PokéSkip, ne rien demander
+  if (phase._pokeskipAutoReplaced) return;
+
+  // Si la capacité a été ignorée (Auto-Skip ou Quick Skip)
+  if (phase._pokeskipIgnored) return;
+
+  const pokemon = phase._pokeskipPokemon;
+  const initialMoveset = phase._pokeskipInitialMoveset;
+  const incoming = phase._pokeskipIncomingMove;
+
+  if (!pokemon || !Array.isArray(initialMoveset) || initialMoveset.length < 4 || !incoming || !incoming.name) {
+    return;
+  }
+
+  // Petite temporisation pour laisser le moteur Phaser / PokéRogue mettre à jour l'instance du Pokémon
+  setTimeout(() => {
+    try {
+      const postMoveset = snapshotMoveset(pokemon);
+      if (!postMoveset || postMoveset.length === 0) return;
+
+      const normalize = s => (s || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
+      const incNorm = normalize(incoming.name);
+      const incId = incoming.id ? Number(incoming.id) : null;
+
+      // 1. Vérifier si la nouvelle attaque est présente dans le nouveau moveset
+      const learnedIncomingIndex = postMoveset.findIndex(m => {
+        if (!m) return false;
+        if (incId && m.id && Number(m.id) === incId) return true;
+        if (incNorm && normalize(m.name) === incNorm) return true;
+        return false;
+      });
+
+      // Si l'attaque n'est pas dans le moveset post-phase, le joueur n'a pas appris l'attaque (annulé/refusé)
+      if (learnedIncomingIndex === -1) return;
+
+      // 2. Identifier l'attaque qui a été remplacée
+      let replacedMove = null;
+      const chosenSlot = phase._pokeskipChosenSlotIndex;
+
+      if (chosenSlot !== undefined && chosenSlot !== null && initialMoveset[chosenSlot]) {
+        replacedMove = initialMoveset[chosenSlot];
+      } else if (initialMoveset[learnedIncomingIndex]) {
+        replacedMove = initialMoveset[learnedIncomingIndex];
+      } else {
+        // Déduction par différence d'ensemble : l'attaque qui était là avant mais n'y est plus
+        replacedMove = initialMoveset.find(oldM => {
+          if (!oldM) return false;
+          const oldNorm = normalize(oldM.name);
+          const oldId = oldM.id ? Number(oldM.id) : null;
+          const stillPresent = postMoveset.some(newM => {
+            if (!newM) return false;
+            if (oldId && newM.id && Number(newM.id) === oldId) return true;
+            if (oldNorm && normalize(newM.name) === oldNorm) return true;
+            return false;
+          });
+          return !stillPresent;
+        });
+      }
+
+      if (!replacedMove || !replacedMove.name) return;
+      if (normalize(replacedMove.name) === incNorm) return;
+
+      // 3. Vérifier si cette règle exacte existe déjà pour cette lignée
+      const existingRules = PokeSkip.getFamilyReplacements(pokemon);
+      const repOldNorm = normalize(replacedMove.name);
+      const repOldId = replacedMove.id ? Number(replacedMove.id) : null;
+
+      const ruleExists = existingRules.some(r => {
+        if (!r) return false;
+        const rNewNorm = normalize(r.newMoveName);
+        const rOldNorm = normalize(r.oldMoveName);
+        const rNewId = r.newMoveId ? Number(r.newMoveId) : null;
+        const rOldId = r.oldMoveId ? Number(r.oldMoveId) : null;
+
+        const newMatches = (incId && rNewId && rNewId === incId) || (incNorm && rNewNorm === incNorm);
+        const oldMatches = (repOldId && rOldId && rOldId === repOldId) || (repOldNorm && rOldNorm === repOldNorm);
+        return newMatches && oldMatches;
+      });
+
+      if (ruleExists) {
+        return;
+      }
+
+      // 4. Afficher le toast d'action demandant si l'on souhaite enregistrer ce remplacement automatique
+      const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
+      const message = `🔄 Toujours remplacer <b>${replacedMove.name}</b> par <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> ?`;
+
+      console.log(`💡 [PokéSkip] Remplacement manuel détecté : "${replacedMove.name}" -> "${incoming.name}" sur ${currentPokemonName}. Proposition d'enregistrement.`);
+
+      UI.showActionToast(
+        message,
+        'Enregistrer',
+        () => {
+          PokeSkip.addReplacementRule(
+            pokemon,
+            incoming.name,
+            replacedMove.name,
+            incoming.id,
+            replacedMove.id
+          );
+          UI.showToast(
+            `✅ Règle enregistrée : <b>${replacedMove.name}</b> ➜ <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> !`,
+            'success',
+            3500
+          );
+          UI.updateHudBadge();
+          if (UI.isModalOpen()) {
+            const teamBody = document.getElementById('pokeskip-body-team');
+            if (teamBody && teamBody.style.display !== 'none' && typeof UI.renderTeamTab === 'function') {
+              UI.renderTeamTab();
+            }
+            const savedBody = document.getElementById('pokeskip-body-saved');
+            if (savedBody && savedBody.style.display !== 'none' && typeof UI.renderSavedSpeciesList === 'function') {
+              UI.renderSavedSpeciesList();
+            }
+          }
+        },
+        10000,
+        'advanced'
+      );
+    } catch (err) {
+      console.error('[PokéSkip] Erreur lors de la détection du remplacement manuel :', err);
+    }
+  }, 120);
+}
+
 function hookLearnMovePhasePrototype(proto) {
   if (!proto || proto._pokeskipHooked) return;
   proto._pokeskipHooked = true;
+
+  // Interception de learnMove pour capturer le slot choisi manuellement
+  if (typeof proto.learnMove === 'function' && !proto._pokeskipHookedLearnMove) {
+    const origLearnMove = proto.learnMove;
+    proto.learnMove = function (slotIndex, ...args) {
+      this._pokeskipChosenSlotIndex = slotIndex;
+      return origLearnMove.apply(this, arguments);
+    };
+    proto._pokeskipHookedLearnMove = true;
+  }
 
   // Fermeture automatique du prompt dès que LearnMovePhase se termine
   const origEnd = proto.end;
   if (typeof origEnd === 'function') {
     proto.end = function () {
       UI.dismissQuickSkipPrompt();
-      if (this._pokeskipEnded) return;
+      if (this._pokeskipEnded) return origEnd.apply(this, arguments);
       this._pokeskipEnded = true;
       if (typeof this._restoreUi === 'function') {
         this._restoreUi();
       }
+
+      checkManualMoveReplacement(this);
+
       return origEnd.apply(this, arguments);
     };
   }
@@ -158,12 +331,27 @@ function hookLearnMovePhasePrototype(proto) {
       PokeSkip.knownMovesCache[move.id] = move.name;
     }
 
+    const moveName = move?.name || (moveId !== undefined ? LineageManager.getMoveName(moveId, pokemon) : `Move #${moveId || '?'}`);
+
+    // Snapshot pour détection du remplacement manuel si le joueur choisit une attaque
+    phase._pokeskipPokemon = pokemon;
+    phase._pokeskipIncomingMove = { id: moveId, name: moveName };
+    phase._pokeskipInitialMoveset = snapshotMoveset(pokemon);
+
+    if (typeof phase.learnMove === 'function' && !phase._pokeskipHookedInstanceLearnMove) {
+      const origInstLearnMove = phase.learnMove;
+      phase.learnMove = function (slotIndex, ...args) {
+        phase._pokeskipChosenSlotIndex = slotIndex;
+        return origInstLearnMove.apply(this, arguments);
+      };
+      phase._pokeskipHookedInstanceLearnMove = true;
+    }
+
     // learnMoveType: 0 = LEARN_MOVE (montée de niveau / évolution), 1 = MEMORY, 2 = TM
     const isLevelUpMove = phase.learnMoveType === 0 || phase.learnMoveType === undefined;
 
     if (PokeSkip.settings.enabled && isLevelUpMove && pokemon) {
       const familyInfo = LineageManager.getFamilyInfo(pokemon);
-      const moveName = move?.name || (moveId !== undefined ? LineageManager.getMoveName(moveId, pokemon) : `Move #${moveId || '?'}`);
 
       // Cas 1 : Remplacement automatique configuré (Mode Avancé)
       const replacement = PokeSkip.findActiveReplacement(pokemon, moveName, moveId);
@@ -202,6 +390,7 @@ function hookLearnMovePhasePrototype(proto) {
         });
 
         if (targetMoveIndex !== -1) {
+          phase._pokeskipAutoReplaced = true;
           console.log(`🔄 [PokéSkip] Remplacement auto : "${replacement.oldMoveName}" -> "${moveName}" sur ${familyInfo.lineageName} (slot ${targetMoveIndex})`);
 
           if (typeof UI.dismissQuickSkipPrompt === 'function') {
@@ -211,7 +400,8 @@ function hookLearnMovePhasePrototype(proto) {
           PokeSkip.recordSkip();
 
           if (PokeSkip.settings.showToasts) {
-            UI.showToast(`🔄 <b>${moveName}</b> a automatiquement remplacé <b>${replacement.oldMoveName}</b> !`, 'info', PokeSkip.settings.toastDuration || 3000);
+            const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
+            UI.showToast(`🔄 <b>${moveName}</b> a automatiquement remplacé <b>${replacement.oldMoveName}</b> sur <b>${currentPokemonName}</b> !`, 'info', PokeSkip.settings.toastDuration || 3000);
           }
           UI.updateHudBadge();
 
@@ -255,11 +445,13 @@ function hookLearnMovePhasePrototype(proto) {
 
       // Cas 2 : Auto-Skip configuré dans les règles
       if (PokeSkip.isMoveSkipped(pokemon, moveName, moveId)) {
+        phase._pokeskipIgnored = true;
         console.log(`🛡️ [PokéSkip] Auto-Skip activé pour "${moveName}" sur ${familyInfo.lineageName} !`);
         PokeSkip.recordSkip();
 
         if (PokeSkip.settings.showToasts) {
-          UI.showToast(`🛡️ Capacité <b>${moveName}</b> ignorée pour <b>${familyInfo.lineageName}</b> !`, 'info', PokeSkip.settings.toastDuration);
+          const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
+          UI.showToast(`🛡️ Capacité <b>${moveName}</b> ignorée pour <b>${currentPokemonName}</b> !`, 'info', PokeSkip.settings.toastDuration);
         }
         UI.updateHudBadge();
         phase.end();

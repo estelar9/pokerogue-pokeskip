@@ -3,6 +3,30 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.13.0] - 2026-10-01
+
+### 🚀 Nouveautés & Gestion Avancée des Prompts
+- **Bouton "Ne plus demander" dans le Quick Prompt** :
+  - Permet d'indiquer en un clic de ne plus jamais afficher de confirmation d'auto-skip pour cette capacité sur cette lignée/Pokémon.
+- **Statut "Ne plus demander" dans l'onglet Mon Équipe** :
+  - Ajout d'une case à cocher et du badge `🔕 Ne plus demander` sur chaque carte de capacité apprenable.
+  - Liaison automatique avec le Mode Avancé : si une capacité remplace automatiquement une autre, la case est cochée d'office, grisée (`disabled`) avec le badge `🔄 Remplacement auto` et un tooltip explicatif dédié.
+- **Paramètre de Désactivation des Toasts de Remplacement** :
+  - Nouveau réglage dans l'onglet Paramètres (`promptAutoReplacement`) permettant de désactiver les invites demandant d'enregistrer les remplacements manuels détectés.
+- **Base Pokédex Complète en Français (Générations 1 à 9)** :
+  - Intégration des 1025 espèces Pokémon avec leurs noms officiels français, gestion des formes régionales et méga-évolutions.
+
+### 🛡️ Correctifs Critiques & Améliorations de Stabilité
+- **Résolution du Blocage lors de l'Apprentissage Manuel (`LearnMovePhase`)** :
+  - Correction de l'interception de `learnMove` sur les instances de phase pour transmettre fidèlement tous les arguments, éliminant le gel du jeu sur l'écran *"Quelle capacité doit être oubliée ?"*.
+- **Réactivation du Clavier & Refocalisation du Canvas** :
+  - Amélioration de `enableGameKeyboard()` pour réactiver les entrées sur toutes les scènes actives de Phaser (`game.scene.scenes`) et refocaliser automatiquement le canvas du jeu.
+  - Réactivation immédiate des contrôles à la fermeture du Quick Prompt.
+- **Formatage Épuré des Toasts d'Action** :
+  - Le toast de confirmation de remplacement tient désormais sur une seule ligne élégante et compacte.
+
+---
+
 ## [v1.12.1] - 2026-10-01
 
 ### 🎨 Améliorations de l'Interface & Correctifs d'Affichage

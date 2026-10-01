@@ -58,6 +58,16 @@ export const SettingsTab = {
           <div id="pokeskip-advanced-status-desc" style="font-size: 11px; color: ${PokeSkip.settings.advancedMode ? '#a855f7' : '#64748b'};">
             ${PokeSkip.settings.advancedMode ? '✓ Actif : les sections de remplacement sont visibles dans les onglets.' : '✕ Désactivé : les règles sont conservées mais non exécutées.'}
           </div>
+
+          <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; opacity: ${PokeSkip.settings.advancedMode ? '1' : '0.4'};">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+              <input type="checkbox" id="pokeskip-opt-prompt-auto-replacement" ${PokeSkip.settings.promptAutoReplacement !== false ? 'checked' : ''} ${!PokeSkip.settings.advancedMode ? 'disabled' : ''} style="accent-color: #a855f7;">
+              Proposer d'enregistrer les remplacements manuels détectés
+            </label>
+            <div style="font-size: 11px; color: #94a3b8; padding-left: 24px; line-height: 1.3;">
+              Affiche un toast interactif lorsqu'un remplacement est effectué manuellement en jeu pour l'enregistrer dans les règles de remplacement automatique.
+            </div>
+          </div>
         </div>
 
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
@@ -125,6 +135,9 @@ export const SettingsTab = {
     }
 
     const optAdvancedMode = container.querySelector('#pokeskip-opt-advanced-mode');
+    const optPromptAutoReplacement = container.querySelector('#pokeskip-opt-prompt-auto-replacement');
+    const promptAutoRepContainer = container.querySelector('#pokeskip-opt-prompt-auto-replacement-container');
+
     if (optAdvancedMode) {
       optAdvancedMode.addEventListener('change', (e) => {
         PokeSkip.settings.advancedMode = e.target.checked;
@@ -136,10 +149,23 @@ export const SettingsTab = {
             : '✕ Désactivé : les règles sont conservées mais non exécutées.';
           statusDesc.style.color = e.target.checked ? '#a855f7' : '#64748b';
         }
+        if (optPromptAutoReplacement) {
+          optPromptAutoReplacement.disabled = !e.target.checked;
+        }
+        if (promptAutoRepContainer) {
+          promptAutoRepContainer.style.opacity = e.target.checked ? '1' : '0.4';
+        }
         ui.showToast(
           e.target.checked ? '⚡ Mode Avancé activé' : 'Mode Avancé désactivé (règles conservées)',
           e.target.checked ? 'success' : 'info'
         );
+      });
+    }
+
+    if (optPromptAutoReplacement) {
+      optPromptAutoReplacement.addEventListener('change', (e) => {
+        PokeSkip.settings.promptAutoReplacement = e.target.checked;
+        PokeSkip.saveSettings();
       });
     }
 

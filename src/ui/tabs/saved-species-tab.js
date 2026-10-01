@@ -84,7 +84,8 @@ export const SavedSpeciesTab = {
             if (confirm(`Supprimer les règles enregistrées pour ${rule.lineageName} ?`)) {
               PokeSkip.deleteFamilyRule(famKey);
               this.renderSavedSpeciesTab();
-              UI.showToast(`Règle supprimée pour ${rule.lineageName}`, 'info');
+              const singleName = LineageManager.getSinglePokemonName(famKey, rule);
+              UI.showToast(`Règle supprimée pour <b>${singleName}</b>`, 'info');
             }
             return;
           }
@@ -209,6 +210,8 @@ export const SavedSpeciesTab = {
         });
       }
 
+      const singleName = LineageManager.getSinglePokemonName(famKey, rule);
+
       // Ajout manuel d'une capacité
       const inputAdd = container.querySelector('#pokeskip-input-add-move');
       const btnAdd = container.querySelector('#pokeskip-btn-add-move');
@@ -216,7 +219,7 @@ export const SavedSpeciesTab = {
         const val = inputAdd.value.trim();
         if (!val) return;
         PokeSkip.setMoveSkipped(famKey, rule.lineageName, val, null, true);
-        UI.showToast(`Capacité <b>${val}</b> ignorée pour <b>${rule.lineageName}</b>`, 'warning');
+        UI.showToast(`Capacité <b>${val}</b> ignorée pour <b>${singleName}</b>`, 'warning');
         this.renderFamilyRuleEditor(container, famKey);
       };
       btnAdd.addEventListener('click', handleAdd);
@@ -240,7 +243,7 @@ export const SavedSpeciesTab = {
           rule.skippedMoves = {};
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          UI.showToast(`Toutes les capacités sont rétablies pour <b>${rule.lineageName}</b>`, 'info');
+          UI.showToast(`Toutes les capacités sont rétablies pour <b>${singleName}</b>`, 'info');
           this.renderFamilyRuleEditor(container, famKey);
         });
       }
@@ -252,7 +255,7 @@ export const SavedSpeciesTab = {
           delete rule.skippedMoves[moveKey];
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          UI.showToast(`Capacité <b>${moveKey}</b> rétablie pour <b>${rule.lineageName}</b>`, 'success');
+          UI.showToast(`Capacité <b>${moveKey}</b> rétablie pour <b>${singleName}</b>`, 'success');
           this.renderFamilyRuleEditor(container, famKey);
         });
       });

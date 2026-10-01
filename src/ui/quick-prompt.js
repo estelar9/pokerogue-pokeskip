@@ -14,6 +14,9 @@ export const QuickPrompt = {
           if (el && el.parentNode) el.remove();
         }, 200);
       }
+      if (typeof UI?.enableGameKeyboard === 'function' && !UI.isModalOpen()) {
+        UI.enableGameKeyboard();
+      }
     },
 
     showQuickSkipPrompt(arg1, arg2, arg3) {
@@ -47,6 +50,11 @@ export const QuickPrompt = {
       const moveName = moveDetails?.name || move?.name || (phaseInstance?.moveId !== undefined ? LineageManager.getMoveName(phaseInstance.moveId) : 'Capacité');
       const finalMoveId = phaseInstance?.moveId ?? moveDetails?.moveId ?? move?.id;
 
+      // Ne pas afficher de prompt si le joueur a demandé de ne plus être interrogé pour cette capacité
+      if (PokeSkip.isMovePromptSuppressed(pokemon, moveName, finalMoveId)) {
+        return;
+      }
+
       const typeColor = (moveDetails?.type && moveDetails.type.bg) ? (
         moveDetails.type.name === 'Combat' ? '#ea580c' :
         moveDetails.type.name === 'Ténèbres' ? '#c4a482' :
@@ -63,6 +71,7 @@ export const QuickPrompt = {
       el.innerHTML = `
         <span class="pokeskip-quick-text">⚡ Ignorer <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> sur <b>${pokemonName}</b> ?</span>
         <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">Toujours ignorer</button>
+        <button class="pokeskip-quick-btn pokeskip-quick-btn-secondary" id="pokeskip-quick-never-ask" title="Ne plus proposer d'ignorer cette attaque pour ce Pokémon">Ne plus demander</button>
         <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="Fermer">&times;</button>
       `;
 
@@ -75,6 +84,19 @@ export const QuickPrompt = {
       el.querySelector('#pokeskip-quick-close').addEventListener('click', (e) => {
         e.stopPropagation();
         dismiss();
+      });
+
+      el.querySelector('#pokeskip-quick-never-ask').addEventListener('click', (e) => {
+        e.stopPropagation();
+        PokeSkip.setMovePromptSuppressed(pokemon, pokemon?.species?.name, moveName, finalMoveId, true);
+        UI.showToast(`ℹ️ Vous ne serez plus interrogé pour <b>${moveName}</b> sur <b>${pokemonName}</b>.`, 'info');
+        dismiss();
+        if (UI.isModalOpen()) {
+          const teamBody = document.getElementById('pokeskip-body-team');
+          if (teamBody && teamBody.style.display !== 'none' && typeof UI.renderTeamTab === 'function') {
+            UI.renderTeamTab();
+          }
+        }
       });
 
       el.querySelector('#pokeskip-quick-skip-always').addEventListener('click', (e) => {
