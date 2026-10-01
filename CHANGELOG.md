@@ -3,6 +3,21 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.14.0] - 2026-10-01
+
+### 🖥️ Compatibilité Client Desktop RogueTop & Mises à Jour Automatiques
+- **Support Natif du Client Desktop RogueTop** :
+  - Génération d'un plugin dédié `pokeskip.roguetop.js` compatible avec le système de mods de RogueTop (Tauri).
+  - Détection automatique de l'environnement Tauri / RogueTop en modes en ligne et hors ligne.
+- **Auto-Updater Transparent Intégré** :
+  - Le plugin RogueTop intègre un chargeur intelligent avec mise en cache locale (`localStorage`).
+  - Détection silencieuse en arrière-plan des nouvelles versions disponibles sur GitHub.
+  - Téléchargement automatique de la mise à jour et notification discrète par toast en jeu (`Ctrl+R` pour appliquer).
+- **Intégration du Workflow de Release** :
+  - Publication automatique de `pokeskip.roguetop.js` parmi les assets officiels des releases GitHub.
+
+---
+
 ## [v1.13.0] - 2026-10-01
 
 ### 🚀 Nouveautés & Gestion Avancée des Prompts

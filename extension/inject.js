@@ -1,4 +1,4 @@
-// PokéSkip Extension Inject Script v1.13.0
+// PokéSkip Extension Inject Script v1.14.0
 
 (() => {
   // src/data/megas.js
