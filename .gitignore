@@ -16,6 +16,9 @@ desktop.ini
 *.njsproj
 *.sln
 *.sw?
+.agents/
+.agent/
+_agents/
 
 # Node & Package Managers
 node_modules/
