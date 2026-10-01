@@ -3,6 +3,18 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.14.1] - 2026-10-01
+
+### 🛡️ Correctifs d'Isolation Clavier & Écran de Connexion
+- **Résolution du Conflit de Saisie sur l'Écran de Connexion (RogueTop & Web)** :
+  - Restriction stricte des écouteurs `focusin` et `focusout` aux seuls champs internes de PokéSkip.
+  - Suppression du vol de focus intempestif vers le canvas lors de la saisie d'identifiants de jeu.
+  - Élimination définitive du contour blanc/ligne de focus sur le canvas de jeu.
+- **Renforcement de la Protection Clavier en Arrière-Plan** :
+  - Verrouillage total garanti des touches vers PokéRogue tant que le menu PokéSkip ou le tableau des types est ouvert.
+
+---
+
 ## [v1.14.0] - 2026-10-01
 
 ### 🖥️ Compatibilité Client Desktop RogueTop & Mises à Jour Automatiques
