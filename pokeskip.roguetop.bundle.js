@@ -7792,6 +7792,15 @@
 .pokeskip-mult-tag.x0 {
   background: #334155;
   color: #94a3b8;
+}
+
+/* Suppression de tout contour blanc / bordure de focus sur le canvas de jeu */
+canvas:focus,
+#app canvas:focus,
+canvas:focus-visible,
+#app canvas:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }`;
 
   // src/game/phaser-hook.js
@@ -8288,12 +8297,18 @@
       }
       const canvas = document.querySelector("#app canvas") || document.querySelector("canvas");
       if (canvas) {
-        if (!canvas.hasAttribute("tabindex")) {
-          canvas.setAttribute("tabindex", "0");
-        }
-        try {
-          canvas.focus();
-        } catch (_) {
+        canvas.style.outline = "none";
+        canvas.style.boxShadow = "none";
+        const activeEl = document.activeElement;
+        const isExternalInput = activeEl && activeEl !== canvas && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.tagName === "SELECT");
+        if (!isExternalInput) {
+          if (!canvas.hasAttribute("tabindex")) {
+            canvas.setAttribute("tabindex", "0");
+          }
+          try {
+            canvas.focus({ preventScroll: true });
+          } catch (_) {
+          }
         }
       }
     } catch (err) {
@@ -9614,14 +9629,19 @@
           }
         }
       });
+      const isPokeSkipElement = (el) => {
+        if (!el || typeof el.closest !== "function") return false;
+        return !!(el.closest("#pokeskip-modal") || el.closest("#pokeskip-type-chart") || el.closest("#pokeskip-quick-prompt") || el.closest("#pokeskip-hud") || el.closest(".pokeskip-container"));
+      };
       document.addEventListener("focusin", (e) => {
         const t = e.target;
-        if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) {
+        if (t && isPokeSkipElement(t) && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) {
           this.disableGameKeyboard();
         }
       }, true);
       document.addEventListener("focusout", (e) => {
-        if (!this.isModalOpen()) {
+        const t = e.target;
+        if (t && isPokeSkipElement(t) && !this.isModalOpen()) {
           this.enableGameKeyboard();
         }
       }, true);

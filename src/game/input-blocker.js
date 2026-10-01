@@ -71,12 +71,23 @@ export function enableGameKeyboard() {
     // Refocaliser le canvas de jeu Phaser pour que les touches de direction/action soient actives
     const canvas = document.querySelector('#app canvas') || document.querySelector('canvas');
     if (canvas) {
-      if (!canvas.hasAttribute('tabindex')) {
-        canvas.setAttribute('tabindex', '0');
+      canvas.style.outline = 'none';
+      canvas.style.boxShadow = 'none';
+
+      // Ne jamais voler le focus si l'utilisateur est dans un champ de saisie externe (ex: login PokéRogue)
+      const activeEl = document.activeElement;
+      const isExternalInput = activeEl && activeEl !== canvas && (
+        activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT'
+      );
+
+      if (!isExternalInput) {
+        if (!canvas.hasAttribute('tabindex')) {
+          canvas.setAttribute('tabindex', '0');
+        }
+        try {
+          canvas.focus({ preventScroll: true });
+        } catch (_) {}
       }
-      try {
-        canvas.focus();
-      } catch (_) {}
     }
   } catch (err) {
     console.warn('[PokéSkip] Erreur réactivation clavier Phaser:', err);

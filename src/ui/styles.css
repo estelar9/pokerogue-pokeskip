@@ -2078,3 +2078,12 @@
   background: #334155;
   color: #94a3b8;
 }
+
+/* Suppression de tout contour blanc / bordure de focus sur le canvas de jeu */
+canvas:focus,
+#app canvas:focus,
+canvas:focus-visible,
+#app canvas:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

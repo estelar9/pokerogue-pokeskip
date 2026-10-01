@@ -33,15 +33,25 @@ export const Hotkeys = {
         }
       });
 
+      const isPokeSkipElement = (el) => {
+        if (!el || typeof el.closest !== 'function') return false;
+        return !!(el.closest('#pokeskip-modal') ||
+                  el.closest('#pokeskip-type-chart') ||
+                  el.closest('#pokeskip-quick-prompt') ||
+                  el.closest('#pokeskip-hud') ||
+                  el.closest('.pokeskip-container'));
+      };
+
       document.addEventListener('focusin', (e) => {
         const t = e.target;
-        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) {
+        if (t && isPokeSkipElement(t) && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) {
           this.disableGameKeyboard();
         }
       }, true);
 
       document.addEventListener('focusout', (e) => {
-        if (!this.isModalOpen()) {
+        const t = e.target;
+        if (t && isPokeSkipElement(t) && !this.isModalOpen()) {
           this.enableGameKeyboard();
         }
       }, true);
