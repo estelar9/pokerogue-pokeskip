@@ -56,7 +56,8 @@ export   function getPokemonFullLearnset(pokemon) {
         accuracy: accuracyText,
         pp,
         desc,
-        evolutionSpecies: evolutionSpecies || null
+        evolutionSpecies: evolutionSpecies || null,
+        isEgg: level === 'Œuf'
       };
     }
 

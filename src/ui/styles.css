@@ -953,6 +953,9 @@
 }
 
 .pokeskip-move-card {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
   background: #111a2e;
   border: 1px solid rgba(56, 189, 248, 0.18);
   border-radius: 12px;
@@ -977,12 +980,27 @@
   color: #fda4af;
 }
 
+/* Zone d'action (Badge d'état + Checkbox) TOUJOURS fixée dans le coin supérieur droit */
+.pokeskip-move-action {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+  user-select: none;
+}
+
 .pokeskip-move-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  padding-right: 130px;
+  box-sizing: border-box;
+  min-height: 28px;
 }
 .pokeskip-move-left {
   display: flex;
@@ -1040,10 +1058,12 @@
   gap: 4px;
 }
 
+.pokeskip-move-stats,
 .pokeskip-move-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .pokeskip-stat-pill {
   background: #090e1a;
@@ -1079,6 +1099,20 @@
   background: rgba(244, 63, 94, 0.15);
   color: #f43f5e;
   border: 1px solid rgba(244, 63, 94, 0.35);
+}
+.pokeskip-egg-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+  letter-spacing: 0.2px;
 }
 
 .pokeskip-move-desc {

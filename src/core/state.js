@@ -14,7 +14,7 @@ export const PokeSkip = {
         showQuickPrompt: true,
         quickPromptDuration: 15,
         showHudCount: true,
-        advancedMode: true
+        advancedMode: false
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4000) s.toastDuration = 2800;
       return s;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
 // @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.12.0
+// @version      1.12.1
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -3622,7 +3622,7 @@
         showQuickPrompt: true,
         quickPromptDuration: 15,
         showHudCount: true,
-        advancedMode: true
+        advancedMode: false
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4e3) s.toastDuration = 2800;
       return s;
@@ -5703,6 +5703,9 @@
 }
 
 .pokeskip-move-card {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
   background: #111a2e;
   border: 1px solid rgba(56, 189, 248, 0.18);
   border-radius: 12px;
@@ -5727,12 +5730,27 @@
   color: #fda4af;
 }
 
+/* Zone d'action (Badge d'\xE9tat + Checkbox) TOUJOURS fix\xE9e dans le coin sup\xE9rieur droit */
+.pokeskip-move-action {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+  user-select: none;
+}
+
 .pokeskip-move-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  padding-right: 130px;
+  box-sizing: border-box;
+  min-height: 28px;
 }
 .pokeskip-move-left {
   display: flex;
@@ -5790,10 +5808,12 @@
   gap: 4px;
 }
 
+.pokeskip-move-stats,
 .pokeskip-move-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .pokeskip-stat-pill {
   background: #090e1a;
@@ -5829,6 +5849,20 @@
   background: rgba(244, 63, 94, 0.15);
   color: #f43f5e;
   border: 1px solid rgba(244, 63, 94, 0.35);
+}
+.pokeskip-egg-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+  letter-spacing: 0.2px;
 }
 
 .pokeskip-move-desc {
@@ -8285,7 +8319,8 @@
         accuracy: accuracyText,
         pp,
         desc,
-        evolutionSpecies: evolutionSpecies || null
+        evolutionSpecies: evolutionSpecies || null,
+        isEgg: level === "\u0152uf"
       };
     }
     const lineage = LineageManager.getLineageMembers(pokemon);
@@ -8775,30 +8810,42 @@
           if (!filter) return true;
           const f = filter.toLowerCase();
           const isEggFilter = f.includes("oeuf") || f.includes("\u0153uf") || f.includes("egg");
-          return m.name.toLowerCase().includes(f) || m.evolutionSpecies && m.evolutionSpecies.toLowerCase().includes(f) || isEggFilter && m.level === "\u0152uf";
+          return m.name.toLowerCase().includes(f) || m.evolutionSpecies && m.evolutionSpecies.toLowerCase().includes(f) || isEggFilter && (m.level === "\u0152uf" || m.isEgg);
         });
         if (filtered.length === 0) {
           grid.innerHTML = `<div style="color: #64748b; font-size: 13px; text-align: center; padding: 20px;">Aucune capacit\xE9 trouv\xE9e.</div>`;
           return;
         }
         filtered.forEach((moveItem) => {
-          const isSkipped = PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
+          const isEggMove = moveItem.isEgg || moveItem.level === "\u0152uf";
+          const isSkipped = !isEggMove && PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
           const isKept = !isSkipped;
           const cardEl = document.createElement("div");
           cardEl.className = `pokeskip-move-card ${isSkipped ? "skipped" : ""}`;
+          if (isEggMove) {
+            cardEl.style.cursor = "default";
+          }
           let lvlStyle = "";
           if (moveItem.level === "Actuelle") {
             lvlStyle = 'style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);"';
           } else if (moveItem.level === "\xC9volution") {
             lvlStyle = 'style="background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);"';
-          } else if (moveItem.level === "\u0152uf") {
+          } else if (isEggMove) {
             lvlStyle = 'style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);"';
           }
           let lvlLabel = typeof moveItem.level === "number" ? `Niv. ${moveItem.level}` : moveItem.level;
-          if (moveItem.level === "\u0152uf") {
+          if (isEggMove) {
             lvlLabel = "\u{1F95A} \u0152uf";
           }
           cardEl.innerHTML = `
+            <div class="pokeskip-move-action">
+              ${isEggMove ? `
+                <span class="pokeskip-egg-badge" title="Capacit\xE9 \u0153uf obtenue au d\xE9part : le jeu ne propose jamais de l'apprendre par mont\xE9e de niveau.">\u{1F95A} Capacit\xE9 \u0152uf</span>
+              ` : `
+                <span class="pokeskip-keep-badge ${isKept ? "kept" : "skip"}">${isKept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e"}</span>
+                <input type="checkbox" class="pokeskip-checkbox" ${isKept ? "checked" : ""} title="${isKept ? "Attaque gard\xE9e (d\xE9cocher pour ignorer)" : "Attaque ignor\xE9e (cocher pour garder)"}">
+              `}
+            </div>
             <div class="pokeskip-move-top">
               <div class="pokeskip-move-left">
                 <span class="pokeskip-move-lvl-pill" ${lvlStyle}>${lvlLabel}</span>
@@ -8807,37 +8854,37 @@
                 <span class="pokeskip-type-tag" style="background:${moveItem.type.bg}; color:${moveItem.type.color};">${moveItem.type.name}</span>
                 <span class="pokeskip-cat-tag" style="color:${moveItem.category.color};">${moveItem.category.icon} ${moveItem.category.name}</span>
               </div>
-              <div class="pokeskip-move-right">
+              <div class="pokeskip-move-stats">
                 <span class="pokeskip-stat-pill">\u2694\uFE0F Puissance : <b>${moveItem.power}</b></span>
                 <span class="pokeskip-stat-pill" style="border-color: rgba(56, 189, 248, 0.3);">\u{1F3AF} Pr\xE9cision : <b style="color: #38bdf8;">${moveItem.accuracy}</b></span>
                 <span class="pokeskip-stat-pill">\u{1F50B} PP : <b>${moveItem.pp}</b></span>
-                <span class="pokeskip-keep-badge ${isKept ? "kept" : "skip"}">${isKept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e"}</span>
-                <input type="checkbox" class="pokeskip-checkbox" ${isKept ? "checked" : ""} title="${isKept ? "Attaque gard\xE9e (d\xE9cocher pour ignorer)" : "Attaque ignor\xE9e (cocher pour garder)"}">
               </div>
             </div>
             ${moveItem.desc ? `<div class="pokeskip-move-desc">${moveItem.desc}</div>` : ""}
           `;
-          const checkbox = cardEl.querySelector(".pokeskip-checkbox");
-          const badge = cardEl.querySelector(".pokeskip-keep-badge");
-          const updateCardState = (kept) => {
-            checkbox.checked = kept;
-            cardEl.classList.toggle("skipped", !kept);
-            if (badge) {
-              badge.className = `pokeskip-keep-badge ${kept ? "kept" : "skip"}`;
-              badge.textContent = kept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e";
-            }
-            PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
-            UI.updateHudBadge();
-            updateLineageToggle();
-          };
-          cardEl.addEventListener("click", (e) => {
-            if (e.target !== checkbox) {
-              updateCardState(!checkbox.checked);
-            }
-          });
-          checkbox.addEventListener("change", () => {
-            updateCardState(checkbox.checked);
-          });
+          if (!isEggMove) {
+            const checkbox = cardEl.querySelector(".pokeskip-checkbox");
+            const badge = cardEl.querySelector(".pokeskip-keep-badge");
+            const updateCardState = (kept) => {
+              checkbox.checked = kept;
+              cardEl.classList.toggle("skipped", !kept);
+              if (badge) {
+                badge.className = `pokeskip-keep-badge ${kept ? "kept" : "skip"}`;
+                badge.textContent = kept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e";
+              }
+              PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
+              UI.updateHudBadge();
+              updateLineageToggle();
+            };
+            cardEl.addEventListener("click", (e) => {
+              if (e.target !== checkbox) {
+                updateCardState(!checkbox.checked);
+              }
+            });
+            checkbox.addEventListener("change", () => {
+              updateCardState(checkbox.checked);
+            });
+          }
           grid.appendChild(cardEl);
         });
       };

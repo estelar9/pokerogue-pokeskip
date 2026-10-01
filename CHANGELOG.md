@@ -3,6 +3,21 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.12.1] - 2026-10-01
+
+### 🎨 Améliorations de l'Interface & Correctifs d'Affichage
+- **Gestion Dédiée des Capacités Œuf** :
+  - Ajout d'un badge distinctif ambré `🥚 Capacité Œuf` dans l'onglet Équipe pour les capacités issues des œufs.
+  - Ces capacités ne peuvent plus être cochées/décochées par erreur (le jeu ne propose jamais de les apprendre par montée de niveau).
+  - Info-bulle explicative précisant que ces attaques sont obtenues au départ.
+- **Positionnement et Alignement des Cartes de Capacités** :
+  - Ancrage fixe de la zone d'action (badge d'état `✓ Gardée` / `✕ Ignorée` et case à cocher) dans le coin supérieur droit de chaque carte.
+  - Suppression définitive des chevauchements de texte avec les statistiques d'attaque (Puissance, Précision, PP).
+- **Ajustement de la Configuration par Défaut** :
+  - Désactivation par défaut du Mode Avancé (`advancedMode: false`) pour une expérience utilisateur initiale simplifiée et épurée.
+
+---
+
 ## [v1.12.0] - 2026-09-30
 
 ### 🔄 Automatisation Robuste des Remplacements & Résolution Intelligente des Capacités

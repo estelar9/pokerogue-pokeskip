@@ -181,7 +181,7 @@ export const TeamTab = {
           const isEggFilter = f.includes('oeuf') || f.includes('œuf') || f.includes('egg');
           return m.name.toLowerCase().includes(f)
             || (m.evolutionSpecies && m.evolutionSpecies.toLowerCase().includes(f))
-            || (isEggFilter && m.level === 'Œuf');
+            || (isEggFilter && (m.level === 'Œuf' || m.isEgg));
         });
 
         if (filtered.length === 0) {
@@ -190,26 +190,38 @@ export const TeamTab = {
         }
 
         filtered.forEach(moveItem => {
-          const isSkipped = PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
+          const isEggMove = moveItem.isEgg || moveItem.level === 'Œuf';
+          const isSkipped = !isEggMove && PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
           const isKept = !isSkipped;
           const cardEl = document.createElement('div');
           cardEl.className = `pokeskip-move-card ${isSkipped ? 'skipped' : ''}`;
+          if (isEggMove) {
+            cardEl.style.cursor = 'default';
+          }
 
           let lvlStyle = '';
           if (moveItem.level === 'Actuelle') {
             lvlStyle = 'style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);"';
           } else if (moveItem.level === 'Évolution') {
             lvlStyle = 'style="background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);"';
-          } else if (moveItem.level === 'Œuf') {
+          } else if (isEggMove) {
             lvlStyle = 'style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);"';
           }
 
           let lvlLabel = typeof moveItem.level === 'number' ? `Niv. ${moveItem.level}` : moveItem.level;
-          if (moveItem.level === 'Œuf') {
+          if (isEggMove) {
             lvlLabel = '🥚 Œuf';
           }
 
           cardEl.innerHTML = `
+            <div class="pokeskip-move-action">
+              ${isEggMove ? `
+                <span class="pokeskip-egg-badge" title="Capacité œuf obtenue au départ : le jeu ne propose jamais de l'apprendre par montée de niveau.">🥚 Capacité Œuf</span>
+              ` : `
+                <span class="pokeskip-keep-badge ${isKept ? 'kept' : 'skip'}">${isKept ? '✓ Gardée' : '✕ Ignorée'}</span>
+                <input type="checkbox" class="pokeskip-checkbox" ${isKept ? 'checked' : ''} title="${isKept ? 'Attaque gardée (décocher pour ignorer)' : 'Attaque ignorée (cocher pour garder)'}">
+              `}
+            </div>
             <div class="pokeskip-move-top">
               <div class="pokeskip-move-left">
                 <span class="pokeskip-move-lvl-pill" ${lvlStyle}>${lvlLabel}</span>
@@ -218,40 +230,40 @@ export const TeamTab = {
                 <span class="pokeskip-type-tag" style="background:${moveItem.type.bg}; color:${moveItem.type.color};">${moveItem.type.name}</span>
                 <span class="pokeskip-cat-tag" style="color:${moveItem.category.color};">${moveItem.category.icon} ${moveItem.category.name}</span>
               </div>
-              <div class="pokeskip-move-right">
+              <div class="pokeskip-move-stats">
                 <span class="pokeskip-stat-pill">⚔️ Puissance : <b>${moveItem.power}</b></span>
                 <span class="pokeskip-stat-pill" style="border-color: rgba(56, 189, 248, 0.3);">🎯 Précision : <b style="color: #38bdf8;">${moveItem.accuracy}</b></span>
                 <span class="pokeskip-stat-pill">🔋 PP : <b>${moveItem.pp}</b></span>
-                <span class="pokeskip-keep-badge ${isKept ? 'kept' : 'skip'}">${isKept ? '✓ Gardée' : '✕ Ignorée'}</span>
-                <input type="checkbox" class="pokeskip-checkbox" ${isKept ? 'checked' : ''} title="${isKept ? 'Attaque gardée (décocher pour ignorer)' : 'Attaque ignorée (cocher pour garder)'}">
               </div>
             </div>
             ${moveItem.desc ? `<div class="pokeskip-move-desc">${moveItem.desc}</div>` : ''}
           `;
 
-          const checkbox = cardEl.querySelector('.pokeskip-checkbox');
-          const badge = cardEl.querySelector('.pokeskip-keep-badge');
+          if (!isEggMove) {
+            const checkbox = cardEl.querySelector('.pokeskip-checkbox');
+            const badge = cardEl.querySelector('.pokeskip-keep-badge');
 
-          const updateCardState = (kept) => {
-            checkbox.checked = kept;
-            cardEl.classList.toggle('skipped', !kept);
-            if (badge) {
-              badge.className = `pokeskip-keep-badge ${kept ? 'kept' : 'skip'}`;
-              badge.textContent = kept ? '✓ Gardée' : '✕ Ignorée';
-            }
-            PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
-            UI.updateHudBadge();
-            updateLineageToggle();
-          };
+            const updateCardState = (kept) => {
+              checkbox.checked = kept;
+              cardEl.classList.toggle('skipped', !kept);
+              if (badge) {
+                badge.className = `pokeskip-keep-badge ${kept ? 'kept' : 'skip'}`;
+                badge.textContent = kept ? '✓ Gardée' : '✕ Ignorée';
+              }
+              PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
+              UI.updateHudBadge();
+              updateLineageToggle();
+            };
 
-          cardEl.addEventListener('click', (e) => {
-            if (e.target !== checkbox) {
-              updateCardState(!checkbox.checked);
-            }
-          });
-          checkbox.addEventListener('change', () => {
-            updateCardState(checkbox.checked);
-          });
+            cardEl.addEventListener('click', (e) => {
+              if (e.target !== checkbox) {
+                updateCardState(!checkbox.checked);
+              }
+            });
+            checkbox.addEventListener('change', () => {
+              updateCardState(checkbox.checked);
+            });
+          }
 
           grid.appendChild(cardEl);
         });
