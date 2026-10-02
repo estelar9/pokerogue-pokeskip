@@ -1,6 +1,7 @@
 // Hooks sur le moteur de jeu Phaser et interception des phases d'apprentissage
 import { PokeSkip } from '../core/state.js';
 import { LineageManager } from '../core/lineage-manager.js';
+import { t } from '../core/i18n.js';
 import { UI } from '../ui/index.js';
 
 export function findPhaserScene() {
@@ -246,13 +247,17 @@ function checkManualMoveReplacement(phase) {
 
       // 4. Afficher le toast d'action demandant si l'on souhaite enregistrer ce remplacement automatique
       const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
-      const message = `🔄 Toujours remplacer <b>${replacedMove.name}</b> par <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> ?`;
+      const message = t('toast_save_manual_rep', {
+        oldMove: `<b>${replacedMove.name}</b>`,
+        newMove: `<b>${incoming.name}</b>`,
+        pokemon: `<b>${currentPokemonName}</b>`
+      });
 
       console.log(`💡 [PokéSkip] Remplacement manuel détecté : "${replacedMove.name}" -> "${incoming.name}" sur ${currentPokemonName}. Proposition d'enregistrement.`);
 
       UI.showActionToast(
         message,
-        'Enregistrer',
+        t('toast_save_btn'),
         () => {
           PokeSkip.addReplacementRule(
             pokemon,
@@ -401,7 +406,16 @@ function hookLearnMovePhasePrototype(proto) {
 
           if (PokeSkip.settings.showToasts) {
             const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
-            UI.showToast(`🔄 <b>${moveName}</b> a automatiquement remplacé <b>${replacement.oldMoveName}</b> sur <b>${currentPokemonName}</b> !`, 'info', PokeSkip.settings.toastDuration || 3000);
+            const toastKey = replacement.isUniversal ? 'toast_universal_auto_replaced' : 'toast_auto_replaced';
+            UI.showToast(
+              t(toastKey, {
+                newMove: moveName,
+                oldMove: replacement.oldMoveName,
+                pokemon: currentPokemonName
+              }),
+              replacement.isUniversal ? 'advanced' : 'info',
+              PokeSkip.settings.toastDuration || 3000
+            );
           }
           UI.updateHudBadge();
 

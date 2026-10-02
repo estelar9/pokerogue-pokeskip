@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
 // @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.15.0
+// @version      1.16.0
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -4413,6 +4413,1923 @@
   var SETTINGS_KEY = "pokeskip_settings_v1";
   var STATS_KEY = "pokeskip_stats_v1";
 
+  // src/core/i18n.js
+  var TRANSLATIONS = {
+    fr: {
+      // HUD
+      hud_active: "Pok\xE9Skip (Actif - ON) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer",
+      hud_paused: "Pok\xE9Skip (En pause - OFF) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer",
+      hud_pill_title_on: "Pok\xE9Skip (Actif - ON) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P",
+      hud_pill_title_off: "Pok\xE9Skip (En pause - OFF) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P",
+      hud_type_btn_title: "Tableau des Types (Touche T)",
+      hud_count_passed_one: "{count} pass\xE9e",
+      hud_count_passed_many: "{count} pass\xE9es",
+      // Modal Header & Tabs
+      header_badge: "Auto-Skip Intelligent",
+      header_subtitle: "Gestion automatis\xE9e des nouvelles capacit\xE9s par Pok\xE9mon",
+      status_active: "Actif",
+      status_inactive: "Inactif",
+      switch_title: "Activer / D\xE9sactiver Pok\xE9Skip",
+      close_btn_title: "Fermer la fen\xEAtre (\xC9chap)",
+      tab_team: "Mon \xC9quipe",
+      tab_saved: "R\xE8gles & Esp\xE8ces",
+      tab_global: "R\xE8gles Globales",
+      tab_settings: "Param\xE8tres",
+      // Global Rules Tab (Universal Move Upgrades)
+      global_title: "Am\xE9liorations Universelles d'Attaques",
+      global_subtitle: "Remplace automatiquement les attaques de base par leurs \xE9volutions sup\xE9rieures directes sur l'ensemble de vos Pok\xE9mon.",
+      global_master_switch: "Activer les am\xE9liorations universelles",
+      global_master_active: "Actif",
+      global_master_inactive: "D\xE9sactiv\xE9",
+      global_search_placeholder: "Rechercher une attaque ou un type (ex: Flamme, Plante, Surf)...",
+      global_active_count: "{active}/{total} active(s)",
+      global_btn_enable_all: "Tout activer",
+      global_btn_disable_all: "Tout d\xE9sactiver",
+      global_empty_search: "Aucune cha\xEEne d'am\xE9lioration ne correspond \xE0 votre recherche.",
+      global_chain_disabled: "\u23F8\uFE0F Cha\xEEne en pause",
+      global_chain_enabled: "\u2713 Cha\xEEne active",
+      global_move_tooltip_power: "Puissance",
+      global_move_tooltip_acc: "Pr\xE9cision",
+      global_move_tooltip_pp: "PP",
+      global_move_tooltip_cat: "Type de d\xE9g\xE2t",
+      global_move_tooltip_type: "Type",
+      global_move_tooltip_active: "\u2713 Active dans la cha\xEEne",
+      global_move_tooltip_disabled: "\u274C Exclue de la cha\xEEne (saut\xE9e)",
+      global_move_tooltip_click_disable: "Cliquer pour exclure",
+      global_move_tooltip_click_enable: "Cliquer pour r\xE9activer",
+      global_move_excluded_badge: "Exclue",
+      // Team Tab
+      team_empty_msg: `\u26A0\uFE0F Aucune partie en cours d\xE9tect\xE9e ou \xE9quipe vide.<br>Lancez une partie dans Pok\xE9Rogue pour voir votre \xE9quipe active, ou utilisez l'onglet <b>"Esp\xE8ces M\xE9moris\xE9es"</b> !`,
+      team_pause_rules: "Mettre en pause les r\xE8gles de ce Pok\xE9mon",
+      team_resume_rules: "R\xE9activer les r\xE8gles pour ce Pok\xE9mon",
+      team_search_placeholder: "Filtrer une capacit\xE9 ou \xE9volution...",
+      team_th_move: "Capacit\xE9",
+      team_th_type: "Type",
+      team_th_cat: "Cat\xE9gorie",
+      team_th_power: "Puissance",
+      team_th_acc: "Pr\xE9cision",
+      team_th_pp: "PP",
+      team_th_effect: "Description & Effet",
+      team_th_skip: "Ignorer ?",
+      team_no_moves: "Aucune capacit\xE9 ne correspond \xE0 votre filtre.",
+      team_evo_badge: "\u{1F9EC} {name}",
+      team_egg_badge: "\u{1F95A} \u0152uf",
+      team_level_prefix: "Niv. ",
+      team_keep_title: "Coch\xE9 = Apprendre normalement",
+      team_skip_title: "D\xE9coch\xE9 = Ignorer automatiquement",
+      // Saved Species Tab
+      saved_empty: "Aucune r\xE8gle m\xE9moris\xE9e pour le moment.<br>D\xE9cochez des attaques dans l'\xE9quipe actuelle pour les ignorer : elles resteront enregistr\xE9es pour toute la lign\xE9e !",
+      saved_subtitle: "Retrouvez ici toutes les lign\xE9es d'esp\xE8ces configur\xE9es. Vos r\xE9glages s'appliquent automatiquement \xE0 tous leurs stades \xE9volutifs et formes, d'une partie \xE0 l'autre.",
+      saved_search_placeholder: "Rechercher une esp\xE8ce...",
+      saved_edit_btn: "\u270F\uFE0F Modifier",
+      saved_del_btn: "Supprimer la r\xE8gle",
+      saved_confirm_del: "Supprimer les r\xE8gles enregistr\xE9es pour {name} ?",
+      saved_skipped_summary: "Capacit\xE9s ignor\xE9es ({count}) : <b>{moves}</b>",
+      saved_none_skipped: "<i>Aucune capacit\xE9 ignor\xE9e</i>",
+      saved_back_btn: "\u2190 Retour aux esp\xE8ces",
+      saved_view_in_team: "\u{1F465} Voir dans l'\xC9quipe Actuelle",
+      saved_lineage_label: "Lign\xE9e : <b>{name}</b>",
+      saved_lineage_desc: "Modifiez les capacit\xE9s ignor\xE9es pour toute la lign\xE9e (tous stades et formes).",
+      saved_add_placeholder: "Ajouter une capacit\xE9 \xE0 ignorer (ex: Tornade, Charge)...",
+      saved_add_btn: "+ Ignorer",
+      saved_current_ignored_title: "Capacit\xE9s actuellement ignor\xE9es ({count}) :",
+      saved_restore_all_btn: "Tout r\xE9tablir (Ne rien ignorer)",
+      saved_no_moves_ignored: "Aucune capacit\xE9 n'est ignor\xE9e pour cette lign\xE9e.<br>Toutes les attaques propos\xE9es seront apprises ou pr\xE9sent\xE9es normalement.",
+      saved_badge_ignored: "\u2715 Ignor\xE9e",
+      saved_keep_again: "\u2713 Garder \xE0 nouveau",
+      saved_lineage_fallback: "Lign\xE9e #{id}",
+      saved_count_skipped_one: "{count} capacit\xE9 ignor\xE9e",
+      saved_count_skipped_many: "{count} capacit\xE9s ignor\xE9es",
+      saved_paused: "\u23F8\uFE0F En pause",
+      saved_restore_all: "Tout r\xE9tablir",
+      saved_back: "\u2B05 Retour \xE0 la liste",
+      // Replacements Tab
+      rep_header: "Mode Avanc\xE9 : Remplacement Automatique de Capacit\xE9s",
+      rep_active_count: "{active}/{total} active(s)",
+      rep_clear_all: "\u{1F5D1}\uFE0F Tout supprimer ({count})",
+      rep_desc: "D\xE9finit les attaques \xE0 remplacer automatiquement : d\xE8s que la nouvelle capacit\xE9 est d\xE9bloqu\xE9e et que le Pok\xE9mon poss\xE8de 4 attaques, l'ancienne est remplac\xE9e sans interrompre le jeu.",
+      rep_add_title: "\u2795 Ajouter une r\xE8gle de remplacement :",
+      rep_label_old: "Toujours remplacer :",
+      rep_label_new: "Par la nouvelle :",
+      rep_placeholder_old: "Ancienne capacit\xE9...",
+      rep_placeholder_new: "Nouvelle capacit\xE9...",
+      rep_save_btn: "+ Enregistrer",
+      rep_arrow: "\u2794 par \u2794",
+      rep_empty: "Aucune r\xE8gle de remplacement pour <b>{name}</b>.<br>Cr\xE9ez une r\xE8gle ci-dessus pour remplacer automatiquement une ancienne attaque d\xE8s le d\xE9blocage d'une nouvelle.",
+      rep_toggle_disable: "D\xE9sactiver",
+      rep_toggle_enable: "Activer",
+      rep_status_active: "Active",
+      rep_status_disabled: "D\xE9sactiv\xE9e",
+      rep_opt_start: "[D\xE9part] ",
+      rep_opt_evol: "[\xC9volution] ",
+      rep_opt_level: "[Niv. {level}] ",
+      rep_opt_egg: "[\u{1F95A} \u0152uf] ",
+      rep_opt_current: "[Actuelle] ",
+      rep_opt_suffix_current: " (Actuelle)",
+      rep_confirm_clear: "Supprimer toutes les r\xE8gles de remplacement pour {name} ?",
+      // Settings Tab
+      settings_lang_title: "Langue de l'interface",
+      settings_lang_desc: "Choisissez la langue d'affichage de Pok\xE9Skip (ou synchronisez-la automatiquement avec Pok\xE9Rogue).",
+      settings_lang_auto: "Automatique (selon Pok\xE9Rogue)",
+      settings_lang_fr: "Fran\xE7ais",
+      settings_lang_en: "English (Anglais)",
+      settings_notif_title: "Notifications & Alertes",
+      settings_toasts_label: "Afficher les notifications toast lors d'un auto-skip",
+      settings_toast_duration: "Dur\xE9e d'affichage des notifications :",
+      settings_hud_count_label: "Afficher le compteur de capacit\xE9s pass\xE9es sur la pastille",
+      settings_quick_prompt_label: "Proposer d'ignorer pour toujours une nouvelle attaque en combat",
+      settings_quick_prompt_duration: "Dur\xE9e d'affichage du message rapide :",
+      settings_seconds: "secondes",
+      settings_advanced_title: "\u26A1 Mode Avanc\xE9 : Remplacement d'Attaques",
+      settings_advanced_enable: "Activer",
+      settings_advanced_desc: "Permet de configurer des remplacements automatiques d'anciennes attaques lorsqu'une nouvelle capacit\xE9 (non ignor\xE9e) est apprise et que le Pok\xE9mon poss\xE8de d\xE9j\xE0 4 attaques.",
+      settings_advanced_status_on: "\u2713 Actif : les sections de remplacement sont visibles dans les onglets.",
+      settings_advanced_status_off: "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es.",
+      settings_prompt_auto_rep: "Proposer d'enregistrer les remplacements manuels d\xE9tect\xE9s",
+      settings_prompt_auto_rep_desc: "Affiche un toast interactif lorsqu'un remplacement est effectu\xE9 manuellement en jeu pour l'enregistrer dans les r\xE8gles de remplacement automatique.",
+      settings_io_title: "Exportation / Importation",
+      settings_io_desc: "Transf\xE9rez vos r\xE8gles de skip et vos param\xE8tres d'options vers un autre navigateur ou ordinateur.",
+      settings_export_btn: "\u{1F4E4} Exporter (JSON)",
+      settings_import_btn: "\u{1F4E5} Importer (JSON)",
+      settings_reset_title: "R\xE9initialisation",
+      settings_reset_desc: "Effacer l'ensemble de vos r\xE8gles de skip ou restaurer les r\xE9glages par d\xE9faut.",
+      settings_reset_rules_btn: "\u{1F5D1}\uFE0F R\xE9initialiser toutes les r\xE8gles",
+      settings_reset_settings_btn: "\u21BA Restaurer les options par d\xE9faut",
+      // Type Chart
+      tc_title: "Forces & Faiblesses",
+      tc_tab_simplified: "\u26A1 Simplifi\xE9",
+      tc_tab_complete: "\u{1F4CA} Complet",
+      tc_immunities: "\u{1F6E1}\uFE0F Immunit\xE9s (\xD70)",
+      tc_weaknesses: "\u26A0\uFE0F Faiblesses (re\xE7oit \xD72)",
+      tc_type: "Type",
+      tc_strengths: "Forces (inflige \xD72) \u2694\uFE0F",
+      tc_def_header: "\u{1F6E1}\uFE0F D\xE9f. \u2794",
+      tc_att_header: "\u2B07 \u2694\uFE0F Att.",
+      tc_legend_super: "\xD72 Super",
+      tc_legend_half: "\xD70.5 Peu",
+      tc_legend_zero: "\xD70 Inefficace",
+      tc_legend_neutral: "\xD71 Neutre",
+      tc_close_tip: "{t_key} ou {esc_key} Fermer",
+      tc_takes_double: "Subit \xD72 de {type}",
+      tc_deals_double: "Inflige \xD72 \xE0 {type}",
+      tc_immune_against: "Immunis\xE9 contre {type} (\xD70)",
+      // Quick Prompt
+      qp_prompt_text: "\u26A1 Ignorer {move} sur <b>{pokemon}</b> ?",
+      qp_skip_always: "Toujours ignorer",
+      qp_never_ask: "Ne plus demander",
+      qp_never_ask_title: "Ne plus proposer d'ignorer cette attaque pour ce Pok\xE9mon",
+      // Toasts & Messages
+      toast_enabled: "Pok\xE9Skip activ\xE9",
+      toast_paused: "Pok\xE9Skip en pause",
+      toast_ready: "Pok\xE9Skip activ\xE9 et pr\xEAt !",
+      toast_never_ask_ack: "\u2139\uFE0F Vous ne serez plus interrog\xE9 pour <b>{move}</b> sur <b>{pokemon}</b>.",
+      toast_rule_saved: "\u2705 R\xE8gle enregistr\xE9e : <b>{pokemon}</b> ignorera {move} !",
+      toast_move_skipped: "\u{1F6E1}\uFE0F Capacit\xE9 <b>{move}</b> ignor\xE9e pour <b>{pokemon}</b> !",
+      toast_auto_replaced: "\u{1F504} <b>{newMove}</b> a automatiquement remplac\xE9 <b>{oldMove}</b> sur <b>{pokemon}</b> !",
+      toast_save_manual_rep: "\u{1F4BE} Remplacement manuel : Enregistrer {oldMove} \u2794 {newMove} sur {pokemon} ?",
+      toast_save_btn: "Enregistrer",
+      toast_export_success: "R\xE8gles et param\xE8tres export\xE9s en fichier JSON",
+      toast_import_invalid: "Erreur : le fichier JSON est invalide ou vide.",
+      toast_import_success: "Succ\xE8s : {details} import\xE9(s) !",
+      toast_import_empty: "Aucune r\xE8gle ou param\xE8tre trouv\xE9 dans ce fichier.",
+      toast_import_error: "Erreur : impossible de lire ou parser ce fichier JSON.",
+      toast_read_error: "Erreur lors de la lecture du fichier.",
+      toast_rules_cleared: "Toutes les r\xE8gles ont \xE9t\xE9 effac\xE9es.",
+      toast_settings_reset: "Options r\xE9initialis\xE9es par d\xE9faut.",
+      toast_lineage_paused: "\u23F8\uFE0F Param\xE9trage mis en pause pour <b>{name}</b> (s\xE9lections conserv\xE9es)",
+      toast_lineage_resumed: "\u2705 Param\xE9trage r\xE9activ\xE9 pour <b>{name}</b>",
+      toast_rep_added: "\u2705 R\xE8gle de remplacement enregistr\xE9e pour <b>{name}</b> !",
+      toast_rep_deleted: "R\xE8gle de remplacement supprim\xE9e.",
+      toast_rep_all_deleted: "Toutes les r\xE8gles de remplacement supprim\xE9es pour <b>{name}</b>.",
+      toast_rep_missing_inputs: "Veuillez renseigner l'ancienne capacit\xE9 \xE0 remplacer et la nouvelle capacit\xE9.",
+      toast_rep_identical_inputs: "La nouvelle capacit\xE9 et l'ancienne doivent \xEAtre diff\xE9rentes.",
+      toast_all_moves_restored: "Toutes les capacit\xE9s sont r\xE9tablies pour <b>{name}</b>",
+      toast_single_move_restored: "Capacit\xE9 <b>{move}</b> r\xE9tablie pour <b>{name}</b>",
+      toast_single_move_skipped: "Capacit\xE9 <b>{move}</b> ignor\xE9e pour <b>{name}</b>",
+      toast_single_rule_deleted: "R\xE8gle supprim\xE9e pour <b>{name}</b>",
+      toast_universal_auto_replaced: "\u{1F504} <b>{newMove}</b> a automatiquement am\xE9lior\xE9 <b>{oldMove}</b> sur <b>{pokemon}</b> !",
+      toast_universal_all_enabled: "Toutes les cha\xEEnes d'am\xE9liorations globales sont activ\xE9es.",
+      toast_universal_all_disabled: "Toutes les cha\xEEnes d'am\xE9liorations globales sont d\xE9sactiv\xE9es.",
+      toast_universal_chain_toggled: "Lign\xE9e <b>{name}</b> : {status}",
+      toast_universal_move_disabled: "\u{1F6AB} Capacit\xE9 <b>{move}</b> exclue de l'automatisation ({chain})",
+      toast_universal_move_enabled: "\u2713 Capacit\xE9 <b>{move}</b> r\xE9activ\xE9e dans l'automatisation ({chain})",
+      // Move Resolver
+      move_infallible: "Infaillible",
+      move_egg: "\u0152uf",
+      move_default_name: "Capacit\xE9 #{id}",
+      move_default_desc: "Inflige des d\xE9g\xE2ts ou applique un effet.",
+      // Regional
+      regional_alola: "{base} d'Alola",
+      regional_galar: "{base} de Galar",
+      regional_hisui: "{base} de Hisui",
+      regional_paldea: "{base} de Paldea"
+    },
+    en: {
+      // HUD
+      hud_active: "Pok\xE9Skip (Active - ON) \u2022 Shortcut P \u2022 Drag to move",
+      hud_paused: "Pok\xE9Skip (Paused - OFF) \u2022 Shortcut P \u2022 Drag to move",
+      hud_pill_title_on: "Pok\xE9Skip (Active - ON) \u2022 Click to manage moves \u2022 Shortcut P",
+      hud_pill_title_off: "Pok\xE9Skip (Paused - OFF) \u2022 Click to manage moves \u2022 Shortcut P",
+      hud_type_btn_title: "Type Chart (Key T)",
+      hud_count_passed_one: "{count} skipped",
+      hud_count_passed_many: "{count} skipped",
+      // Modal Header & Tabs
+      header_badge: "Smart Auto-Skip",
+      header_subtitle: "Automated move management per Pok\xE9mon",
+      status_active: "Active",
+      status_inactive: "Paused",
+      switch_title: "Enable / Disable Pok\xE9Skip",
+      close_btn_title: "Close window (Esc)",
+      tab_team: "My Team",
+      tab_saved: "Rules & Species",
+      tab_global: "Global Rules",
+      tab_settings: "Settings",
+      // Global Rules Tab (Universal Move Upgrades)
+      global_title: "Universal Move Upgrades",
+      global_subtitle: "Automatically replaces base moves with their direct superior upgrades across all your Pok\xE9mon.",
+      global_master_switch: "Enable universal move upgrades",
+      global_master_active: "Active",
+      global_master_inactive: "Disabled",
+      global_search_placeholder: "Search a move or type (e.g. Fire, Grass, Surf)...",
+      global_active_count: "{active}/{total} active",
+      global_btn_enable_all: "Enable all",
+      global_btn_disable_all: "Disable all",
+      global_empty_search: "No move upgrade chains match your search.",
+      global_chain_disabled: "\u23F8\uFE0F Chain paused",
+      global_chain_enabled: "\u2713 Chain active",
+      global_move_tooltip_power: "Power",
+      global_move_tooltip_acc: "Accuracy",
+      global_move_tooltip_pp: "PP",
+      global_move_tooltip_cat: "Category",
+      global_move_tooltip_type: "Type",
+      global_move_tooltip_active: "\u2713 Active in chain",
+      global_move_tooltip_disabled: "\u274C Excluded from chain (skipped)",
+      global_move_tooltip_click_disable: "Click to exclude",
+      global_move_tooltip_click_enable: "Click to re-enable",
+      global_move_excluded_badge: "Excluded",
+      // Team Tab
+      team_empty_msg: '\u26A0\uFE0F No active game detected or party is empty.<br>Start a game in Pok\xE9Rogue to view your party, or check the <b>"Rules & Species"</b> tab!',
+      team_pause_rules: "Pause rules for this Pok\xE9mon",
+      team_resume_rules: "Resume rules for this Pok\xE9mon",
+      team_search_placeholder: "Filter a move or evolution...",
+      team_th_move: "Move",
+      team_th_type: "Type",
+      team_th_cat: "Category",
+      team_th_power: "Power",
+      team_th_acc: "Accuracy",
+      team_th_pp: "PP",
+      team_th_effect: "Description & Effect",
+      team_th_skip: "Skip?",
+      team_no_moves: "No moves match your filter.",
+      team_evo_badge: "\u{1F9EC} {name}",
+      team_egg_badge: "\u{1F95A} Egg",
+      team_level_prefix: "Lv. ",
+      team_keep_title: "Checked = Learn normally",
+      team_skip_title: "Unchecked = Auto-skip",
+      // Saved Species Tab
+      saved_empty: "No saved rules yet.<br>Uncheck moves in your active team to auto-skip them: they will stay saved for the whole evolutionary line!",
+      saved_subtitle: "Find all configured species lines here. Your preferences automatically apply to all evolutionary stages and forms across runs.",
+      saved_search_placeholder: "Search a species...",
+      saved_edit_btn: "\u270F\uFE0F Edit",
+      saved_del_btn: "Delete rule",
+      saved_confirm_del: "Delete saved rules for {name}?",
+      saved_skipped_summary: "Ignored moves ({count}): <b>{moves}</b>",
+      saved_none_skipped: "<i>No ignored moves</i>",
+      saved_back_btn: "\u2190 Back to species",
+      saved_view_in_team: "\u{1F465} View in Active Team",
+      saved_lineage_label: "Lineage: <b>{name}</b>",
+      saved_lineage_desc: "Manage ignored moves for the entire lineage (all stages and forms).",
+      saved_add_placeholder: "Add a move to ignore (e.g. Tackle, Scratch)...",
+      saved_add_btn: "+ Ignore",
+      saved_current_ignored_title: "Currently ignored moves ({count}):",
+      saved_restore_all_btn: "Restore all (Ignore nothing)",
+      saved_no_moves_ignored: "No moves are ignored for this lineage.<br>All moves offered will be learned or shown normally.",
+      saved_badge_ignored: "\u2715 Ignored",
+      saved_keep_again: "\u2713 Keep again",
+      saved_lineage_fallback: "Lineage #{id}",
+      saved_count_skipped_one: "{count} move skipped",
+      saved_count_skipped_many: "{count} moves skipped",
+      saved_paused: "\u23F8\uFE0F Paused",
+      saved_restore_all: "Restore all",
+      saved_back: "\u2B05 Back to list",
+      // Replacements Tab
+      rep_header: "Advanced Mode: Auto Move Replacements",
+      rep_active_count: "{active}/{total} active",
+      rep_clear_all: "\u{1F5D1}\uFE0F Clear all ({count})",
+      rep_desc: "Configure moves to automatically replace: once the new move is learned and the Pok\xE9mon already has 4 moves, the old one is replaced seamlessly.",
+      rep_add_title: "\u2795 Add a replacement rule:",
+      rep_label_old: "Always replace:",
+      rep_label_new: "With new move:",
+      rep_placeholder_old: "Old move...",
+      rep_placeholder_new: "New move...",
+      rep_save_btn: "+ Save",
+      rep_arrow: "\u2794 with \u2794",
+      rep_empty: "No replacement rules for <b>{name}</b>.<br>Add a rule above to automatically replace an old move when learning a new one.",
+      rep_toggle_disable: "Disable",
+      rep_toggle_enable: "Enable",
+      rep_status_active: "Active",
+      rep_status_disabled: "Disabled",
+      rep_opt_start: "[Start] ",
+      rep_opt_evol: "[Evolution] ",
+      rep_opt_level: "[Lv. {level}] ",
+      rep_opt_egg: "[\u{1F95A} Egg] ",
+      rep_opt_current: "[Current] ",
+      rep_opt_suffix_current: " (Current)",
+      rep_confirm_clear: "Delete all replacement rules for {name}?",
+      // Settings Tab
+      settings_lang_title: "Interface Language",
+      settings_lang_desc: "Choose Pok\xE9Skip's display language (or synchronize automatically with Pok\xE9Rogue).",
+      settings_lang_auto: "Automatic (match Pok\xE9Rogue)",
+      settings_lang_fr: "Fran\xE7ais (French)",
+      settings_lang_en: "English",
+      settings_notif_title: "Notifications & Alerts",
+      settings_toasts_label: "Show toast notifications on auto-skip",
+      settings_toast_duration: "Toast notification duration:",
+      settings_hud_count_label: "Show skipped moves count on HUD pill",
+      settings_quick_prompt_label: "Prompt to decline new moves in battle (Quick Prompt)",
+      settings_quick_prompt_duration: "Quick prompt duration:",
+      settings_seconds: "seconds",
+      settings_advanced_title: "\u26A1 Advanced Mode: Move Replacements",
+      settings_advanced_enable: "Enable",
+      settings_advanced_desc: "Configure automated replacements for old moves when a new move is learned and the Pok\xE9mon already has 4 moves.",
+      settings_advanced_status_on: "\u2713 Active: replacement sections are visible in tabs.",
+      settings_advanced_status_off: "\u2715 Disabled: rules are preserved but not executed.",
+      settings_prompt_auto_rep: "Prompt to save manual replacements detected in-game",
+      settings_prompt_auto_rep_desc: "Displays an interactive toast when a replacement is performed manually in-game to save it as an auto-replacement rule.",
+      settings_io_title: "Export / Import",
+      settings_io_desc: "Transfer your skip rules and settings to another browser or computer.",
+      settings_export_btn: "\u{1F4E4} Export (JSON)",
+      settings_import_btn: "\u{1F4E5} Import (JSON)",
+      settings_reset_title: "Reset",
+      settings_reset_desc: "Clear all your skip rules or restore default settings.",
+      settings_reset_rules_btn: "\u{1F5D1}\uFE0F Reset all rules",
+      settings_reset_settings_btn: "\u21BA Restore default settings",
+      // Type Chart
+      tc_title: "Strengths & Weaknesses",
+      tc_tab_simplified: "\u26A1 Simplified",
+      tc_tab_complete: "\u{1F4CA} Complete",
+      tc_immunities: "\u{1F6E1}\uFE0F Immunities (\xD70)",
+      tc_weaknesses: "\u26A0\uFE0F Weaknesses (takes \xD72)",
+      tc_type: "Type",
+      tc_strengths: "Strengths (deals \xD72) \u2694\uFE0F",
+      tc_def_header: "\u{1F6E1}\uFE0F Def. \u2794",
+      tc_att_header: "\u2B07 \u2694\uFE0F Att.",
+      tc_legend_super: "\xD72 Super",
+      tc_legend_half: "\xD70.5 Resisted",
+      tc_legend_zero: "\xD70 Immune",
+      tc_legend_neutral: "\xD71 Neutral",
+      tc_close_tip: "{t_key} or {esc_key} Close",
+      tc_takes_double: "Takes \xD72 from {type}",
+      tc_deals_double: "Deals \xD72 to {type}",
+      tc_immune_against: "Immune to {type} (\xD70)",
+      // Quick Prompt
+      qp_prompt_text: "\u26A1 Skip {move} on <b>{pokemon}</b>?",
+      qp_skip_always: "Always Skip",
+      qp_never_ask: "Never ask again",
+      qp_never_ask_title: "Do not prompt to skip this move for this Pok\xE9mon",
+      // Toasts & Messages
+      toast_enabled: "Pok\xE9Skip enabled",
+      toast_paused: "Pok\xE9Skip paused",
+      toast_ready: "Pok\xE9Skip enabled and ready!",
+      toast_never_ask_ack: "\u2139\uFE0F You will no longer be asked about <b>{move}</b> on <b>{pokemon}</b>.",
+      toast_rule_saved: "\u2705 Rule saved: <b>{pokemon}</b> will skip {move}!",
+      toast_move_skipped: "\u{1F6E1}\uFE0F Move <b>{move}</b> skipped for <b>{pokemon}</b>!",
+      toast_auto_replaced: "\u{1F504} <b>{newMove}</b> automatically replaced <b>{oldMove}</b> on <b>{pokemon}</b>!",
+      toast_save_manual_rep: "\u{1F4BE} Manual replacement: Save {oldMove} \u2794 {newMove} on {pokemon}?",
+      toast_save_btn: "Save",
+      toast_export_success: "Rules and settings exported to JSON file",
+      toast_import_invalid: "Error: JSON file is invalid or empty.",
+      toast_import_success: "Success: {details} imported!",
+      toast_import_empty: "No rules or settings found in this file.",
+      toast_import_error: "Error: unable to read or parse this JSON file.",
+      toast_read_error: "Error reading file.",
+      toast_rules_cleared: "All rules have been cleared.",
+      toast_settings_reset: "Settings reset to default.",
+      toast_lineage_paused: "\u23F8\uFE0F Settings paused for <b>{name}</b> (selections kept)",
+      toast_lineage_resumed: "\u2705 Settings resumed for <b>{name}</b>",
+      toast_rep_added: "\u2705 Replacement rule saved for <b>{name}</b>!",
+      toast_rep_deleted: "Replacement rule deleted.",
+      toast_rep_all_deleted: "All replacement rules deleted for <b>{name}</b>.",
+      toast_rep_missing_inputs: "Please enter both the old move to replace and the new move.",
+      toast_rep_identical_inputs: "The new move and old move must be different.",
+      toast_all_moves_restored: "All moves restored for <b>{name}</b>",
+      toast_single_move_restored: "Move <b>{move}</b> restored for <b>{name}</b>",
+      toast_single_move_skipped: "Move <b>{move}</b> skipped for <b>{name}</b>",
+      toast_single_rule_deleted: "Rule deleted for <b>{name}</b>",
+      toast_universal_auto_replaced: "\u{1F504} <b>{newMove}</b> automatically upgraded <b>{oldMove}</b> on <b>{pokemon}</b>!",
+      toast_universal_all_enabled: "All global move upgrade chains are enabled.",
+      toast_universal_all_disabled: "All global move upgrade chains are disabled.",
+      toast_universal_chain_toggled: "Chain <b>{name}</b>: {status}",
+      toast_universal_move_disabled: "\u{1F6AB} Move <b>{move}</b> excluded from automation ({chain})",
+      toast_universal_move_enabled: "\u2713 Move <b>{move}</b> re-enabled in automation ({chain})",
+      // Move Resolver
+      move_infallible: "Never-miss",
+      move_egg: "Egg",
+      move_default_name: "Move #{id}",
+      move_default_desc: "Deals damage or applies an effect.",
+      // Regional
+      regional_alola: "Alolan {base}",
+      regional_galar: "Galarian {base}",
+      regional_hisui: "Hisuian {base}",
+      regional_paldea: "Paldean {base}"
+    }
+  };
+  function getCurrentLang() {
+    const pref = PokeSkip.settings?.language || "auto";
+    if (pref === "fr") return "fr";
+    if (pref === "en") return "en";
+    try {
+      const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+      const gameLang = win.i18next?.language || typeof localStorage !== "undefined" && localStorage.getItem("i18nextLng");
+      if (gameLang) {
+        if (gameLang.toLowerCase().startsWith("fr")) return "fr";
+        return "en";
+      }
+    } catch (_) {
+    }
+    if (typeof navigator !== "undefined" && navigator.language) {
+      if (navigator.language.toLowerCase().startsWith("fr")) return "fr";
+    }
+    return "en";
+  }
+  function isFrench() {
+    return getCurrentLang() === "fr";
+  }
+  function isEnglish() {
+    return getCurrentLang() === "en";
+  }
+  function t(key, params = {}) {
+    const lang = getCurrentLang();
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    let text = dict[key] ?? (TRANSLATIONS.fr[key] || key);
+    if (params && typeof params === "object") {
+      for (const [pKey, pVal] of Object.entries(params)) {
+        text = text.replace(new RegExp(`\\{${pKey}\\}`, "g"), String(pVal));
+      }
+    }
+    return text;
+  }
+
+  // src/constants/categories.js
+  var MOVE_CATEGORIES = [
+    { id: 0, nameFr: "Physique", nameEn: "Physical", icon: "\u{1F4A5}", color: "#f87171", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    } },
+    { id: 1, nameFr: "Sp\xE9ciale", nameEn: "Special", icon: "\u2728", color: "#60a5fa", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    } },
+    { id: 2, nameFr: "Statut", nameEn: "Status", icon: "\u{1F300}", color: "#94a3b8", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    } }
+  ];
+
+  // src/constants/types.js
+  var POKEMON_TYPES = [
+    { id: 0, key: "Normal", nameFr: "Normal", nameEn: "Normal", codeFr: "NOR", codeEn: "NOR", color: "#ffffff", bg: "#ada594", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 1, key: "Combat", nameFr: "Combat", nameEn: "Fighting", codeFr: "COM", codeEn: "FIG", color: "#ffffff", bg: "#a55239", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 2, key: "Vol", nameFr: "Vol", nameEn: "Flying", codeFr: "VOL", codeEn: "FLY", color: "#ffffff", bg: "#9cadf7", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 3, key: "Poison", nameFr: "Poison", nameEn: "Poison", codeFr: "POI", codeEn: "POI", color: "#ffffff", bg: "#9141cb", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 4, key: "Sol", nameFr: "Sol", nameEn: "Ground", codeFr: "SOL", codeEn: "GRO", color: "#ffffff", bg: "#ae7a3b", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 5, key: "Roche", nameFr: "Roche", nameEn: "Rock", codeFr: "ROC", codeEn: "ROC", color: "#ffffff", bg: "#bda55a", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 6, key: "Insecte", nameFr: "Insecte", nameEn: "Bug", codeFr: "INS", codeEn: "BUG", color: "#ffffff", bg: "#adbd21", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 7, key: "Spectre", nameFr: "Spectre", nameEn: "Ghost", codeFr: "SPE", codeEn: "GHO", color: "#ffffff", bg: "#6363b5", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 8, key: "Acier", nameFr: "Acier", nameEn: "Steel", codeFr: "ACI", codeEn: "STE", color: "#ffffff", bg: "#81a6be", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 9, key: "Feu", nameFr: "Feu", nameEn: "Fire", codeFr: "FEU", codeEn: "FIR", color: "#ffffff", bg: "#f75231", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 10, key: "Eau", nameFr: "Eau", nameEn: "Water", codeFr: "EAU", codeEn: "WAT", color: "#ffffff", bg: "#399cff", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 11, key: "Plante", nameFr: "Plante", nameEn: "Grass", codeFr: "PLA", codeEn: "GRA", color: "#ffffff", bg: "#7bce52", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 12, key: "\xC9lectrik", nameFr: "\xC9lectrik", nameEn: "Electric", codeFr: "\xC9LE", codeEn: "ELE", color: "#ffffff", bg: "#ffc631", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 13, key: "Psy", nameFr: "Psy", nameEn: "Psychic", codeFr: "PSY", codeEn: "PSY", color: "#ffffff", bg: "#ef4179", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 14, key: "Glace", nameFr: "Glace", nameEn: "Ice", codeFr: "GLA", codeEn: "ICE", color: "#ffffff", bg: "#5acee7", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 15, key: "Dragon", nameFr: "Dragon", nameEn: "Dragon", codeFr: "DRA", codeEn: "DRA", color: "#ffffff", bg: "#7b63e7", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 16, key: "T\xE9n\xE8bres", nameFr: "T\xE9n\xE8bres", nameEn: "Dark", codeFr: "T\xC9N", codeEn: "DAR", color: "#ffffff", bg: "#735a4a", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 17, key: "F\xE9e", nameFr: "F\xE9e", nameEn: "Fairy", codeFr: "F\xC9E", codeEn: "FAI", color: "#ffffff", bg: "#ef70ef", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 18, key: "Stellaire", nameFr: "Stellaire", nameEn: "Stellar", codeFr: "STE", codeEn: "STL", color: "#ffffff", bg: "#6299bd", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } }
+  ];
+  var TYPE_CHART = [
+    // 0: Normal
+    [1, 1, 1, 1, 1, 0.5, 1, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    // 1: Combat
+    [2, 1, 0.5, 0.5, 1, 2, 0.5, 0, 2, 1, 1, 1, 1, 0.5, 2, 1, 2, 0.5],
+    // 2: Vol
+    [1, 2, 1, 1, 1, 0.5, 2, 1, 0.5, 1, 1, 2, 0.5, 1, 1, 1, 1, 1],
+    // 3: Poison
+    [1, 1, 1, 0.5, 0.5, 0.5, 1, 0.5, 0, 1, 1, 2, 1, 1, 1, 1, 1, 2],
+    // 4: Sol
+    [1, 1, 0, 2, 1, 2, 0.5, 1, 2, 2, 1, 0.5, 2, 1, 1, 1, 1, 1],
+    // 5: Roche
+    [1, 0.5, 2, 1, 0.5, 1, 2, 1, 0.5, 2, 1, 1, 1, 1, 2, 1, 1, 1],
+    // 6: Insecte
+    [1, 0.5, 0.5, 0.5, 1, 1, 1, 0.5, 0.5, 0.5, 1, 2, 1, 2, 1, 1, 2, 0.5],
+    // 7: Spectre
+    [0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 0.5, 1],
+    // 8: Acier
+    [1, 1, 1, 1, 1, 2, 1, 1, 0.5, 0.5, 0.5, 1, 0.5, 1, 2, 1, 1, 2],
+    // 9: Feu
+    [1, 1, 1, 1, 1, 0.5, 2, 1, 2, 0.5, 0.5, 2, 1, 1, 2, 0.5, 1, 1],
+    // 10: Eau
+    [1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 0.5, 0.5, 1, 1, 1, 0.5, 1, 1],
+    // 11: Plante
+    [1, 1, 0.5, 0.5, 2, 2, 0.5, 1, 0.5, 0.5, 2, 0.5, 1, 1, 1, 0.5, 1, 1],
+    // 12: Électrik
+    [1, 1, 2, 1, 0, 1, 1, 1, 1, 1, 2, 0.5, 0.5, 1, 1, 0.5, 1, 1],
+    // 13: Psy
+    [1, 2, 1, 2, 1, 1, 1, 1, 0.5, 1, 1, 1, 1, 0.5, 1, 1, 0, 1],
+    // 14: Glace
+    [1, 1, 2, 1, 2, 1, 1, 1, 0.5, 0.5, 0.5, 2, 1, 1, 0.5, 2, 1, 1],
+    // 15: Dragon
+    [1, 1, 1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 1, 1, 1, 2, 1, 0],
+    // 16: Ténèbres
+    [1, 0.5, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 0.5, 0.5],
+    // 17: Fée
+    [1, 2, 1, 0.5, 1, 1, 1, 1, 0.5, 0.5, 1, 1, 1, 1, 1, 2, 2, 1]
+  ];
+
+  // src/constants/move-chains.js
+  var MOVE_UPGRADE_CHAINS = [
+    // --- PLANTE ---
+    {
+      id: "grass_drain",
+      nameFr: "Drain de PV Plante",
+      nameEn: "Grass HP Drain",
+      type: "Plante",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Vol-Vie",
+          nameEn: "Absorb",
+          id: 71,
+          power: 20,
+          acc: 100,
+          pp: 25,
+          descFr: "Vole des PV \xE0 la cible. Rend la moiti\xE9 des d\xE9g\xE2ts inflig\xE9s au lanceur.",
+          descEn: "User recovers half the damage inflicted on target."
+        },
+        {
+          name: "M\xE9ga-Sangsue",
+          nameEn: "Mega Drain",
+          id: 72,
+          power: 40,
+          acc: 100,
+          pp: 15,
+          descFr: "Vole des PV \xE0 la cible. Rend la moiti\xE9 des d\xE9g\xE2ts inflig\xE9s au lanceur.",
+          descEn: "User recovers half the damage inflicted on target."
+        },
+        {
+          name: "Giga-Sangsue",
+          nameEn: "Giga Drain",
+          id: 202,
+          power: 75,
+          acc: 100,
+          pp: 10,
+          descFr: "Vole des PV \xE0 la cible. Rend la moiti\xE9 des d\xE9g\xE2ts inflig\xE9s au lanceur.",
+          descEn: "User recovers half the damage inflicted on target."
+        }
+      ]
+    },
+    {
+      id: "grass_physical",
+      nameFr: "Tranchant Plante",
+      nameEn: "Grass Physical Slices",
+      type: "Plante",
+      category: "Physique",
+      moves: [
+        {
+          name: "Fouet Lianes",
+          nameEn: "Vine Whip",
+          id: 22,
+          power: 45,
+          acc: 100,
+          pp: 25,
+          descFr: "Frappe l'ennemi avec de fines lianes.",
+          descEn: "The target is struck with slender, whiplike vines."
+        },
+        {
+          name: "Tranch'Herbe",
+          nameEn: "Razor Leaf",
+          id: 75,
+          power: 55,
+          acc: 95,
+          pp: 25,
+          descFr: "Tranche l'ennemi avec des feuilles ac\xE9r\xE9es. Taux de critiques \xE9lev\xE9.",
+          descEn: "Sharp leaves cut the target. High critical-hit ratio."
+        },
+        {
+          name: "Lame Feuille",
+          nameEn: "Leaf Blade",
+          id: 348,
+          power: 90,
+          acc: 100,
+          pp: 15,
+          descFr: "Tranche l'ennemi avec une feuille tranchante. Taux de critiques \xE9lev\xE9.",
+          descEn: "The user handles a sharp leaf like a sword. High critical-hit ratio."
+        }
+      ]
+    },
+    {
+      id: "grass_special",
+      nameFr: "Projectiles Plante",
+      nameEn: "Grass Energy Beams",
+      type: "Plante",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Feuille Magik",
+          nameEn: "Magical Leaf",
+          id: 345,
+          power: 60,
+          acc: -1,
+          pp: 20,
+          descFr: "Projette des feuilles magiques qui n'\xE9chouent jamais.",
+          descEn: "The user scatters curious leaves that never miss."
+        },
+        {
+          name: "\xC9co-Sph\xE8re",
+          nameEn: "Energy Ball",
+          id: 412,
+          power: 90,
+          acc: 100,
+          pp: 10,
+          descFr: "Projette l'\xE9nergie de la nature. Peut baisser la D\xE9fense Sp\xE9ciale de la cible.",
+          descEn: "Draws power from nature and fires it. May lower target's Sp. Def."
+        }
+      ]
+    },
+    // --- FEU ---
+    {
+      id: "fire_special",
+      nameFr: "Flammes Sp\xE9ciales",
+      nameEn: "Special Fire Beams",
+      type: "Feu",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Flamm\xE8che",
+          nameEn: "Ember",
+          id: 52,
+          power: 40,
+          acc: 100,
+          pp: 25,
+          descFr: "Une faible attaque de flammes pouvant br\xFBler l'ennemi.",
+          descEn: "A weak fire attack that may burn the target."
+        },
+        {
+          name: "Lance-Flammes",
+          nameEn: "Flamethrower",
+          id: 53,
+          power: 90,
+          acc: 100,
+          pp: 15,
+          descFr: "Un torrent de flammes ardentes. Peut br\xFBler la cible.",
+          descEn: "A stream of fire that may burn the target."
+        }
+      ]
+    },
+    {
+      id: "fire_physical",
+      nameFr: "Flammes Physiques",
+      nameEn: "Physical Fire Attacks",
+      type: "Feu",
+      category: "Physique",
+      moves: [
+        {
+          name: "Roue de Feu",
+          nameEn: "Flame Wheel",
+          id: 172,
+          power: 60,
+          acc: 100,
+          pp: 25,
+          descFr: "Une charge enflamm\xE9e tournoyante pouvant br\xFBler la cible.",
+          descEn: "The user charges while covered in fire. May inflict a burn."
+        },
+        {
+          name: "Crocs Feu",
+          nameEn: "Fire Fang",
+          id: 424,
+          power: 65,
+          acc: 95,
+          pp: 15,
+          descFr: "Morsure de flammes. Peut apeurer ou br\xFBler l'ennemi.",
+          descEn: "The user bites with flame-cloaked fangs. May burn or flinch."
+        },
+        {
+          name: "Boutefeu",
+          nameEn: "Flare Blitz",
+          id: 394,
+          power: 120,
+          acc: 100,
+          pp: 15,
+          descFr: "Charge incandescente d\xE9vastatrice. Blesse aussi le lanceur et peut br\xFBler la cible.",
+          descEn: "A fierce charge covered in fire. User takes recoil damage. May burn."
+        }
+      ]
+    },
+    // --- EAU ---
+    {
+      id: "water_special",
+      nameFr: "Jets d'Eau Sp\xE9ciaux",
+      nameEn: "Special Water Jets",
+      type: "Eau",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Pistolet \xE0 O",
+          nameEn: "Water Gun",
+          id: 55,
+          power: 40,
+          acc: 100,
+          pp: 25,
+          descFr: "Projette un jet d'eau puissant sur l'ennemi.",
+          descEn: "Shoots a jet of water at the target."
+        },
+        {
+          name: "Bulles d'O",
+          nameEn: "Bubble Beam",
+          id: 61,
+          power: 65,
+          acc: 100,
+          pp: 20,
+          descFr: "Projette des bulles puissantes pouvant r\xE9duire la Vitesse ennemie.",
+          descEn: "A spray of bubbles that may lower the target's Speed."
+        },
+        {
+          name: "Surf",
+          nameEn: "Surf",
+          id: 57,
+          power: 90,
+          acc: 100,
+          pp: 15,
+          descFr: "Une vague g\xE9ante qui submerge le champ de bataille.",
+          descEn: "A giant wave that crashes down on the battlefield."
+        },
+        {
+          name: "Hydrocanon",
+          nameEn: "Hydro Pump",
+          id: 56,
+          power: 110,
+          acc: 80,
+          pp: 5,
+          descFr: "Un \xE9norme torrent d'eau projet\xE9 \xE0 tr\xE8s haute pression.",
+          descEn: "A massive volume of water launched under great pressure."
+        }
+      ]
+    },
+    {
+      id: "water_physical",
+      nameFr: "Impacts d'Eau Physiques",
+      nameEn: "Physical Water Strikes",
+      type: "Eau",
+      category: "Physique",
+      moves: [
+        {
+          name: "Pince-Masse",
+          nameEn: "Crabhammer",
+          id: 152,
+          power: 100,
+          acc: 90,
+          pp: 10,
+          descFr: "Frappe l'ennemi avec une grosse pince. Taux de critiques \xE9lev\xE9.",
+          descEn: "Hammered with a large pincer. High critical-hit ratio."
+        },
+        {
+          name: "Cascade",
+          nameEn: "Waterfall",
+          id: 127,
+          power: 80,
+          acc: 100,
+          pp: 15,
+          descFr: "Charge aquatique imp\xE9tueuse pouvant apeurer la cible.",
+          descEn: "A powerful aquatic charge that may flinch the target."
+        },
+        {
+          name: "Aqua-Br\xE8che",
+          nameEn: "Liquidation",
+          id: 710,
+          power: 85,
+          acc: 100,
+          pp: 10,
+          descFr: "Attaque avec une lame d'eau. Peut r\xE9duire la D\xE9fense de la cible.",
+          descEn: "Slices with a blade of water. May lower the target's Defense."
+        }
+      ]
+    },
+    // --- ÉLECTRIK ---
+    {
+      id: "electric_special",
+      nameFr: "Foudre Sp\xE9ciale",
+      nameEn: "Special Electric Jolts",
+      type: "\xC9lectrik",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "\xC9clair",
+          nameEn: "Thunder Shock",
+          id: 84,
+          power: 40,
+          acc: 100,
+          pp: 30,
+          descFr: "Une d\xE9charge \xE9lectrique pouvant paralyser la cible.",
+          descEn: "A jolt of electricity that may paralyze the target."
+        },
+        {
+          name: "\xC9tincelle",
+          nameEn: "Spark",
+          id: 209,
+          power: 65,
+          acc: 100,
+          pp: 20,
+          descFr: "Une charge \xE9lectris\xE9e pouvant paralyser la cible.",
+          descEn: "An electrifying charge that may paralyze the target."
+        },
+        {
+          name: "Tonnerre",
+          nameEn: "Thunderbolt",
+          id: 85,
+          power: 90,
+          acc: 100,
+          pp: 15,
+          descFr: "Une puissante foudre s'abat sur la cible. Peut la paralyser.",
+          descEn: "A strong electric jolt that may paralyze the target."
+        }
+      ]
+    },
+    {
+      id: "electric_physical",
+      nameFr: "Foudre Physique",
+      nameEn: "Physical Electric Attacks",
+      type: "\xC9lectrik",
+      category: "Physique",
+      moves: [
+        {
+          name: "Crocs \xC9clair",
+          nameEn: "Thunder Fang",
+          id: 422,
+          power: 65,
+          acc: 95,
+          pp: 15,
+          descFr: "Morsure \xE9lectrifi\xE9e pouvant apeurer ou paralyser la cible.",
+          descEn: "Bites with electrified fangs. May paralyze or flinch."
+        },
+        {
+          name: "\xC9clair Fou",
+          nameEn: "Wild Charge",
+          id: 528,
+          power: 90,
+          acc: 100,
+          pp: 15,
+          descFr: "Charge \xE9lectris\xE9e foudroyante. Blesse un peu le lanceur par recul.",
+          descEn: "The user shrouds itself in electricity and charges. Recoil damage."
+        }
+      ]
+    },
+    // --- GLACE ---
+    {
+      id: "ice_special",
+      nameFr: "Rayons de Givre",
+      nameEn: "Special Frost Beams",
+      type: "Glace",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Poudreuse",
+          nameEn: "Powder Snow",
+          id: 181,
+          power: 40,
+          acc: 100,
+          pp: 25,
+          descFr: "Projette un vent de neige pouvant geler la cible.",
+          descEn: "The user blasts snowy powder that may freeze the target."
+        },
+        {
+          name: "Onde Bor\xE9ale",
+          nameEn: "Aurora Beam",
+          id: 62,
+          power: 65,
+          acc: 100,
+          pp: 20,
+          descFr: "Rayon multicolore glacial. Peut baisser l'Attaque ennemie.",
+          descEn: "A rainbow-colored ray of light that may lower target's Attack."
+        },
+        {
+          name: "Laser Glace",
+          nameEn: "Ice Beam",
+          id: 58,
+          power: 90,
+          acc: 100,
+          pp: 10,
+          descFr: "Un puissant rayon de glace pure pouvant geler la cible.",
+          descEn: "A blast of icy energy that may freeze the target."
+        }
+      ]
+    },
+    {
+      id: "ice_physical",
+      nameFr: "Impacts Glac\xE9s Physiques",
+      nameEn: "Physical Ice Strikes",
+      type: "Glace",
+      category: "Physique",
+      moves: [
+        {
+          name: "Crocs Givre",
+          nameEn: "Ice Fang",
+          id: 423,
+          power: 65,
+          acc: 95,
+          pp: 15,
+          descFr: "Morsure glaciale pouvant apeurer ou geler la cible.",
+          descEn: "Bites with frost-covered fangs. May freeze or flinch."
+        },
+        {
+          name: "Poing Glace",
+          nameEn: "Ice Punch",
+          id: 8,
+          power: 75,
+          acc: 100,
+          pp: 15,
+          descFr: "Coup de poing glacial pouvant geler la cible.",
+          descEn: "An icy punch that may freeze the target."
+        },
+        {
+          name: "Chute Glace",
+          nameEn: "Icicle Crash",
+          id: 556,
+          power: 85,
+          acc: 90,
+          pp: 10,
+          descFr: "Fait tomber de gros blocs de glace ac\xE9r\xE9s. Peut apeurer la cible.",
+          descEn: "Large icicles fall onto target. May flinch."
+        }
+      ]
+    },
+    // --- PSY ---
+    {
+      id: "psychic_special",
+      nameFr: "Ondes Psychiques",
+      nameEn: "Psychic Waves",
+      type: "Psy",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Choc Mental",
+          nameEn: "Confusion",
+          id: 93,
+          power: 50,
+          acc: 100,
+          pp: 25,
+          descFr: "Onde t\xE9l\xE9kin\xE9tique pouvant rendre la cible confuse.",
+          descEn: "A telekinetic wave that may confuse the target."
+        },
+        {
+          name: "Rafale Psy",
+          nameEn: "Psybeam",
+          id: 60,
+          power: 65,
+          acc: 100,
+          pp: 20,
+          descFr: "\xC9trange rayon lumineux pouvant rendre la cible confuse.",
+          descEn: "A peculiar ray of light that may confuse the target."
+        },
+        {
+          name: "Psyko",
+          nameEn: "Psychic",
+          id: 94,
+          power: 90,
+          acc: 100,
+          pp: 10,
+          descFr: "Puissante onde t\xE9l\xE9kin\xE9tique pouvant baisser la D\xE9fense Sp\xE9ciale ennemie.",
+          descEn: "Strong telekinetic force that may lower target's Sp. Def."
+        }
+      ]
+    },
+    {
+      id: "psychic_physical",
+      nameFr: "Lames Psychiques Physiques",
+      nameEn: "Psychic Physical Cuts",
+      type: "Psy",
+      category: "Physique",
+      moves: [
+        {
+          name: "Coupe Psycho",
+          nameEn: "Psycho Cut",
+          id: 427,
+          power: 70,
+          acc: 100,
+          pp: 20,
+          descFr: "Lames psychiques tranchantes. Taux de critiques \xE9lev\xE9.",
+          descEn: "Psychic blades tear target. High critical-hit ratio."
+        },
+        {
+          name: "Choc Psy",
+          nameEn: "Psyshock",
+          id: 473,
+          power: 80,
+          acc: 100,
+          pp: 10,
+          descFr: "Mat\xE9rialise une onde psychique infligeant des d\xE9g\xE2ts physiques \xE0 la D\xE9fense.",
+          descEn: "Materializes an odd psychic wave doing physical damage to Defense."
+        }
+      ]
+    },
+    // --- TÉNÈBRES ---
+    {
+      id: "dark_bite",
+      nameFr: "Morsure & M\xE2chouille",
+      nameEn: "Bite & Crunch",
+      type: "T\xE9n\xE8bres",
+      category: "Physique",
+      moves: [
+        {
+          name: "Morsure",
+          nameEn: "Bite",
+          id: 44,
+          power: 60,
+          acc: 100,
+          pp: 25,
+          descFr: "Morsure ac\xE9r\xE9e pouvant apeurer la cible.",
+          descEn: "Bites with sharp teeth. May flinch."
+        },
+        {
+          name: "M\xE2chouille",
+          nameEn: "Crunch",
+          id: 242,
+          power: 80,
+          acc: 100,
+          pp: 15,
+          descFr: "Morsure brutale pouvant r\xE9duire la D\xE9fense ennemie.",
+          descEn: "Bites down with vicious fangs. May lower target's Defense."
+        }
+      ]
+    },
+    {
+      id: "dark_special",
+      nameFr: "Ondes Obscures",
+      nameEn: "Dark Pulses",
+      type: "T\xE9n\xE8bres",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Feinte",
+          nameEn: "Feint Attack",
+          id: 185,
+          power: 60,
+          acc: -1,
+          pp: 20,
+          descFr: "Approche sournoisement et frappe sans jamais \xE9chouer.",
+          descEn: "Draws up close then strikes. Never misses."
+        },
+        {
+          name: "Vibrobscur",
+          nameEn: "Dark Pulse",
+          id: 399,
+          power: 80,
+          acc: 100,
+          pp: 15,
+          descFr: "Lib\xE8re des t\xE9n\xE8bres condens\xE9es pouvant apeurer la cible.",
+          descEn: "Releases a horrible aura of darkness. May flinch."
+        }
+      ]
+    },
+    // --- COMBAT ---
+    {
+      id: "fighting_physical",
+      nameFr: "Coups & Arts Martiaux",
+      nameEn: "Martial Arts Strikes",
+      type: "Combat",
+      category: "Physique",
+      moves: [
+        {
+          name: "\xC9clate-Roc",
+          nameEn: "Rock Smash",
+          id: 249,
+          power: 40,
+          acc: 100,
+          pp: 15,
+          descFr: "Coup de poing destructeur pouvant r\xE9duire la D\xE9fense de la cible.",
+          descEn: "A smashing punch that may lower the target's Defense."
+        },
+        {
+          name: "Casse-Brique",
+          nameEn: "Brick Break",
+          id: 280,
+          power: 75,
+          acc: 100,
+          pp: 15,
+          descFr: "Attaque tranchante d\xE9truisant les barri\xE8res (Protection, Mur Lumi\xE8re).",
+          descEn: "Strikes with hard-hitting hands. Breaks barriers."
+        },
+        {
+          name: "Close Combat",
+          nameEn: "Close Combat",
+          id: 370,
+          power: 120,
+          acc: 100,
+          pp: 5,
+          descFr: "Combat rapproch\xE9 d\xE9cha\xEEn\xE9 sans garde. Baisse la D\xE9fense et la D\xE9f. Sp\xE9. du lanceur.",
+          descEn: "Fights up close without guarding. Lowers Defense and Sp. Def."
+        }
+      ]
+    },
+    // --- SOL ---
+    {
+      id: "ground_earth",
+      nameFr: "Secousses Telluriques",
+      nameEn: "Ground Vibrations",
+      type: "Sol",
+      category: "Physique",
+      moves: [
+        {
+          name: "Tir de Boue",
+          nameEn: "Mud Shot",
+          id: 341,
+          power: 55,
+          acc: 95,
+          pp: 15,
+          descFr: "Projette de la terre boueuse qui r\xE9duit la Vitesse ennemie.",
+          descEn: "Fires mud at target. Reduces target's Speed."
+        },
+        {
+          name: "Pi\xE9tinement",
+          nameEn: "Bulldoze",
+          id: 523,
+          power: 60,
+          acc: 100,
+          pp: 20,
+          descFr: "Frappe violemment le sol et r\xE9duit la Vitesse de toutes les cibles.",
+          descEn: "Stomps the ground hard. Lowers the target's Speed."
+        },
+        {
+          name: "S\xE9isme",
+          nameEn: "Earthquake",
+          id: 89,
+          power: 100,
+          acc: 100,
+          pp: 10,
+          descFr: "Tremblement de terre ravageur frappant tous les Pok\xE9mon au sol.",
+          descEn: "A huge earthquake that strikes all Pok\xE9mon on the ground."
+        }
+      ]
+    },
+    // --- ROCHE ---
+    {
+      id: "rock_throw",
+      nameFr: "Projectiles de Pierre",
+      nameEn: "Rock Missiles",
+      type: "Roche",
+      category: "Physique",
+      moves: [
+        {
+          name: "Jet-Pierres",
+          nameEn: "Rock Throw",
+          id: 88,
+          power: 50,
+          acc: 90,
+          pp: 15,
+          descFr: "Projette de grosses pierres sur la cible.",
+          descEn: "Throws rocks at the target."
+        },
+        {
+          name: "Tomberoche",
+          nameEn: "Rock Tomb",
+          id: 317,
+          power: 60,
+          acc: 95,
+          pp: 15,
+          descFr: "Fait tomber des rochers qui pi\xE8gent l'ennemi et r\xE9duisent sa Vitesse.",
+          descEn: "Hurls rocks at the target. Lowers the target's Speed."
+        },
+        {
+          name: "\xC9boulement",
+          nameEn: "Rock Slide",
+          id: 157,
+          power: 75,
+          acc: 90,
+          pp: 10,
+          descFr: "Envoie de gros rochers sur l'ennemi. Peut apeurer la cible.",
+          descEn: "Large boulders are hurled at target. May flinch."
+        },
+        {
+          name: "Lame de Roc",
+          nameEn: "Stone Edge",
+          id: 444,
+          power: 100,
+          acc: 80,
+          pp: 5,
+          descFr: "Fait surgir des rochers ac\xE9r\xE9s sous la cible. Taux de critiques \xE9lev\xE9.",
+          descEn: "Stabs target from below with sharp stones. High critical-hit ratio."
+        }
+      ]
+    },
+    // --- VOL ---
+    {
+      id: "flying_peck",
+      nameFr: "Piqu\xE9s & Coups d'Ailes",
+      nameEn: "Wing Strikes & Beaks",
+      type: "Vol",
+      category: "Physique",
+      moves: [
+        {
+          name: "Picpic",
+          nameEn: "Peck",
+          id: 64,
+          power: 35,
+          acc: 100,
+          pp: 35,
+          descFr: "Frappe l'ennemi avec un bec pointu ou une corne.",
+          descEn: "The target is poked with a sharp beak or horn."
+        },
+        {
+          name: "Cru-Ailes",
+          nameEn: "Wing Attack",
+          id: 17,
+          power: 60,
+          acc: 100,
+          pp: 35,
+          descFr: "Frappe l'ennemi en d\xE9ployant de larges ailes.",
+          descEn: "Strikes the target with large, spread wings."
+        },
+        {
+          name: "Bec Vrille",
+          nameEn: "Drill Peck",
+          id: 65,
+          power: 80,
+          acc: 100,
+          pp: 20,
+          descFr: "Attaque tournoyante per\xE7ante comme une vrille.",
+          descEn: "A corkscrewing attack that strikes with a sharp beak."
+        },
+        {
+          name: "Rapace",
+          nameEn: "Brave Bird",
+          id: 413,
+          power: 120,
+          acc: 100,
+          pp: 15,
+          descFr: "Attaque a\xE9rienne t\xE9m\xE9raire \xE0 pleine vitesse. Le lanceur subit un recul important.",
+          descEn: "Folds wings and dives. User takes serious recoil damage."
+        }
+      ]
+    },
+    {
+      id: "flying_special",
+      nameFr: "Bourrasques A\xE9riennes",
+      nameEn: "Air Gusts & Slashes",
+      type: "Vol",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Tornade",
+          nameEn: "Gust",
+          id: 16,
+          power: 40,
+          acc: 100,
+          pp: 35,
+          descFr: "D\xE9clenche une tornade de vent en battant des ailes.",
+          descEn: "Strikes target with a gust of wind whipped up by wings."
+        },
+        {
+          name: "Lame d'Air",
+          nameEn: "Air Slash",
+          id: 403,
+          power: 75,
+          acc: 95,
+          pp: 15,
+          descFr: "Tranche l'ennemi avec le vent. Peut apeurer la cible.",
+          descEn: "Slices with blades of wind. May cause target to flinch."
+        },
+        {
+          name: "Vent Violent",
+          nameEn: "Hurricane",
+          id: 542,
+          power: 110,
+          acc: 70,
+          pp: 10,
+          descFr: "Ouragan puissant enveloppant la cible. Peut la rendre confuse.",
+          descEn: "A fierce hurricane that may confuse the target."
+        }
+      ]
+    },
+    // --- INSECTE ---
+    {
+      id: "bug_physical",
+      nameFr: "Morsures & Griffes Insecte",
+      nameEn: "Bug Physical Bites",
+      type: "Insecte",
+      category: "Physique",
+      moves: [
+        {
+          name: "Piq\xFBre",
+          nameEn: "Bug Bite",
+          id: 450,
+          power: 60,
+          acc: 100,
+          pp: 20,
+          descFr: "Pique l'ennemi et d\xE9vore sa baie tenue le cas \xE9ch\xE9ant.",
+          descEn: "Bites the target. Eats target's held Berry."
+        },
+        {
+          name: "Plaie Croix",
+          nameEn: "X-Scissor",
+          id: 404,
+          power: 80,
+          acc: 100,
+          pp: 15,
+          descFr: "Tranche l'ennemi en croisant ses faux ou ses griffes en X.",
+          descEn: "Crosses scythes or claws to slash target."
+        }
+      ]
+    },
+    {
+      id: "bug_special",
+      nameFr: "Ondes Insecte",
+      nameEn: "Bug Sounds & Buzz",
+      type: "Insecte",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Survinsecte",
+          nameEn: "Struggle Bug",
+          id: 522,
+          power: 50,
+          acc: 100,
+          pp: 20,
+          descFr: "Se d\xE9bat pour frapper les cibles. R\xE9duit leur Attaque Sp\xE9ciale.",
+          descEn: "Resists struggle and strikes. Lowers target's Sp. Atk."
+        },
+        {
+          name: "Bourdon",
+          nameEn: "Bug Buzz",
+          id: 405,
+          power: 90,
+          acc: 100,
+          pp: 10,
+          descFr: "Vibrations sonores d\xE9chirantes. Peut r\xE9duire la D\xE9fense Sp\xE9ciale ennemie.",
+          descEn: "Vibrates sound waves. May lower target's Sp. Def."
+        }
+      ]
+    },
+    // --- SPECTRE ---
+    {
+      id: "ghost_special",
+      nameFr: "Ondes Spectrales",
+      nameEn: "Ghost Energy",
+      type: "Spectre",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "\xC9tonnement",
+          nameEn: "Astonish",
+          id: 310,
+          power: 30,
+          acc: 100,
+          pp: 30,
+          descFr: "Cri terrifiant pouvant apeurer la cible.",
+          descEn: "Shouts loudly to startle target. May flinch."
+        },
+        {
+          name: "Ombre Nocturne",
+          nameEn: "Night Shade",
+          id: 101,
+          power: 50,
+          acc: 100,
+          pp: 15,
+          descFr: "Mirage t\xE9n\xE9breux infligeant des d\xE9g\xE2ts \xE9quivalents au niveau du lanceur.",
+          descEn: "Mirage inflicting damage equal to the user's level."
+        },
+        {
+          name: "Ball'Ombre",
+          nameEn: "Shadow Ball",
+          id: 247,
+          power: 80,
+          acc: 100,
+          pp: 15,
+          descFr: "Projette une masse d'ombres condens\xE9e. Peut r\xE9duire la D\xE9fense Sp\xE9ciale.",
+          descEn: "Hurls a shadowy blob. May lower target's Sp. Def."
+        }
+      ]
+    },
+    // --- POISON ---
+    {
+      id: "poison_physical",
+      nameFr: "Dards & Frappes Toxiques",
+      nameEn: "Poison Strikes",
+      type: "Poison",
+      category: "Physique",
+      moves: [
+        {
+          name: "Dard-Venin",
+          nameEn: "Poison Sting",
+          id: 40,
+          power: 15,
+          acc: 100,
+          pp: 35,
+          descFr: "Pique avec un dard venimeux pouvant empoisonner.",
+          descEn: "Stabs with poisonous barb. May poison target."
+        },
+        {
+          name: "Poison-Croix",
+          nameEn: "Cross Poison",
+          id: 440,
+          power: 70,
+          acc: 100,
+          pp: 20,
+          descFr: "Tranchant empoisonn\xE9 en croix. Taux de critiques \xE9lev\xE9, peut empoisonner.",
+          descEn: "Poison slash. High critical-hit ratio, may poison."
+        },
+        {
+          name: "Direct Toxik",
+          nameEn: "Poison Jab",
+          id: 398,
+          power: 80,
+          acc: 100,
+          pp: 20,
+          descFr: "Frappe de poing venimeuse pouvant empoisonner la cible.",
+          descEn: "Poisoned fist strike that may poison target."
+        },
+        {
+          name: "D\xE9tricanon",
+          nameEn: "Gunk Shot",
+          id: 441,
+          power: 120,
+          acc: 80,
+          pp: 5,
+          descFr: "Projette des d\xE9chets immondes et toxiques. Peut empoisonner la cible.",
+          descEn: "Shoots filthy garbage. May poison target."
+        }
+      ]
+    },
+    {
+      id: "poison_special",
+      nameFr: "Acides & Toxines Liquides",
+      nameEn: "Acid & Sludge Beams",
+      type: "Poison",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Acide",
+          nameEn: "Acid",
+          id: 51,
+          power: 40,
+          acc: 100,
+          pp: 30,
+          descFr: "Arrose d'acide corrosif. Peut r\xE9duire la D\xE9fense Sp\xE9ciale de la cible.",
+          descEn: "Sprays acid that may lower target's Sp. Def."
+        },
+        {
+          name: "Bomb-Beurk",
+          nameEn: "Sludge Bomb",
+          id: 188,
+          power: 90,
+          acc: 100,
+          pp: 10,
+          descFr: "Envoie des boues toxiques et infectieuses pouvant empoisonner la cible.",
+          descEn: "Hurls unsanitary sludge. May poison target."
+        },
+        {
+          name: "Cradovague",
+          nameEn: "Sludge Wave",
+          id: 482,
+          power: 95,
+          acc: 100,
+          pp: 10,
+          descFr: "Vague de fange toxique qui submerge le terrain. Peut empoisonner la cible.",
+          descEn: "A swamp wave that may poison the target."
+        }
+      ]
+    },
+    // --- DRAGON ---
+    {
+      id: "dragon_physical",
+      nameFr: "Griffes & Crocs Draconiques",
+      nameEn: "Dragon Physical Claws",
+      type: "Dragon",
+      category: "Physique",
+      moves: [
+        {
+          name: "Draco-Griffe",
+          nameEn: "Dragon Claw",
+          id: 337,
+          power: 80,
+          acc: 100,
+          pp: 15,
+          descFr: "Lac\xE8re la cible avec de grandes griffes ac\xE9r\xE9es.",
+          descEn: "Slashes the target with huge, sharp claws."
+        },
+        {
+          name: "Col\xE8re",
+          nameEn: "Outrage",
+          id: 200,
+          power: 120,
+          acc: 100,
+          pp: 10,
+          descFr: "Attaque furieuse pendant 2 \xE0 3 tours, puis rend le lanceur confus.",
+          descEn: "Rampages for 2-3 turns then becomes confused."
+        }
+      ]
+    },
+    {
+      id: "dragon_special",
+      nameFr: "Souffle Draconique",
+      nameEn: "Dragon Breaths",
+      type: "Dragon",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Dracosouffle",
+          nameEn: "Dragon Breath",
+          id: 225,
+          power: 60,
+          acc: 100,
+          pp: 20,
+          descFr: "Souffle draconique incandescent pouvant paralyser la cible.",
+          descEn: "Strikes with breath of dragon. May paralyze."
+        },
+        {
+          name: "Draco-Choc",
+          nameEn: "Dragon Pulse",
+          id: 406,
+          power: 85,
+          acc: 100,
+          pp: 10,
+          descFr: "Onde de choc draconique pure projet\xE9e de la gueule du lanceur.",
+          descEn: "Attacks target with a shock wave generated by dragon mouth."
+        }
+      ]
+    },
+    // --- ACIER ---
+    {
+      id: "steel_physical",
+      nameFr: "Armes M\xE9talliques",
+      nameEn: "Steel Physical Strikes",
+      type: "Acier",
+      category: "Physique",
+      moves: [
+        {
+          name: "Griffe Acier",
+          nameEn: "Metal Claw",
+          id: 232,
+          power: 50,
+          acc: 95,
+          pp: 35,
+          descFr: "Griffe d'acier pouvant augmenter l'Attaque du lanceur.",
+          descEn: "Steel claw strike that may raise user's Attack."
+        },
+        {
+          name: "T\xEAte de Fer",
+          nameEn: "Iron Head",
+          id: 442,
+          power: 80,
+          acc: 100,
+          pp: 15,
+          descFr: "Coup de t\xEAte d'acier renforc\xE9 pouvant apeurer la cible.",
+          descEn: "Hard-as-iron headbutt that may flinch target."
+        }
+      ]
+    },
+    // --- FÉE ---
+    {
+      id: "fairy_special",
+      nameFr: "Lumi\xE8res F\xE9\xE9riques",
+      nameEn: "Fairy Radiant Lights",
+      type: "F\xE9e",
+      category: "Sp\xE9ciale",
+      moves: [
+        {
+          name: "Vent F\xE9\xE9rique",
+          nameEn: "Fairy Wind",
+          id: 584,
+          power: 40,
+          acc: 100,
+          pp: 30,
+          descFr: "Vent f\xE9\xE9rique scintillant balayant la cible.",
+          descEn: "The user stirs up a fairy wind to strike the target."
+        },
+        {
+          name: "\xC9clat Magique",
+          nameEn: "Dazzling Gleam",
+          id: 605,
+          power: 80,
+          acc: 100,
+          pp: 20,
+          descFr: "\xC9blouit avec une lumi\xE8re puissante frappant tous les ennemis.",
+          descEn: "Dazzling flash of light that harms adjacent targets."
+        },
+        {
+          name: "Pouvoir Lunaire",
+          nameEn: "Moonblast",
+          id: 295,
+          power: 95,
+          acc: 100,
+          pp: 15,
+          descFr: "Emprunte la puissance de la lune. Peut baisser l'Attaque Sp\xE9ciale ennemie.",
+          descEn: "Draws power from the moon. May lower target's Sp. Atk."
+        }
+      ]
+    },
+    // --- NORMAL ---
+    {
+      id: "normal_tackle",
+      nameFr: "Impacts Normaux Directs",
+      nameEn: "Normal Direct Impacts",
+      type: "Normal",
+      category: "Physique",
+      moves: [
+        {
+          name: "Charge",
+          nameEn: "Tackle",
+          id: 33,
+          power: 40,
+          acc: 100,
+          pp: 35,
+          descFr: "Charge l'ennemi avec force de tout son corps.",
+          descEn: "A physical charge in which user rushes target."
+        },
+        {
+          name: "Plaquage",
+          nameEn: "Body Slam",
+          id: 34,
+          power: 85,
+          acc: 100,
+          pp: 15,
+          descFr: "\xC9crase la cible de tout son poids. Peut la paralyser.",
+          descEn: "Drops whole body onto target. May paralyze."
+        },
+        {
+          name: "Damocl\xE8s",
+          nameEn: "Double-Edge",
+          id: 38,
+          power: 120,
+          acc: 100,
+          pp: 15,
+          descFr: "Charge t\xE9m\xE9raire surpuissante. Le lanceur subit un recul important.",
+          descEn: "A life-risking tackle that also hurts user."
+        }
+      ]
+    },
+    // --- STATUT SOMMEIL ---
+    {
+      id: "sleep_status",
+      nameFr: "Poudres & Spores de Sommeil",
+      nameEn: "Sleep Spores & Powder",
+      type: "Plante",
+      category: "Statut",
+      moves: [
+        {
+          name: "Poudre Dodo",
+          nameEn: "Sleep Powder",
+          id: 79,
+          power: "\u2014",
+          acc: 75,
+          pp: 15,
+          descFr: "R\xE9pand une poudre endormante qui plonge l'ennemi dans le sommeil.",
+          descEn: "Scatters sleep powder that puts target to sleep."
+        },
+        {
+          name: "Spore",
+          nameEn: "Spore",
+          id: 147,
+          power: "\u2014",
+          acc: 100,
+          pp: 10,
+          descFr: "R\xE9pand des spores plongeant l'ennemi dans le sommeil \xE0 coup s\xFBr.",
+          descEn: "Scatters sleep spores that lull target into sleep."
+        }
+      ]
+    }
+  ];
+  var _liveMoveCache = /* @__PURE__ */ new Map();
+  function getLiveMoveInfo(moveDef, chainDef = null, pokeSkipInstance = null) {
+    if (!moveDef) return null;
+    const moveId = Number(moveDef.id);
+    const isEn = isEnglish();
+    const cacheKey = `${moveId}_${isEn ? "en" : "fr"}`;
+    if (_liveMoveCache.has(cacheKey)) {
+      const cached = _liveMoveCache.get(cacheKey);
+      if (cached._fromGame) return cached;
+    }
+    let chain = chainDef;
+    let ps = pokeSkipInstance;
+    if (chainDef && chainDef.settings) {
+      ps = chainDef;
+      chain = null;
+    }
+    if (!chain) {
+      chain = MOVE_UPGRADE_CHAINS.find((c) => c.moves && c.moves.some((m) => Number(m.id) === moveId));
+    }
+    ps = ps || (typeof window !== "undefined" ? window.PokeSkip : null);
+    let liveObj = null;
+    let getMoveFn = ps?.cachedGetMoveFn || null;
+    if (!getMoveFn && ps) {
+      const party = ps.scene?.party && Array.isArray(ps.scene.party) ? ps.scene.party : ps.activeParty && Array.isArray(ps.activeParty) ? ps.activeParty : [];
+      for (const p of party) {
+        if (p?.moveset && p.moveset.length > 0 && typeof p.moveset[0].getMove === "function") {
+          getMoveFn = p.moveset[0].getMove;
+          ps.cachedGetMoveFn = getMoveFn;
+          break;
+        }
+      }
+    }
+    if (!getMoveFn && ps?.scene?.currentBattle?.enemyParty) {
+      for (const p of ps.scene.currentBattle.enemyParty) {
+        if (p?.moveset && p.moveset.length > 0 && typeof p.moveset[0].getMove === "function") {
+          getMoveFn = p.moveset[0].getMove;
+          if (ps) ps.cachedGetMoveFn = getMoveFn;
+          break;
+        }
+      }
+    }
+    if (getMoveFn) {
+      try {
+        liveObj = getMoveFn.call({ moveId });
+      } catch (_) {
+      }
+    }
+    if (!liveObj && typeof unsafeWindow !== "undefined" && unsafeWindow.allMoves) {
+      try {
+        liveObj = unsafeWindow.allMoves[moveId];
+      } catch (_) {
+      }
+    } else if (!liveObj && typeof window !== "undefined" && window.allMoves) {
+      try {
+        liveObj = window.allMoves[moveId];
+      } catch (_) {
+      }
+    }
+    const hasLiveObj = Boolean(liveObj);
+    let name = isEn ? moveDef.nameEn || moveDef.name : moveDef.name || moveDef.nameEn;
+    if (liveObj?.name) {
+      name = liveObj.name;
+    } else if (ps?.knownMovesCache && ps.knownMovesCache[moveId]) {
+      name = ps.knownMovesCache[moveId];
+    }
+    let typeObj = null;
+    if (liveObj && liveObj.type !== void 0) {
+      if (typeof liveObj.type === "number") {
+        typeObj = POKEMON_TYPES[liveObj.type];
+      } else if (typeof liveObj.type === "string") {
+        typeObj = POKEMON_TYPES.find(
+          (t2) => t2.nameFr.toLowerCase() === liveObj.type.toLowerCase() || t2.nameEn.toLowerCase() === liveObj.type.toLowerCase() || t2.key.toLowerCase() === liveObj.type.toLowerCase()
+        );
+      }
+    }
+    if (!typeObj) {
+      const rawType = moveDef.type || chain?.type;
+      typeObj = POKEMON_TYPES.find(
+        (t2) => t2.nameFr === rawType || t2.key === rawType || t2.nameEn === rawType
+      ) || POKEMON_TYPES[0];
+    }
+    let catObj = null;
+    if (liveObj && liveObj.category !== void 0) {
+      if (typeof liveObj.category === "number") {
+        catObj = MOVE_CATEGORIES[liveObj.category];
+      } else if (typeof liveObj.category === "string") {
+        catObj = MOVE_CATEGORIES.find(
+          (c) => c.nameFr.toLowerCase() === liveObj.category.toLowerCase() || c.nameEn.toLowerCase() === liveObj.category.toLowerCase()
+        );
+      }
+    }
+    if (!catObj) {
+      const rawCat = moveDef.category || chain?.category;
+      catObj = MOVE_CATEGORIES.find(
+        (c) => c.nameFr === rawCat || c.nameEn === rawCat
+      ) || MOVE_CATEGORIES[2];
+    }
+    let power = "\u2014";
+    if (liveObj && liveObj.power !== void 0) {
+      power = liveObj.power > 0 ? liveObj.power : liveObj.power === 0 ? "\u2014" : moveDef.power || "\u2014";
+    } else if (moveDef.power !== void 0) {
+      power = moveDef.power;
+    }
+    let accuracy = "\u2014";
+    const rawAcc = liveObj?.accuracy !== void 0 ? liveObj.accuracy : moveDef.acc;
+    if (rawAcc !== void 0 && rawAcc !== null) {
+      if (typeof rawAcc === "number") {
+        if (rawAcc > 0) {
+          accuracy = `${rawAcc}%`;
+        } else if (rawAcc < 0) {
+          accuracy = t("move_infallible");
+        } else {
+          accuracy = "\u2014";
+        }
+      } else {
+        accuracy = String(rawAcc);
+      }
+    }
+    let pp = "\u2014";
+    if (liveObj && liveObj.pp !== void 0 && liveObj.pp > 0) {
+      pp = liveObj.pp;
+    } else if (liveObj && liveObj.maxPp !== void 0 && liveObj.maxPp > 0) {
+      pp = liveObj.maxPp;
+    } else if (moveDef.pp !== void 0) {
+      pp = moveDef.pp;
+    }
+    let desc = null;
+    if (liveObj) {
+      if (typeof liveObj.getDescription === "function") {
+        try {
+          desc = liveObj.getDescription();
+        } catch (_) {
+        }
+      }
+      if (!desc && liveObj.description) desc = liveObj.description;
+      if (!desc && liveObj.effect) desc = liveObj.effect;
+      if (!desc && liveObj.effectDescription) desc = liveObj.effectDescription;
+    }
+    if (!desc) {
+      desc = isEn ? moveDef.descEn : moveDef.descFr;
+    }
+    if (!desc) {
+      desc = t("move_default_desc");
+    }
+    const result = {
+      id: moveId,
+      name,
+      type: typeObj,
+      category: catObj,
+      power,
+      accuracy,
+      pp,
+      desc,
+      _fromGame: hasLiveObj
+    };
+    _liveMoveCache.set(cacheKey, result);
+    return result;
+  }
+
   // src/core/state.js
   var PokeSkip = {
     rules: PokeStorage.get(STORAGE_KEY, {}),
@@ -4427,9 +6344,22 @@
         quickPromptDuration: 15,
         showHudCount: true,
         advancedMode: false,
-        promptAutoReplacement: true
+        promptAutoReplacement: true,
+        universalUpgradesEnabled: false,
+        universalUpgradesManual: false,
+        disabledUniversalChains: {},
+        disabledUniversalMoves: {}
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4e3) s.toastDuration = 2800;
+      if (!s.universalUpgradesManual) {
+        s.universalUpgradesEnabled = false;
+      }
+      if (!s.disabledUniversalChains || typeof s.disabledUniversalChains !== "object") {
+        s.disabledUniversalChains = {};
+      }
+      if (!s.disabledUniversalMoves || typeof s.disabledUniversalMoves !== "object") {
+        s.disabledUniversalMoves = {};
+      }
       return s;
     })(),
     stats: PokeStorage.get(STATS_KEY, {
@@ -4443,6 +6373,7 @@
     hooked: false,
     activeParty: [],
     knownMovesCache: {},
+    cachedGetMoveFn: null,
     saveRules() {
       PokeStorage.set(STORAGE_KEY, this.rules);
     },
@@ -4771,566 +6702,150 @@
       if (!this.settings.enabled) return null;
       if (this.settings.advancedMode === false) return null;
       const rule = this.getFamilyRule(target);
-      if (!rule || !Array.isArray(rule.replacements) || rule.replacements.length === 0) return null;
-      if (rule.enabled === false) return null;
+      if (rule && Array.isArray(rule.replacements) && rule.replacements.length > 0 && rule.enabled !== false) {
+        const normalize = (s) => (s || "").toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, "");
+        const incNorm = normalize(incomingMoveName);
+        const incId = incomingMoveId !== void 0 && incomingMoveId !== null ? Number(incomingMoveId) : null;
+        const found = rule.replacements.find((r) => {
+          if (!r.enabled) return false;
+          if (incId && r.newMoveId && Number(r.newMoveId) === incId) return true;
+          if (incNorm && normalize(r.newMoveName) === incNorm) return true;
+          return false;
+        });
+        if (found) return found;
+      }
+      return this.findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId);
+    },
+    findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId) {
+      if (!this.settings.enabled) return null;
+      if (!this.settings.advancedMode) return null;
+      if (!this.settings.universalUpgradesEnabled) return null;
       const normalize = (s) => (s || "").toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, "");
       const incNorm = normalize(incomingMoveName);
       const incId = incomingMoveId !== void 0 && incomingMoveId !== null ? Number(incomingMoveId) : null;
-      return rule.replacements.find((r) => {
-        if (!r.enabled) return false;
-        if (incId && r.newMoveId && Number(r.newMoveId) === incId) return true;
-        if (incNorm && normalize(r.newMoveName) === incNorm) return true;
-        return false;
-      }) || null;
-    }
-  };
-
-  // src/core/i18n.js
-  var TRANSLATIONS = {
-    fr: {
-      // HUD
-      hud_active: "Pok\xE9Skip (Actif - ON) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer",
-      hud_paused: "Pok\xE9Skip (En pause - OFF) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer",
-      hud_pill_title_on: "Pok\xE9Skip (Actif - ON) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P",
-      hud_pill_title_off: "Pok\xE9Skip (En pause - OFF) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P",
-      hud_type_btn_title: "Tableau des Types (Touche T)",
-      hud_count_passed_one: "{count} pass\xE9e",
-      hud_count_passed_many: "{count} pass\xE9es",
-      // Modal Header & Tabs
-      header_badge: "Auto-Skip Intelligent",
-      header_subtitle: "Gestion automatis\xE9e des nouvelles capacit\xE9s par Pok\xE9mon",
-      status_active: "Actif",
-      status_inactive: "Inactif",
-      switch_title: "Activer / D\xE9sactiver Pok\xE9Skip",
-      close_btn_title: "Fermer la fen\xEAtre (\xC9chap)",
-      tab_team: "Mon \xC9quipe",
-      tab_saved: "R\xE8gles & Esp\xE8ces",
-      tab_settings: "Param\xE8tres",
-      // Team Tab
-      team_empty_msg: `\u26A0\uFE0F Aucune partie en cours d\xE9tect\xE9e ou \xE9quipe vide.<br>Lancez une partie dans Pok\xE9Rogue pour voir votre \xE9quipe active, ou utilisez l'onglet <b>"Esp\xE8ces M\xE9moris\xE9es"</b> !`,
-      team_pause_rules: "Mettre en pause les r\xE8gles de ce Pok\xE9mon",
-      team_resume_rules: "R\xE9activer les r\xE8gles pour ce Pok\xE9mon",
-      team_search_placeholder: "Filtrer une capacit\xE9 ou \xE9volution...",
-      team_th_move: "Capacit\xE9",
-      team_th_type: "Type",
-      team_th_cat: "Cat\xE9gorie",
-      team_th_power: "Puissance",
-      team_th_acc: "Pr\xE9cision",
-      team_th_pp: "PP",
-      team_th_effect: "Description & Effet",
-      team_th_skip: "Ignorer ?",
-      team_no_moves: "Aucune capacit\xE9 ne correspond \xE0 votre filtre.",
-      team_evo_badge: "\u{1F9EC} {name}",
-      team_egg_badge: "\u{1F95A} \u0152uf",
-      team_level_prefix: "Niv. ",
-      team_keep_title: "Coch\xE9 = Apprendre normalement",
-      team_skip_title: "D\xE9coch\xE9 = Ignorer automatiquement",
-      // Saved Species Tab
-      saved_empty: "Aucune r\xE8gle m\xE9moris\xE9e pour le moment.<br>D\xE9cochez des attaques dans l'\xE9quipe actuelle pour les ignorer : elles resteront enregistr\xE9es pour toute la lign\xE9e !",
-      saved_subtitle: "Retrouvez ici toutes les lign\xE9es d'esp\xE8ces configur\xE9es. Vos r\xE9glages s'appliquent automatiquement \xE0 tous leurs stades \xE9volutifs et formes, d'une partie \xE0 l'autre.",
-      saved_search_placeholder: "Rechercher une esp\xE8ce...",
-      saved_edit_btn: "\u270F\uFE0F Modifier",
-      saved_del_btn: "Supprimer la r\xE8gle",
-      saved_confirm_del: "Supprimer les r\xE8gles enregistr\xE9es pour {name} ?",
-      saved_skipped_summary: "Capacit\xE9s ignor\xE9es ({count}) : <b>{moves}</b>",
-      saved_none_skipped: "<i>Aucune capacit\xE9 ignor\xE9e</i>",
-      saved_back_btn: "\u2190 Retour aux esp\xE8ces",
-      saved_view_in_team: "\u{1F465} Voir dans l'\xC9quipe Actuelle",
-      saved_lineage_label: "Lign\xE9e : <b>{name}</b>",
-      saved_lineage_desc: "Modifiez les capacit\xE9s ignor\xE9es pour toute la lign\xE9e (tous stades et formes).",
-      saved_add_placeholder: "Ajouter une capacit\xE9 \xE0 ignorer (ex: Tornade, Charge)...",
-      saved_add_btn: "+ Ignorer",
-      saved_current_ignored_title: "Capacit\xE9s actuellement ignor\xE9es ({count}) :",
-      saved_restore_all_btn: "Tout r\xE9tablir (Ne rien ignorer)",
-      saved_no_moves_ignored: "Aucune capacit\xE9 n'est ignor\xE9e pour cette lign\xE9e.<br>Toutes les attaques propos\xE9es seront apprises ou pr\xE9sent\xE9es normalement.",
-      saved_badge_ignored: "\u2715 Ignor\xE9e",
-      saved_keep_again: "\u2713 Garder \xE0 nouveau",
-      saved_lineage_fallback: "Lign\xE9e #{id}",
-      saved_count_skipped_one: "{count} capacit\xE9 ignor\xE9e",
-      saved_count_skipped_many: "{count} capacit\xE9s ignor\xE9es",
-      saved_paused: "\u23F8\uFE0F En pause",
-      saved_restore_all: "Tout r\xE9tablir",
-      saved_back: "\u2B05 Retour \xE0 la liste",
-      // Replacements Tab
-      rep_header: "Mode Avanc\xE9 : Remplacement Automatique de Capacit\xE9s",
-      rep_active_count: "{active}/{total} active(s)",
-      rep_clear_all: "\u{1F5D1}\uFE0F Tout supprimer ({count})",
-      rep_desc: "D\xE9finit les attaques \xE0 remplacer automatiquement : d\xE8s que la nouvelle capacit\xE9 est d\xE9bloqu\xE9e et que le Pok\xE9mon poss\xE8de 4 attaques, l'ancienne est remplac\xE9e sans interrompre le jeu.",
-      rep_add_title: "\u2795 Ajouter une r\xE8gle de remplacement :",
-      rep_label_old: "Toujours remplacer :",
-      rep_label_new: "Par la nouvelle :",
-      rep_placeholder_old: "Ancienne capacit\xE9...",
-      rep_placeholder_new: "Nouvelle capacit\xE9...",
-      rep_save_btn: "+ Enregistrer",
-      rep_arrow: "\u2794 par \u2794",
-      rep_empty: "Aucune r\xE8gle de remplacement pour <b>{name}</b>.<br>Cr\xE9ez une r\xE8gle ci-dessus pour remplacer automatiquement une ancienne attaque d\xE8s le d\xE9blocage d'une nouvelle.",
-      rep_toggle_disable: "D\xE9sactiver",
-      rep_toggle_enable: "Activer",
-      rep_status_active: "Active",
-      rep_status_disabled: "D\xE9sactiv\xE9e",
-      rep_opt_start: "[D\xE9part] ",
-      rep_opt_evol: "[\xC9volution] ",
-      rep_opt_level: "[Niv. {level}] ",
-      rep_opt_egg: "[\u{1F95A} \u0152uf] ",
-      rep_opt_current: "[Actuelle] ",
-      rep_opt_suffix_current: " (Actuelle)",
-      rep_confirm_clear: "Supprimer toutes les r\xE8gles de remplacement pour {name} ?",
-      // Settings Tab
-      settings_lang_title: "Langue de l'interface",
-      settings_lang_desc: "Choisissez la langue d'affichage de Pok\xE9Skip (ou synchronisez-la automatiquement avec Pok\xE9Rogue).",
-      settings_lang_auto: "Automatique (selon Pok\xE9Rogue)",
-      settings_lang_fr: "Fran\xE7ais",
-      settings_lang_en: "English (Anglais)",
-      settings_notif_title: "Notifications & Alertes",
-      settings_toasts_label: "Afficher les notifications toast lors d'un auto-skip",
-      settings_toast_duration: "Dur\xE9e d'affichage des notifications :",
-      settings_hud_count_label: "Afficher le compteur de capacit\xE9s pass\xE9es sur la pastille",
-      settings_quick_prompt_label: "Proposer d'ignorer pour toujours une nouvelle attaque en combat",
-      settings_quick_prompt_duration: "Dur\xE9e d'affichage du message rapide :",
-      settings_seconds: "secondes",
-      settings_advanced_title: "\u26A1 Mode Avanc\xE9 : Remplacement d'Attaques",
-      settings_advanced_enable: "Activer",
-      settings_advanced_desc: "Permet de configurer des remplacements automatiques d'anciennes attaques lorsqu'une nouvelle capacit\xE9 (non ignor\xE9e) est apprise et que le Pok\xE9mon poss\xE8de d\xE9j\xE0 4 attaques.",
-      settings_advanced_status_on: "\u2713 Actif : les sections de remplacement sont visibles dans les onglets.",
-      settings_advanced_status_off: "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es.",
-      settings_prompt_auto_rep: "Proposer d'enregistrer les remplacements manuels d\xE9tect\xE9s",
-      settings_prompt_auto_rep_desc: "Affiche un toast interactif lorsqu'un remplacement est effectu\xE9 manuellement en jeu pour l'enregistrer dans les r\xE8gles de remplacement automatique.",
-      settings_io_title: "Exportation / Importation",
-      settings_io_desc: "Transf\xE9rez vos r\xE8gles de skip et vos param\xE8tres d'options vers un autre navigateur ou ordinateur.",
-      settings_export_btn: "\u{1F4E4} Exporter (JSON)",
-      settings_import_btn: "\u{1F4E5} Importer (JSON)",
-      settings_reset_title: "R\xE9initialisation",
-      settings_reset_desc: "Effacer l'ensemble de vos r\xE8gles de skip ou restaurer les r\xE9glages par d\xE9faut.",
-      settings_reset_rules_btn: "\u{1F5D1}\uFE0F R\xE9initialiser toutes les r\xE8gles",
-      settings_reset_settings_btn: "\u21BA Restaurer les options par d\xE9faut",
-      // Type Chart
-      tc_title: "Forces & Faiblesses",
-      tc_tab_simplified: "\u26A1 Simplifi\xE9",
-      tc_tab_complete: "\u{1F4CA} Complet",
-      tc_immunities: "\u{1F6E1}\uFE0F Immunit\xE9s (\xD70)",
-      tc_weaknesses: "\u26A0\uFE0F Faiblesses (re\xE7oit \xD72)",
-      tc_type: "Type",
-      tc_strengths: "Forces (inflige \xD72) \u2694\uFE0F",
-      tc_def_header: "\u{1F6E1}\uFE0F D\xE9f. \u2794",
-      tc_att_header: "\u2B07 \u2694\uFE0F Att.",
-      tc_legend_super: "\xD72 Super",
-      tc_legend_half: "\xD70.5 Peu",
-      tc_legend_zero: "\xD70 Inefficace",
-      tc_legend_neutral: "\xD71 Neutre",
-      tc_close_tip: "{t_key} ou {esc_key} Fermer",
-      tc_takes_double: "Subit \xD72 de {type}",
-      tc_deals_double: "Inflige \xD72 \xE0 {type}",
-      tc_immune_against: "Immunis\xE9 contre {type} (\xD70)",
-      // Quick Prompt
-      qp_prompt_text: "\u26A1 Ignorer {move} sur <b>{pokemon}</b> ?",
-      qp_skip_always: "Toujours ignorer",
-      qp_never_ask: "Ne plus demander",
-      qp_never_ask_title: "Ne plus proposer d'ignorer cette attaque pour ce Pok\xE9mon",
-      // Toasts & Messages
-      toast_enabled: "Pok\xE9Skip activ\xE9",
-      toast_paused: "Pok\xE9Skip en pause",
-      toast_ready: "Pok\xE9Skip activ\xE9 et pr\xEAt !",
-      toast_never_ask_ack: "\u2139\uFE0F Vous ne serez plus interrog\xE9 pour <b>{move}</b> sur <b>{pokemon}</b>.",
-      toast_rule_saved: "\u2705 R\xE8gle enregistr\xE9e : <b>{pokemon}</b> ignorera {move} !",
-      toast_move_skipped: "\u{1F6E1}\uFE0F Capacit\xE9 <b>{move}</b> ignor\xE9e pour <b>{pokemon}</b> !",
-      toast_auto_replaced: "\u{1F504} <b>{newMove}</b> a automatiquement remplac\xE9 <b>{oldMove}</b> sur <b>{pokemon}</b> !",
-      toast_save_manual_rep: "\u{1F4BE} Remplacement manuel : Enregistrer {oldMove} \u2794 {newMove} sur {pokemon} ?",
-      toast_save_btn: "Enregistrer",
-      toast_export_success: "R\xE8gles et param\xE8tres export\xE9s en fichier JSON",
-      toast_import_invalid: "Erreur : le fichier JSON est invalide ou vide.",
-      toast_import_success: "Succ\xE8s : {details} import\xE9(s) !",
-      toast_import_empty: "Aucune r\xE8gle ou param\xE8tre trouv\xE9 dans ce fichier.",
-      toast_import_error: "Erreur : impossible de lire ou parser ce fichier JSON.",
-      toast_read_error: "Erreur lors de la lecture du fichier.",
-      toast_rules_cleared: "Toutes les r\xE8gles ont \xE9t\xE9 effac\xE9es.",
-      toast_settings_reset: "Options r\xE9initialis\xE9es par d\xE9faut.",
-      toast_lineage_paused: "\u23F8\uFE0F Param\xE9trage mis en pause pour <b>{name}</b> (s\xE9lections conserv\xE9es)",
-      toast_lineage_resumed: "\u2705 Param\xE9trage r\xE9activ\xE9 pour <b>{name}</b>",
-      toast_rep_added: "\u2705 R\xE8gle de remplacement enregistr\xE9e pour <b>{name}</b> !",
-      toast_rep_deleted: "R\xE8gle de remplacement supprim\xE9e.",
-      toast_rep_all_deleted: "Toutes les r\xE8gles de remplacement supprim\xE9es pour <b>{name}</b>.",
-      toast_rep_missing_inputs: "Veuillez renseigner l'ancienne capacit\xE9 \xE0 remplacer et la nouvelle capacit\xE9.",
-      toast_rep_identical_inputs: "La nouvelle capacit\xE9 et l'ancienne doivent \xEAtre diff\xE9rentes.",
-      toast_all_moves_restored: "Toutes les capacit\xE9s sont r\xE9tablies pour <b>{name}</b>",
-      toast_single_move_restored: "Capacit\xE9 <b>{move}</b> r\xE9tablie pour <b>{name}</b>",
-      toast_single_move_skipped: "Capacit\xE9 <b>{move}</b> ignor\xE9e pour <b>{name}</b>",
-      toast_single_rule_deleted: "R\xE8gle supprim\xE9e pour <b>{name}</b>",
-      // Move Resolver
-      move_infallible: "Infaillible",
-      move_egg: "\u0152uf",
-      move_default_name: "Capacit\xE9 #{id}",
-      move_default_desc: "Inflige des d\xE9g\xE2ts ou applique un effet.",
-      // Regional
-      regional_alola: "{base} d'Alola",
-      regional_galar: "{base} de Galar",
-      regional_hisui: "{base} de Hisui",
-      regional_paldea: "{base} de Paldea"
+      const disabledChains = this.settings.disabledUniversalChains || {};
+      for (const chain of MOVE_UPGRADE_CHAINS) {
+        if (disabledChains[chain.id]) continue;
+        const incomingIndex = chain.moves.findIndex((m) => {
+          if (incId && m.id && Number(m.id) === incId) return true;
+          if (incNorm && (normalize(m.name) === incNorm || normalize(m.nameEn) === incNorm)) return true;
+          return false;
+        });
+        if (incomingIndex <= 0) continue;
+        const incomingMove = chain.moves[incomingIndex];
+        if (this.isUniversalMoveDisabled(chain.id, incomingMove.id)) {
+          continue;
+        }
+        const currentMoveset = target && typeof target.getMoveset === "function" ? target.getMoveset() : target?.moveset || [];
+        for (let i = incomingIndex - 1; i >= 0; i--) {
+          const lowerMove = chain.moves[i];
+          if (this.isUniversalMoveDisabled(chain.id, lowerMove.id)) {
+            continue;
+          }
+          const lowerNorm = normalize(lowerMove.name);
+          const lowerNormEn = normalize(lowerMove.nameEn);
+          const lowerId = lowerMove.id ? Number(lowerMove.id) : null;
+          const hasLowerMove = currentMoveset.some((m) => {
+            if (!m) return false;
+            const mId = m.moveId ?? m.id ?? (typeof m === "number" ? m : null);
+            if (lowerId && mId && Number(mId) === lowerId) return true;
+            const names = [];
+            if (typeof m.getName === "function") {
+              try {
+                names.push(m.getName());
+              } catch (_) {
+              }
+            }
+            if (m.name) names.push(m.name);
+            if (typeof m.getMove === "function") {
+              try {
+                const mv = m.getMove();
+                if (mv?.name) names.push(mv.name);
+              } catch (_) {
+              }
+            }
+            for (const n of names) {
+              if (n && (normalize(n) === lowerNorm || normalize(n) === lowerNormEn)) return true;
+            }
+            return false;
+          });
+          if (hasLowerMove) {
+            const familyRule = this.getFamilyRule(target);
+            if (familyRule && Array.isArray(familyRule.replacements)) {
+              const conflict = familyRule.replacements.some((r) => {
+                if (!r.enabled) return false;
+                const rOldNorm = normalize(r.oldMoveName);
+                const rOldId = r.oldMoveId ? Number(r.oldMoveId) : null;
+                return lowerId && rOldId && rOldId === lowerId || rOldNorm && (rOldNorm === lowerNorm || rOldNorm === lowerNormEn);
+              });
+              if (conflict) {
+                continue;
+              }
+            }
+            return {
+              id: `univ_${chain.id}_${lowerMove.id}_${chain.moves[incomingIndex].id}`,
+              isUniversal: true,
+              chainId: chain.id,
+              chainName: isEnglish() ? chain.nameEn : chain.nameFr,
+              newMoveName: isEnglish() ? chain.moves[incomingIndex].nameEn : chain.moves[incomingIndex].name,
+              newMoveId: chain.moves[incomingIndex].id,
+              oldMoveName: isEnglish() ? lowerMove.nameEn : lowerMove.name,
+              oldMoveId: lowerMove.id,
+              enabled: true
+            };
+          }
+        }
+      }
+      return null;
     },
-    en: {
-      // HUD
-      hud_active: "Pok\xE9Skip (Active - ON) \u2022 Shortcut P \u2022 Drag to move",
-      hud_paused: "Pok\xE9Skip (Paused - OFF) \u2022 Shortcut P \u2022 Drag to move",
-      hud_pill_title_on: "Pok\xE9Skip (Active - ON) \u2022 Click to manage moves \u2022 Shortcut P",
-      hud_pill_title_off: "Pok\xE9Skip (Paused - OFF) \u2022 Click to manage moves \u2022 Shortcut P",
-      hud_type_btn_title: "Type Chart (Key T)",
-      hud_count_passed_one: "{count} skipped",
-      hud_count_passed_many: "{count} skipped",
-      // Modal Header & Tabs
-      header_badge: "Smart Auto-Skip",
-      header_subtitle: "Automated move management per Pok\xE9mon",
-      status_active: "Active",
-      status_inactive: "Paused",
-      switch_title: "Enable / Disable Pok\xE9Skip",
-      close_btn_title: "Close window (Esc)",
-      tab_team: "My Team",
-      tab_saved: "Rules & Species",
-      tab_settings: "Settings",
-      // Team Tab
-      team_empty_msg: '\u26A0\uFE0F No active game detected or party is empty.<br>Start a game in Pok\xE9Rogue to view your party, or check the <b>"Rules & Species"</b> tab!',
-      team_pause_rules: "Pause rules for this Pok\xE9mon",
-      team_resume_rules: "Resume rules for this Pok\xE9mon",
-      team_search_placeholder: "Filter a move or evolution...",
-      team_th_move: "Move",
-      team_th_type: "Type",
-      team_th_cat: "Category",
-      team_th_power: "Power",
-      team_th_acc: "Accuracy",
-      team_th_pp: "PP",
-      team_th_effect: "Description & Effect",
-      team_th_skip: "Skip?",
-      team_no_moves: "No moves match your filter.",
-      team_evo_badge: "\u{1F9EC} {name}",
-      team_egg_badge: "\u{1F95A} Egg",
-      team_level_prefix: "Lv. ",
-      team_keep_title: "Checked = Learn normally",
-      team_skip_title: "Unchecked = Auto-skip",
-      // Saved Species Tab
-      saved_empty: "No saved rules yet.<br>Uncheck moves in your active team to auto-skip them: they will stay saved for the whole evolutionary line!",
-      saved_subtitle: "Find all configured species lines here. Your preferences automatically apply to all evolutionary stages and forms across runs.",
-      saved_search_placeholder: "Search a species...",
-      saved_edit_btn: "\u270F\uFE0F Edit",
-      saved_del_btn: "Delete rule",
-      saved_confirm_del: "Delete saved rules for {name}?",
-      saved_skipped_summary: "Ignored moves ({count}): <b>{moves}</b>",
-      saved_none_skipped: "<i>No ignored moves</i>",
-      saved_back_btn: "\u2190 Back to species",
-      saved_view_in_team: "\u{1F465} View in Active Team",
-      saved_lineage_label: "Lineage: <b>{name}</b>",
-      saved_lineage_desc: "Manage ignored moves for the entire lineage (all stages and forms).",
-      saved_add_placeholder: "Add a move to ignore (e.g. Tackle, Scratch)...",
-      saved_add_btn: "+ Ignore",
-      saved_current_ignored_title: "Currently ignored moves ({count}):",
-      saved_restore_all_btn: "Restore all (Ignore nothing)",
-      saved_no_moves_ignored: "No moves are ignored for this lineage.<br>All moves offered will be learned or shown normally.",
-      saved_badge_ignored: "\u2715 Ignored",
-      saved_keep_again: "\u2713 Keep again",
-      saved_lineage_fallback: "Lineage #{id}",
-      saved_count_skipped_one: "{count} move skipped",
-      saved_count_skipped_many: "{count} moves skipped",
-      saved_paused: "\u23F8\uFE0F Paused",
-      saved_restore_all: "Restore all",
-      saved_back: "\u2B05 Back to list",
-      // Replacements Tab
-      rep_header: "Advanced Mode: Auto Move Replacements",
-      rep_active_count: "{active}/{total} active",
-      rep_clear_all: "\u{1F5D1}\uFE0F Clear all ({count})",
-      rep_desc: "Configure moves to automatically replace: once the new move is learned and the Pok\xE9mon already has 4 moves, the old one is replaced seamlessly.",
-      rep_add_title: "\u2795 Add a replacement rule:",
-      rep_label_old: "Always replace:",
-      rep_label_new: "With new move:",
-      rep_placeholder_old: "Old move...",
-      rep_placeholder_new: "New move...",
-      rep_save_btn: "+ Save",
-      rep_arrow: "\u2794 with \u2794",
-      rep_empty: "No replacement rules for <b>{name}</b>.<br>Add a rule above to automatically replace an old move when learning a new one.",
-      rep_toggle_disable: "Disable",
-      rep_toggle_enable: "Enable",
-      rep_status_active: "Active",
-      rep_status_disabled: "Disabled",
-      rep_opt_start: "[Start] ",
-      rep_opt_evol: "[Evolution] ",
-      rep_opt_level: "[Lv. {level}] ",
-      rep_opt_egg: "[\u{1F95A} Egg] ",
-      rep_opt_current: "[Current] ",
-      rep_opt_suffix_current: " (Current)",
-      rep_confirm_clear: "Delete all replacement rules for {name}?",
-      // Settings Tab
-      settings_lang_title: "Interface Language",
-      settings_lang_desc: "Choose Pok\xE9Skip's display language (or synchronize automatically with Pok\xE9Rogue).",
-      settings_lang_auto: "Automatic (match Pok\xE9Rogue)",
-      settings_lang_fr: "Fran\xE7ais (French)",
-      settings_lang_en: "English",
-      settings_notif_title: "Notifications & Alerts",
-      settings_toasts_label: "Show toast notifications on auto-skip",
-      settings_toast_duration: "Toast notification duration:",
-      settings_hud_count_label: "Show skipped moves count on HUD pill",
-      settings_quick_prompt_label: "Prompt to decline new moves in battle (Quick Prompt)",
-      settings_quick_prompt_duration: "Quick prompt duration:",
-      settings_seconds: "seconds",
-      settings_advanced_title: "\u26A1 Advanced Mode: Move Replacements",
-      settings_advanced_enable: "Enable",
-      settings_advanced_desc: "Configure automated replacements for old moves when a new move is learned and the Pok\xE9mon already has 4 moves.",
-      settings_advanced_status_on: "\u2713 Active: replacement sections are visible in tabs.",
-      settings_advanced_status_off: "\u2715 Disabled: rules are preserved but not executed.",
-      settings_prompt_auto_rep: "Prompt to save manual replacements detected in-game",
-      settings_prompt_auto_rep_desc: "Displays an interactive toast when a replacement is performed manually in-game to save it as an auto-replacement rule.",
-      settings_io_title: "Export / Import",
-      settings_io_desc: "Transfer your skip rules and settings to another browser or computer.",
-      settings_export_btn: "\u{1F4E4} Export (JSON)",
-      settings_import_btn: "\u{1F4E5} Import (JSON)",
-      settings_reset_title: "Reset",
-      settings_reset_desc: "Clear all your skip rules or restore default settings.",
-      settings_reset_rules_btn: "\u{1F5D1}\uFE0F Reset all rules",
-      settings_reset_settings_btn: "\u21BA Restore default settings",
-      // Type Chart
-      tc_title: "Strengths & Weaknesses",
-      tc_tab_simplified: "\u26A1 Simplified",
-      tc_tab_complete: "\u{1F4CA} Complete",
-      tc_immunities: "\u{1F6E1}\uFE0F Immunities (\xD70)",
-      tc_weaknesses: "\u26A0\uFE0F Weaknesses (takes \xD72)",
-      tc_type: "Type",
-      tc_strengths: "Strengths (deals \xD72) \u2694\uFE0F",
-      tc_def_header: "\u{1F6E1}\uFE0F Def. \u2794",
-      tc_att_header: "\u2B07 \u2694\uFE0F Att.",
-      tc_legend_super: "\xD72 Super",
-      tc_legend_half: "\xD70.5 Resisted",
-      tc_legend_zero: "\xD70 Immune",
-      tc_legend_neutral: "\xD71 Neutral",
-      tc_close_tip: "{t_key} or {esc_key} Close",
-      tc_takes_double: "Takes \xD72 from {type}",
-      tc_deals_double: "Deals \xD72 to {type}",
-      tc_immune_against: "Immune to {type} (\xD70)",
-      // Quick Prompt
-      qp_prompt_text: "\u26A1 Skip {move} on <b>{pokemon}</b>?",
-      qp_skip_always: "Always Skip",
-      qp_never_ask: "Never ask again",
-      qp_never_ask_title: "Do not prompt to skip this move for this Pok\xE9mon",
-      // Toasts & Messages
-      toast_enabled: "Pok\xE9Skip enabled",
-      toast_paused: "Pok\xE9Skip paused",
-      toast_ready: "Pok\xE9Skip enabled and ready!",
-      toast_never_ask_ack: "\u2139\uFE0F You will no longer be asked about <b>{move}</b> on <b>{pokemon}</b>.",
-      toast_rule_saved: "\u2705 Rule saved: <b>{pokemon}</b> will skip {move}!",
-      toast_move_skipped: "\u{1F6E1}\uFE0F Move <b>{move}</b> skipped for <b>{pokemon}</b>!",
-      toast_auto_replaced: "\u{1F504} <b>{newMove}</b> automatically replaced <b>{oldMove}</b> on <b>{pokemon}</b>!",
-      toast_save_manual_rep: "\u{1F4BE} Manual replacement: Save {oldMove} \u2794 {newMove} on {pokemon}?",
-      toast_save_btn: "Save",
-      toast_export_success: "Rules and settings exported to JSON file",
-      toast_import_invalid: "Error: JSON file is invalid or empty.",
-      toast_import_success: "Success: {details} imported!",
-      toast_import_empty: "No rules or settings found in this file.",
-      toast_import_error: "Error: unable to read or parse this JSON file.",
-      toast_read_error: "Error reading file.",
-      toast_rules_cleared: "All rules have been cleared.",
-      toast_settings_reset: "Settings reset to default.",
-      toast_lineage_paused: "\u23F8\uFE0F Settings paused for <b>{name}</b> (selections kept)",
-      toast_lineage_resumed: "\u2705 Settings resumed for <b>{name}</b>",
-      toast_rep_added: "\u2705 Replacement rule saved for <b>{name}</b>!",
-      toast_rep_deleted: "Replacement rule deleted.",
-      toast_rep_all_deleted: "All replacement rules deleted for <b>{name}</b>.",
-      toast_rep_missing_inputs: "Please enter both the old move to replace and the new move.",
-      toast_rep_identical_inputs: "The new move and old move must be different.",
-      toast_all_moves_restored: "All moves restored for <b>{name}</b>",
-      toast_single_move_restored: "Move <b>{move}</b> restored for <b>{name}</b>",
-      toast_single_move_skipped: "Move <b>{move}</b> skipped for <b>{name}</b>",
-      toast_single_rule_deleted: "Rule deleted for <b>{name}</b>",
-      // Move Resolver
-      move_infallible: "Never-miss",
-      move_egg: "Egg",
-      move_default_name: "Move #{id}",
-      move_default_desc: "Deals damage or applies an effect.",
-      // Regional
-      regional_alola: "Alolan {base}",
-      regional_galar: "Galarian {base}",
-      regional_hisui: "Hisuian {base}",
-      regional_paldea: "Paldean {base}"
+    isUniversalMoveDisabled(chainId, moveId) {
+      if (!this.settings.disabledUniversalMoves || typeof this.settings.disabledUniversalMoves !== "object") {
+        return false;
+      }
+      const key = `${chainId}:${moveId}`;
+      return Boolean(this.settings.disabledUniversalMoves[key] || this.settings.disabledUniversalMoves[moveId]);
+    },
+    toggleUniversalMove(chainId, moveId, enabled = null) {
+      if (!this.settings.disabledUniversalMoves || typeof this.settings.disabledUniversalMoves !== "object") {
+        this.settings.disabledUniversalMoves = {};
+      }
+      const key = `${chainId}:${moveId}`;
+      const isCurrentlyDisabled = Boolean(this.settings.disabledUniversalMoves[key] || this.settings.disabledUniversalMoves[moveId]);
+      const shouldBeDisabled = enabled !== null ? !enabled : !isCurrentlyDisabled;
+      if (shouldBeDisabled) {
+        this.settings.disabledUniversalMoves[key] = true;
+      } else {
+        delete this.settings.disabledUniversalMoves[key];
+        delete this.settings.disabledUniversalMoves[moveId];
+      }
+      this.saveSettings();
+      return !shouldBeDisabled;
+    },
+    toggleUniversalChain(chainId, enabled) {
+      if (!this.settings.disabledUniversalChains || typeof this.settings.disabledUniversalChains !== "object") {
+        this.settings.disabledUniversalChains = {};
+      }
+      if (enabled) {
+        delete this.settings.disabledUniversalChains[chainId];
+      } else {
+        this.settings.disabledUniversalChains[chainId] = true;
+      }
+      this.saveSettings();
+    },
+    setAllUniversalChains(enabled) {
+      if (!this.settings.disabledUniversalChains || typeof this.settings.disabledUniversalChains !== "object") {
+        this.settings.disabledUniversalChains = {};
+      }
+      if (enabled) {
+        this.settings.disabledUniversalChains = {};
+      } else {
+        for (const chain of MOVE_UPGRADE_CHAINS) {
+          this.settings.disabledUniversalChains[chain.id] = true;
+        }
+      }
+      this.saveSettings();
     }
   };
-  function getCurrentLang() {
-    const pref = PokeSkip.settings?.language || "auto";
-    if (pref === "fr") return "fr";
-    if (pref === "en") return "en";
-    try {
-      const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
-      const gameLang = win.i18next?.language || typeof localStorage !== "undefined" && localStorage.getItem("i18nextLng");
-      if (gameLang) {
-        if (gameLang.toLowerCase().startsWith("fr")) return "fr";
-        return "en";
-      }
-    } catch (_) {
-    }
-    if (typeof navigator !== "undefined" && navigator.language) {
-      if (navigator.language.toLowerCase().startsWith("fr")) return "fr";
-    }
-    return "en";
-  }
-  function isFrench() {
-    return getCurrentLang() === "fr";
-  }
-  function isEnglish() {
-    return getCurrentLang() === "en";
-  }
-  function t(key, params = {}) {
-    const lang = getCurrentLang();
-    const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
-    let text = dict[key] ?? (TRANSLATIONS.fr[key] || key);
-    if (params && typeof params === "object") {
-      for (const [pKey, pVal] of Object.entries(params)) {
-        text = text.replace(new RegExp(`\\{${pKey}\\}`, "g"), String(pVal));
-      }
-    }
-    return text;
-  }
-
-  // src/constants/categories.js
-  var MOVE_CATEGORIES = [
-    { id: 0, nameFr: "Physique", nameEn: "Physical", icon: "\u{1F4A5}", color: "#f87171", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    } },
-    { id: 1, nameFr: "Sp\xE9ciale", nameEn: "Special", icon: "\u2728", color: "#60a5fa", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    } },
-    { id: 2, nameFr: "Statut", nameEn: "Status", icon: "\u{1F300}", color: "#94a3b8", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    } }
-  ];
-
-  // src/constants/types.js
-  var POKEMON_TYPES = [
-    { id: 0, key: "Normal", nameFr: "Normal", nameEn: "Normal", codeFr: "NOR", codeEn: "NOR", color: "#ffffff", bg: "#ada594", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 1, key: "Combat", nameFr: "Combat", nameEn: "Fighting", codeFr: "COM", codeEn: "FIG", color: "#ffffff", bg: "#a55239", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 2, key: "Vol", nameFr: "Vol", nameEn: "Flying", codeFr: "VOL", codeEn: "FLY", color: "#ffffff", bg: "#9cadf7", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 3, key: "Poison", nameFr: "Poison", nameEn: "Poison", codeFr: "POI", codeEn: "POI", color: "#ffffff", bg: "#9141cb", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 4, key: "Sol", nameFr: "Sol", nameEn: "Ground", codeFr: "SOL", codeEn: "GRO", color: "#ffffff", bg: "#ae7a3b", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 5, key: "Roche", nameFr: "Roche", nameEn: "Rock", codeFr: "ROC", codeEn: "ROC", color: "#ffffff", bg: "#bda55a", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 6, key: "Insecte", nameFr: "Insecte", nameEn: "Bug", codeFr: "INS", codeEn: "BUG", color: "#ffffff", bg: "#adbd21", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 7, key: "Spectre", nameFr: "Spectre", nameEn: "Ghost", codeFr: "SPE", codeEn: "GHO", color: "#ffffff", bg: "#6363b5", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 8, key: "Acier", nameFr: "Acier", nameEn: "Steel", codeFr: "ACI", codeEn: "STE", color: "#ffffff", bg: "#81a6be", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 9, key: "Feu", nameFr: "Feu", nameEn: "Fire", codeFr: "FEU", codeEn: "FIR", color: "#ffffff", bg: "#f75231", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 10, key: "Eau", nameFr: "Eau", nameEn: "Water", codeFr: "EAU", codeEn: "WAT", color: "#ffffff", bg: "#399cff", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 11, key: "Plante", nameFr: "Plante", nameEn: "Grass", codeFr: "PLA", codeEn: "GRA", color: "#ffffff", bg: "#7bce52", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 12, key: "\xC9lectrik", nameFr: "\xC9lectrik", nameEn: "Electric", codeFr: "\xC9LE", codeEn: "ELE", color: "#ffffff", bg: "#ffc631", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 13, key: "Psy", nameFr: "Psy", nameEn: "Psychic", codeFr: "PSY", codeEn: "PSY", color: "#ffffff", bg: "#ef4179", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 14, key: "Glace", nameFr: "Glace", nameEn: "Ice", codeFr: "GLA", codeEn: "ICE", color: "#ffffff", bg: "#5acee7", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 15, key: "Dragon", nameFr: "Dragon", nameEn: "Dragon", codeFr: "DRA", codeEn: "DRA", color: "#ffffff", bg: "#7b63e7", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 16, key: "T\xE9n\xE8bres", nameFr: "T\xE9n\xE8bres", nameEn: "Dark", codeFr: "T\xC9N", codeEn: "DAR", color: "#ffffff", bg: "#735a4a", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 17, key: "F\xE9e", nameFr: "F\xE9e", nameEn: "Fairy", codeFr: "F\xC9E", codeEn: "FAI", color: "#ffffff", bg: "#ef70ef", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } },
-    { id: 18, key: "Stellaire", nameFr: "Stellaire", nameEn: "Stellar", codeFr: "STE", codeEn: "STL", color: "#ffffff", bg: "#6299bd", get name() {
-      return isEnglish() ? this.nameEn : this.nameFr;
-    }, get code() {
-      return isEnglish() ? this.codeEn : this.codeFr;
-    } }
-  ];
-  var TYPE_CHART = [
-    // 0: Normal
-    [1, 1, 1, 1, 1, 0.5, 1, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    // 1: Combat
-    [2, 1, 0.5, 0.5, 1, 2, 0.5, 0, 2, 1, 1, 1, 1, 0.5, 2, 1, 2, 0.5],
-    // 2: Vol
-    [1, 2, 1, 1, 1, 0.5, 2, 1, 0.5, 1, 1, 2, 0.5, 1, 1, 1, 1, 1],
-    // 3: Poison
-    [1, 1, 1, 0.5, 0.5, 0.5, 1, 0.5, 0, 1, 1, 2, 1, 1, 1, 1, 1, 2],
-    // 4: Sol
-    [1, 1, 0, 2, 1, 2, 0.5, 1, 2, 2, 1, 0.5, 2, 1, 1, 1, 1, 1],
-    // 5: Roche
-    [1, 0.5, 2, 1, 0.5, 1, 2, 1, 0.5, 2, 1, 1, 1, 1, 2, 1, 1, 1],
-    // 6: Insecte
-    [1, 0.5, 0.5, 0.5, 1, 1, 1, 0.5, 0.5, 0.5, 1, 2, 1, 2, 1, 1, 2, 0.5],
-    // 7: Spectre
-    [0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 0.5, 1],
-    // 8: Acier
-    [1, 1, 1, 1, 1, 2, 1, 1, 0.5, 0.5, 0.5, 1, 0.5, 1, 2, 1, 1, 2],
-    // 9: Feu
-    [1, 1, 1, 1, 1, 0.5, 2, 1, 2, 0.5, 0.5, 2, 1, 1, 2, 0.5, 1, 1],
-    // 10: Eau
-    [1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 0.5, 0.5, 1, 1, 1, 0.5, 1, 1],
-    // 11: Plante
-    [1, 1, 0.5, 0.5, 2, 2, 0.5, 1, 0.5, 0.5, 2, 0.5, 1, 1, 1, 0.5, 1, 1],
-    // 12: Électrik
-    [1, 1, 2, 1, 0, 1, 1, 1, 1, 1, 2, 0.5, 0.5, 1, 1, 0.5, 1, 1],
-    // 13: Psy
-    [1, 2, 1, 2, 1, 1, 1, 1, 0.5, 1, 1, 1, 1, 0.5, 1, 1, 0, 1],
-    // 14: Glace
-    [1, 1, 2, 1, 2, 1, 1, 1, 0.5, 0.5, 0.5, 2, 1, 1, 0.5, 2, 1, 1],
-    // 15: Dragon
-    [1, 1, 1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 1, 1, 1, 2, 1, 0],
-    // 16: Ténèbres
-    [1, 0.5, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 0.5, 0.5],
-    // 17: Fée
-    [1, 2, 1, 0.5, 1, 1, 1, 1, 0.5, 0.5, 1, 1, 1, 1, 1, 2, 2, 1]
-  ];
 
   // src/core/lineage-manager.js
   var LineageManager = {
@@ -8524,11 +10039,15 @@ canvas:focus-visible,
           return;
         }
         const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
-        const message = `\u{1F504} Toujours remplacer <b>${replacedMove.name}</b> par <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> ?`;
+        const message = t("toast_save_manual_rep", {
+          oldMove: `<b>${replacedMove.name}</b>`,
+          newMove: `<b>${incoming.name}</b>`,
+          pokemon: `<b>${currentPokemonName}</b>`
+        });
         console.log(`\u{1F4A1} [Pok\xE9Skip] Remplacement manuel d\xE9tect\xE9 : "${replacedMove.name}" -> "${incoming.name}" sur ${currentPokemonName}. Proposition d'enregistrement.`);
         UI2.showActionToast(
           message,
-          "Enregistrer",
+          t("toast_save_btn"),
           () => {
             PokeSkip.addReplacementRule(
               pokemon,
@@ -8655,7 +10174,16 @@ canvas:focus-visible,
             PokeSkip.recordSkip();
             if (PokeSkip.settings.showToasts) {
               const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
-              UI2.showToast(`\u{1F504} <b>${moveName}</b> a automatiquement remplac\xE9 <b>${replacement.oldMoveName}</b> sur <b>${currentPokemonName}</b> !`, "info", PokeSkip.settings.toastDuration || 3e3);
+              const toastKey = replacement.isUniversal ? "toast_universal_auto_replaced" : "toast_auto_replaced";
+              UI2.showToast(
+                t(toastKey, {
+                  newMove: moveName,
+                  oldMove: replacement.oldMoveName,
+                  pokemon: currentPokemonName
+                }),
+                replacement.isUniversal ? "advanced" : "info",
+                PokeSkip.settings.toastDuration || 3e3
+              );
             }
             UI2.updateHudBadge();
             const effectiveMove = move || { id: moveId, name: moveName };
@@ -9340,22 +10868,17 @@ canvas:focus-visible,
       if (optAdvancedMode) {
         optAdvancedMode.addEventListener("change", (e) => {
           PokeSkip.settings.advancedMode = e.target.checked;
+          if (!PokeSkip.settings.universalUpgradesManual) {
+            PokeSkip.settings.universalUpgradesEnabled = false;
+          }
           PokeSkip.saveSettings();
-          const statusDesc = container.querySelector("#pokeskip-advanced-status-desc");
-          if (statusDesc) {
-            statusDesc.textContent = e.target.checked ? t("settings_advanced_status_on") : t("settings_advanced_status_off");
-            statusDesc.style.color = e.target.checked ? "#a855f7" : "#64748b";
-          }
-          if (optPromptAutoReplacement) {
-            optPromptAutoReplacement.disabled = !e.target.checked;
-          }
-          if (promptAutoRepContainer) {
-            promptAutoRepContainer.style.opacity = e.target.checked ? "1" : "0.4";
-          }
           ui.showToast(
             e.target.checked ? "\u26A1 " + t("settings_advanced_status_on") : t("settings_advanced_status_off"),
             e.target.checked ? "success" : "info"
           );
+          if (typeof ui.rebuildModal === "function") {
+            ui.rebuildModal();
+          }
         });
       }
       if (optPromptAutoReplacement) {
@@ -9532,6 +11055,7 @@ canvas:focus-visible,
         <div class="pokeskip-modal-tabs">
           <button class="pokeskip-tab-btn active" data-tab="team"><span>\u2694\uFE0F</span> <span>${t("tab_team")}</span></button>
           <button class="pokeskip-tab-btn" data-tab="saved"><span>\u{1F9EC}</span> <span>${t("tab_saved")}</span></button>
+          ${PokeSkip.settings.advancedMode ? `<button class="pokeskip-tab-btn" data-tab="global"><span>\u{1F310}</span> <span>${t("tab_global")}</span></button>` : ""}
           <button class="pokeskip-tab-btn" data-tab="settings"><span>\u2699\uFE0F</span> <span>${t("tab_settings")}</span></button>
         </div>
 
@@ -9542,6 +11066,10 @@ canvas:focus-visible,
 
         <div class="pokeskip-modal-body" id="pokeskip-body-saved" style="display: none;">
           <div id="pokeskip-saved-species-list"></div>
+        </div>
+
+        <div class="pokeskip-modal-body" id="pokeskip-body-global" style="display: none;">
+          <div id="pokeskip-global-rules-content"></div>
         </div>
 
         <div class="pokeskip-modal-body" id="pokeskip-body-settings" style="display: none;">
@@ -9586,8 +11114,11 @@ canvas:focus-visible,
           const tab = btn.dataset.tab;
           document.getElementById("pokeskip-body-team").style.display = tab === "team" ? "block" : "none";
           document.getElementById("pokeskip-body-saved").style.display = tab === "saved" ? "block" : "none";
+          const bodyGlobal = document.getElementById("pokeskip-body-global");
+          if (bodyGlobal) bodyGlobal.style.display = tab === "global" ? "block" : "none";
           document.getElementById("pokeskip-body-settings").style.display = tab === "settings" ? "block" : "none";
           if (tab === "saved") this.renderSavedSpeciesTab();
+          if (tab === "global" && typeof this.renderGlobalTab === "function") this.renderGlobalTab();
         });
       });
       SettingsTab.bindSettingsTabEvents(backdrop, this);
@@ -9607,6 +11138,11 @@ canvas:focus-visible,
       this.modalContainer.classList.add("active");
     },
     closeModal() {
+      const tooltip = document.getElementById("pokeskip-move-rich-tooltip");
+      if (tooltip) {
+        tooltip.style.opacity = "0";
+        tooltip.style.display = "none";
+      }
       if (this.modalContainer) {
         this.modalContainer.classList.remove("active");
       }
@@ -9619,6 +11155,9 @@ canvas:focus-visible,
       let activeTab = "settings";
       const activeBtn = this.modalContainer?.querySelector(".pokeskip-tab-btn.active");
       if (activeBtn) activeTab = activeBtn.dataset.tab;
+      if (activeTab === "global" && !PokeSkip.settings.advancedMode) {
+        activeTab = "settings";
+      }
       if (this.modalContainer) {
         this.modalContainer.remove();
         this.modalContainer = null;
@@ -11598,6 +13137,390 @@ canvas:focus-visible,
     }
   };
 
+  // src/ui/tabs/global-tab.js
+  var GlobalTab = {
+    globalSearchQuery: "",
+    _ensureMoveTooltip() {
+      let tooltip = document.getElementById("pokeskip-move-rich-tooltip");
+      if (!tooltip) {
+        tooltip = document.createElement("div");
+        tooltip.id = "pokeskip-move-rich-tooltip";
+        tooltip.style.cssText = `
+        position: fixed;
+        z-index: 99999999;
+        pointer-events: none;
+        background: #0d1321;
+        border: 1px solid rgba(168, 85, 247, 0.5);
+        border-radius: 12px;
+        padding: 12px 14px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.92), 0 0 24px rgba(168, 85, 247, 0.28);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        width: 300px;
+        box-sizing: border-box;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        display: none;
+        font-family: inherit;
+        color: #f1f5f9;
+      `;
+        document.body.appendChild(tooltip);
+      }
+      return tooltip;
+    },
+    _showMoveTooltip(pill, moveDef, chainId) {
+      if (!pill || !moveDef) return;
+      const tooltip = this._ensureMoveTooltip();
+      const chain = MOVE_UPGRADE_CHAINS.find((c) => c.id === chainId);
+      const moveInfo = getLiveMoveInfo(moveDef, chain, PokeSkip);
+      const isMoveDisabled = PokeSkip.isUniversalMoveDisabled(chainId, moveDef.id);
+      tooltip.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 9px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <!-- Header: Nom + Type + Cat\xE9gorie -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 14px; font-weight: 700; color: #f8fafc; letter-spacing: -0.2px;">
+            ${moveInfo.name}
+          </span>
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span style="background: ${moveInfo.type.bg}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">
+              ${moveInfo.type.name}
+            </span>
+            <span style="background: rgba(255,255,255,0.08); color: ${moveInfo.category.color}; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12);">
+              ${moveInfo.category.icon} ${moveInfo.category.name}
+            </span>
+          </div>
+        </div>
+
+        <!-- Grille de Stats: Puissance / Pr\xE9cision / PP -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: rgba(0, 0, 0, 0.45); padding: 7px; border-radius: 7px; text-align: center; border: 1px solid rgba(255,255,255,0.06);">
+          <div>
+            <div style="font-size: 9.5px; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px;">${t("global_move_tooltip_power")}</div>
+            <div style="font-size: 13px; font-weight: 700; color: #f1f5f9; margin-top: 2px;">${moveInfo.power}</div>
+          </div>
+          <div>
+            <div style="font-size: 9.5px; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px;">${t("global_move_tooltip_acc")}</div>
+            <div style="font-size: 13px; font-weight: 700; color: #f1f5f9; margin-top: 2px;">${moveInfo.accuracy}</div>
+          </div>
+          <div>
+            <div style="font-size: 9.5px; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px;">${t("global_move_tooltip_pp")}</div>
+            <div style="font-size: 13px; font-weight: 700; color: #f1f5f9; margin-top: 2px;">${moveInfo.pp}</div>
+          </div>
+        </div>
+
+        <!-- Description officielle Pok\xE9Rogue -->
+        <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.45; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07); padding: 8px 10px; border-radius: 7px;">
+          ${moveInfo.desc}
+        </div>
+
+        <!-- Indication discr\xE8te : petit et gris sans la partie statut -->
+        <div style="font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 5px; margin-top: 1px; letter-spacing: 0.1px;">
+          ${isMoveDisabled ? t("global_move_tooltip_click_enable") : t("global_move_tooltip_click_disable")}
+        </div>
+      </div>
+    `;
+      tooltip.style.visibility = "hidden";
+      tooltip.style.display = "block";
+      const rect = pill.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      let top = rect.top - tooltipRect.height - 10;
+      if (top < 10) {
+        top = rect.bottom + 10;
+      }
+      let left = rect.left + rect.width / 2 - tooltipRect.width / 2;
+      left = Math.max(12, Math.min(window.innerWidth - tooltipRect.width - 12, left));
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.visibility = "visible";
+      tooltip.style.opacity = "1";
+      tooltip.style.transform = "translateY(0)";
+    },
+    _hideMoveTooltip() {
+      const tooltip = document.getElementById("pokeskip-move-rich-tooltip");
+      if (tooltip) {
+        tooltip.style.opacity = "0";
+        tooltip.style.transform = "translateY(4px)";
+        setTimeout(() => {
+          if (tooltip.style.opacity === "0") {
+            tooltip.style.display = "none";
+          }
+        }, 150);
+      }
+    },
+    renderGlobalTab() {
+      const container = document.getElementById("pokeskip-global-rules-content");
+      if (!container) return;
+      const modalBody = container.closest("#pokeskip-modal-body");
+      const prevScrollTop = modalBody ? modalBody.scrollTop : 0;
+      const isMasterActive = Boolean(PokeSkip.settings.universalUpgradesEnabled);
+      const disabledChains = PokeSkip.settings.disabledUniversalChains || {};
+      const totalCount = MOVE_UPGRADE_CHAINS.length;
+      const activeCount = MOVE_UPGRADE_CHAINS.filter((c) => !disabledChains[c.id]).length;
+      const filteredChains = MOVE_UPGRADE_CHAINS.filter((chain) => {
+        if (!this.globalSearchQuery) return true;
+        const q = this.globalSearchQuery.toLowerCase().trim();
+        const name = (isEnglish() ? chain.nameEn : chain.nameFr).toLowerCase();
+        const type = (chain.type || "").toLowerCase();
+        const category = (chain.category || "").toLowerCase();
+        const hasMove = chain.moves.some((m) => {
+          return (m.name || "").toLowerCase().includes(q) || (m.nameEn || "").toLowerCase().includes(q);
+        });
+        return name.includes(q) || type.includes(q) || category.includes(q) || hasMove;
+      });
+      container.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <!-- En-t\xEAte avec Switch Ma\xEEtre -->
+        <div style="background: linear-gradient(135deg, rgba(88, 28, 135, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 12px; padding: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+            <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 240px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">\u{1F310}</span>
+                <span style="font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: -0.2px;">
+                  ${t("global_title")}
+                </span>
+                <span style="font-size: 11px; background: ${isMasterActive ? "rgba(168, 85, 247, 0.25)" : "rgba(100, 116, 139, 0.2)"}; color: ${isMasterActive ? "#d8b4fe" : "#94a3b8"}; padding: 2px 8px; border-radius: 10px; font-weight: 600;">
+                  ${t("global_active_count", { active: isMasterActive ? activeCount : 0, total: totalCount })}
+                </span>
+              </div>
+              <span style="font-size: 12px; color: #94a3b8; line-height: 1.4;">
+                ${t("global_subtitle")}
+              </span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 13px; font-weight: 600; color: ${isMasterActive ? "#c084fc" : "#64748b"};" id="pokeskip-global-master-label">
+                ${isMasterActive ? t("global_master_active") : t("global_master_inactive")}
+              </span>
+              <label class="pokeskip-switch" title="${t("global_master_switch")}">
+                <input type="checkbox" id="pokeskip-toggle-master-universal" ${isMasterActive ? "checked" : ""}>
+                <span class="pokeskip-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barre de recherche et actions rapides -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 220px; position: relative;">
+            <input type="text" id="pokeskip-input-search-global" placeholder="${t("global_search_placeholder")}" value="${this.globalSearchQuery || ""}" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 12.5px; outline: none;">
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="pokeskip-btn-enable-all-global" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600;">
+              \u2713 ${t("global_btn_enable_all")}
+            </button>
+            <button id="pokeskip-btn-disable-all-global" style="background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600;">
+              \u2715 ${t("global_btn_disable_all")}
+            </button>
+          </div>
+        </div>
+
+        <!-- Liste des cha\xEEnes d'attaques -->
+        <div id="pokeskip-global-chains-list" style="display: flex; flex-direction: column; gap: 10px; opacity: ${isMasterActive ? "1" : "0.45"}; transition: opacity 0.25s ease;">
+          ${filteredChains.length === 0 ? `
+            <div style="text-align: center; padding: 30px; color: #64748b; background: #090e1a; border-radius: 10px; font-size: 13px;">
+              ${t("global_empty_search")}
+            </div>
+          ` : filteredChains.map((chain) => {
+        const isChainEnabled = !disabledChains[chain.id] && isMasterActive;
+        const chainName = isEnglish() ? chain.nameEn : chain.nameFr;
+        const typeInfo = POKEMON_TYPES.find((t2) => t2.nameFr === chain.type || t2.key === chain.type) || { bg: "#64748b", name: chain.type };
+        const typeColor = typeInfo.bg;
+        const typeDisplay = typeInfo.name || chain.type;
+        return `
+              <div class="pokeskip-global-chain-card" data-chain-id="${chain.id}" style="background: #111a2e; border: 1px solid ${isChainEnabled ? "rgba(168, 85, 247, 0.3)" : "rgba(255, 255, 255, 0.08)"}; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 13.5px; font-weight: 700; color: #f8fafc;">${chainName}</span>
+                    <span style="background: ${typeColor}; color: #fff; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+                      ${typeDisplay}
+                    </span>
+                    <span style="background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 10.5px; padding: 2px 6px; border-radius: 4px;">
+                      ${chain.category}
+                    </span>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="pokeskip-chain-status-text" style="font-size: 11.5px; color: ${isChainEnabled ? "#d8b4fe" : "#64748b"}; font-weight: 600;">
+                      ${isChainEnabled ? t("global_chain_enabled") : t("global_chain_disabled")}
+                    </span>
+                    <label class="pokeskip-switch" title="${chainName}">
+                      <input type="checkbox" class="pokeskip-toggle-chain" data-id="${chain.id}" ${!disabledChains[chain.id] ? "checked" : ""} ${!isMasterActive ? "disabled" : ""}>
+                      <span class="pokeskip-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Flux visuel de l'am\xE9lioration d'attaque avec pastilles interactives -->
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: rgba(15, 23, 42, 0.6); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                  ${chain.moves.map((m, idx) => {
+          const moveInfo = getLiveMoveInfo(m, chain, PokeSkip);
+          const isMoveDisabled = PokeSkip.isUniversalMoveDisabled(chain.id, m.id);
+          const isLast = idx === chain.moves.length - 1;
+          const powerText = moveInfo.power !== "\u2014" && moveInfo.power > 0 ? `${moveInfo.power}` : moveInfo.accuracy !== "\u2014" ? moveInfo.accuracy : "";
+          const actionHint = isMoveDisabled ? t("global_move_tooltip_click_enable") : t("global_move_tooltip_click_disable");
+          const titleFallback = `${moveInfo.name} (${moveInfo.type.name} \u2022 ${moveInfo.category.name})
+${t("global_move_tooltip_power")}: ${moveInfo.power} | ${t("global_move_tooltip_acc")}: ${moveInfo.accuracy} | ${t("global_move_tooltip_pp")}: ${moveInfo.pp}
+"${moveInfo.desc}"
+
+\u{1F449} \u{1F4A1} ${actionHint}`;
+          return `
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <button
+                          type="button"
+                          class="pokeskip-universal-move-pill ${isMoveDisabled ? "is-disabled" : ""}"
+                          data-chain-id="${chain.id}"
+                          data-move-id="${m.id}"
+                          title="${titleFallback.replace(/"/g, "&quot;")}"
+                          style="
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 6px;
+                            background: ${isMoveDisabled ? "rgba(239, 68, 68, 0.12)" : isLast ? "rgba(168, 85, 247, 0.22)" : "rgba(255, 255, 255, 0.06)"};
+                            border: 1px ${isMoveDisabled ? "dashed rgba(239, 68, 68, 0.55)" : isLast ? "solid rgba(168, 85, 247, 0.45)" : "solid rgba(255, 255, 255, 0.12)"};
+                            padding: 5px 11px;
+                            border-radius: 7px;
+                            font-size: 12px;
+                            font-weight: ${isLast ? "700" : "600"};
+                            color: ${isMoveDisabled ? "#fca5a5" : isLast ? "#f3e8ff" : "#cbd5e1"};
+                            cursor: pointer;
+                            transition: all 0.18s ease;
+                            outline: none;
+                            user-select: none;
+                            text-decoration: ${isMoveDisabled ? "line-through" : "none"};
+                            opacity: ${isMoveDisabled ? "0.62" : "1"};
+                          "
+                        >
+                          <span>${moveInfo.name}</span>
+                          ${powerText ? `<span style="font-size: 10px; opacity: 0.75; font-weight: 500;">(${powerText})</span>` : ""}
+                          ${isMoveDisabled ? `<span style="background: rgba(239, 68, 68, 0.35); color: #fecaca; font-size: 9px; padding: 1px 4px; border-radius: 3px; text-decoration: none; font-weight: 700;">${t("global_move_excluded_badge")}</span>` : ""}
+                        </button>
+                        ${!isLast ? `<span style="color: ${isMoveDisabled ? "rgba(168, 85, 247, 0.4)" : "#a855f7"}; font-size: 13px; font-weight: bold;">\u2794</span>` : ""}
+                      </div>
+                    `;
+        }).join("")}
+                </div>
+              </div>
+            `;
+      }).join("")}
+        </div>
+      </div>
+    `;
+      this.bindGlobalTabEvents(container);
+      if (modalBody && prevScrollTop) {
+        modalBody.scrollTop = prevScrollTop;
+      }
+    },
+    bindGlobalTabEvents(container) {
+      const masterSwitch = container.querySelector("#pokeskip-toggle-master-universal");
+      if (masterSwitch) {
+        masterSwitch.addEventListener("change", (e) => {
+          PokeSkip.settings.universalUpgradesManual = true;
+          PokeSkip.settings.universalUpgradesEnabled = e.target.checked;
+          PokeSkip.saveSettings();
+          UI2.showToast(
+            e.target.checked ? "\u{1F310} " + t("global_master_active") : t("global_master_inactive"),
+            e.target.checked ? "success" : "info"
+          );
+          this.renderGlobalTab();
+        });
+      }
+      const searchInput = container.querySelector("#pokeskip-input-search-global");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          this.globalSearchQuery = e.target.value;
+          this.renderGlobalTab();
+          const updatedInput = container.querySelector("#pokeskip-input-search-global");
+          if (updatedInput) {
+            updatedInput.focus();
+            updatedInput.selectionStart = updatedInput.selectionEnd = updatedInput.value.length;
+          }
+        });
+        ["keydown", "keyup", "keypress"].forEach((type) => {
+          searchInput.addEventListener(type, (e) => e.stopPropagation());
+        });
+      }
+      const btnEnableAll = container.querySelector("#pokeskip-btn-enable-all-global");
+      if (btnEnableAll) {
+        btnEnableAll.addEventListener("click", () => {
+          PokeSkip.setAllUniversalChains(true);
+          UI2.showToast(t("toast_universal_all_enabled"), "success");
+          this.renderGlobalTab();
+        });
+      }
+      const btnDisableAll = container.querySelector("#pokeskip-btn-disable-all-global");
+      if (btnDisableAll) {
+        btnDisableAll.addEventListener("click", () => {
+          PokeSkip.setAllUniversalChains(false);
+          UI2.showToast(t("toast_universal_all_disabled"), "info");
+          this.renderGlobalTab();
+        });
+      }
+      container.querySelectorAll(".pokeskip-toggle-chain").forEach((toggle) => {
+        toggle.addEventListener("change", (e) => {
+          const chainId = toggle.getAttribute("data-id");
+          const enabled = e.target.checked;
+          PokeSkip.toggleUniversalChain(chainId, enabled);
+          const card = toggle.closest(".pokeskip-global-chain-card");
+          const statusText = card?.querySelector(".pokeskip-chain-status-text");
+          if (statusText) {
+            statusText.textContent = enabled ? t("global_chain_enabled") : t("global_chain_disabled");
+            statusText.style.color = enabled ? "#d8b4fe" : "#64748b";
+          }
+          if (card) {
+            card.style.borderColor = enabled ? "rgba(168, 85, 247, 0.3)" : "rgba(255, 255, 255, 0.08)";
+          }
+          const chainObj = MOVE_UPGRADE_CHAINS.find((c) => c.id === chainId);
+          const chainName = chainObj ? isEnglish() ? chainObj.nameEn : chainObj.nameFr : chainId;
+          UI2.showToast(
+            t("toast_universal_chain_toggled", { name: chainName, status: enabled ? t("global_chain_enabled") : t("global_chain_disabled") }),
+            enabled ? "success" : "info",
+            1800
+          );
+        });
+      });
+      container.querySelectorAll(".pokeskip-universal-move-pill").forEach((pill) => {
+        const chainId = pill.getAttribute("data-chain-id");
+        const moveId = Number(pill.getAttribute("data-move-id"));
+        const chain = MOVE_UPGRADE_CHAINS.find((c) => c.id === chainId);
+        const moveDef = chain?.moves.find((m) => Number(m.id) === moveId);
+        pill.addEventListener("mouseenter", () => {
+          this._showMoveTooltip(pill, moveDef, chainId);
+        });
+        pill.addEventListener("mousemove", () => {
+          this._showMoveTooltip(pill, moveDef, chainId);
+        });
+        pill.addEventListener("mouseleave", () => {
+          this._hideMoveTooltip();
+        });
+        pill.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this._hideMoveTooltip();
+          if (!moveDef) return;
+          const nowEnabled = PokeSkip.toggleUniversalMove(chainId, moveId);
+          const chainName = isEnglish() ? chain.nameEn : chain.nameFr;
+          const moveInfo = getLiveMoveInfo(moveDef, chain, PokeSkip);
+          this.renderGlobalTab();
+          UI2.showToast(
+            t(nowEnabled ? "toast_universal_move_enabled" : "toast_universal_move_disabled", {
+              move: moveInfo.name,
+              chain: chainName
+            }),
+            nowEnabled ? "success" : "warning",
+            1800
+          );
+        });
+      });
+      const modalBody = container.closest("#pokeskip-modal-body");
+      if (modalBody && !modalBody.__hasTooltipScrollListener) {
+        modalBody.__hasTooltipScrollListener = true;
+        modalBody.addEventListener("scroll", () => {
+          this._hideMoveTooltip();
+        }, { passive: true });
+      }
+      UI2.isolateInputs(container);
+    }
+  };
+
   // src/ui/quick-prompt.js
   var QuickPrompt = {
     dismissQuickSkipPrompt() {
@@ -11794,6 +13717,7 @@ canvas:focus-visible,
     ...TeamTab,
     ...SavedSpeciesTab,
     ...ReplacementsTab,
+    ...GlobalTab,
     ...SettingsTab,
     // Quick Prompt
     ...QuickPrompt

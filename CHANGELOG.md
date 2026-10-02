@@ -3,6 +3,25 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.16.0] - 2026-10-02
+
+### 🌐 Améliorations Directes Universelles d'Attaques (Règles Globales)
+- **Nouvel Onglet "Règles Globales" (Mode Avancé)** :
+  - Permet d'automatiser l'évolution des capacités directes sur l'ensemble de vos Pokémon (ex: *Pistolet à O* ➔ *Bulles d'O* ➔ *Hydrocanon* ou *Éclair* ➔ *Étincelle* ➔ *Tonnerre*).
+  - Plus de 25 familles d'attaques progressives intégrées pour tous les types élémentaires (Plante, Feu, Eau, Électrik, Glace, Psy, Ténèbres, Combat, Sol, Roche, Vol, Insecte, Spectre, Poison, Dragon, Acier, Fée, Normal, Statut).
+  - Désactivé par défaut : le joueur garde un contrôle total et doit l'activer intentionnellement via l'interrupteur maître.
+- **Infobulles Riches & Statistiques en Direct de PokéRogue** :
+  - Survol interactif de chaque pastille d'attaque affichant le Type, la Catégorie (Physique, Spéciale, Statut), la Puissance, la Précision (avec mention des attaques infaillibles), les PP et la description de l'effet.
+  - Extraction dynamique prioritaire depuis le moteur PokéRogue afin d'afficher fidèlement les équilibrages et modifications propres au jeu.
+- **Saut d'Attaque ("Skip-Over") & Exclusion Individuelle** :
+  - Possibilité d'exclure ou de réactiver n'importe quelle capacité d'une chaîne d'un simple clic.
+  - L'automatisation saute par-dessus les attaques exclues (ex: passer de *Bulles d'O* directement à *Hydrocanon* sans jamais apprendre *Surf*).
+  - Marquage visuel immédiat (texte barré, bordure rouge pointillée et badge d'exclusion).
+- **Priorité des Espèces Préservée** :
+  - Les règles spécifiques définies sur une espèce ou une lignée particulière restent strictement prioritaires sur les règles universelles.
+
+---
+
 ## [v1.15.0] - 2026-10-02
 
 ### 🌐 Support Multilingue Complet (Français & Anglais)

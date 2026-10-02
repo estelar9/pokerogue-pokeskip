@@ -2,6 +2,8 @@
 import { PokeStorage } from './storage.js';
 import { STORAGE_KEY, SETTINGS_KEY, STATS_KEY } from '../constants/storage-keys.js';
 import { LineageManager } from './lineage-manager.js';
+import { MOVE_UPGRADE_CHAINS } from '../constants/move-chains.js';
+import { isEnglish } from './i18n.js';
 
 export const PokeSkip = {
     rules: PokeStorage.get(STORAGE_KEY, {}),
@@ -16,9 +18,22 @@ export const PokeSkip = {
         quickPromptDuration: 15,
         showHudCount: true,
         advancedMode: false,
-        promptAutoReplacement: true
+        promptAutoReplacement: true,
+        universalUpgradesEnabled: false,
+        universalUpgradesManual: false,
+        disabledUniversalChains: {},
+        disabledUniversalMoves: {}
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4000) s.toastDuration = 2800;
+      if (!s.universalUpgradesManual) {
+        s.universalUpgradesEnabled = false;
+      }
+      if (!s.disabledUniversalChains || typeof s.disabledUniversalChains !== 'object') {
+        s.disabledUniversalChains = {};
+      }
+      if (!s.disabledUniversalMoves || typeof s.disabledUniversalMoves !== 'object') {
+        s.disabledUniversalMoves = {};
+      }
       return s;
     })(),
     stats: PokeStorage.get(STATS_KEY, {
@@ -32,6 +47,7 @@ export const PokeSkip = {
     hooked: false,
     activeParty: [],
     knownMovesCache: {},
+    cachedGetMoveFn: null,
 
     saveRules() {
       PokeStorage.set(STORAGE_KEY, this.rules);
@@ -409,19 +425,175 @@ export const PokeSkip = {
     findActiveReplacement(target, incomingMoveName, incomingMoveId) {
       if (!this.settings.enabled) return null;
       if (this.settings.advancedMode === false) return null;
+
+      // 1. Règle spécifique à l'espèce / lignée (priorité absolue #1)
       const rule = this.getFamilyRule(target);
-      if (!rule || !Array.isArray(rule.replacements) || rule.replacements.length === 0) return null;
-      if (rule.enabled === false) return null; // Paramétrage suspendu / en pause pour cette lignée
+      if (rule && Array.isArray(rule.replacements) && rule.replacements.length > 0 && rule.enabled !== false) {
+        const normalize = s => (s || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
+        const incNorm = normalize(incomingMoveName);
+        const incId = (incomingMoveId !== undefined && incomingMoveId !== null) ? Number(incomingMoveId) : null;
+
+        const found = rule.replacements.find(r => {
+          if (!r.enabled) return false;
+          if (incId && r.newMoveId && Number(r.newMoveId) === incId) return true;
+          if (incNorm && normalize(r.newMoveName) === incNorm) return true;
+          return false;
+        });
+        if (found) return found;
+      }
+
+      // 2. Règle globale universelle d'amélioration directe (priorité #2)
+      return this.findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId);
+    },
+
+    findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId) {
+      if (!this.settings.enabled) return null;
+      if (!this.settings.advancedMode) return null;
+      if (!this.settings.universalUpgradesEnabled) return null;
 
       const normalize = s => (s || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
       const incNorm = normalize(incomingMoveName);
       const incId = (incomingMoveId !== undefined && incomingMoveId !== null) ? Number(incomingMoveId) : null;
 
-      return rule.replacements.find(r => {
-        if (!r.enabled) return false;
-        if (incId && r.newMoveId && Number(r.newMoveId) === incId) return true;
-        if (incNorm && normalize(r.newMoveName) === incNorm) return true;
+      const disabledChains = this.settings.disabledUniversalChains || {};
+
+      for (const chain of MOVE_UPGRADE_CHAINS) {
+        if (disabledChains[chain.id]) continue; // Chaîne désactivée par l'utilisateur
+
+        // Chercher l'index de la nouvelle attaque dans la chaîne
+        const incomingIndex = chain.moves.findIndex(m => {
+          if (incId && m.id && Number(m.id) === incId) return true;
+          if (incNorm && (normalize(m.name) === incNorm || normalize(m.nameEn) === incNorm)) return true;
+          return false;
+        });
+
+        // Si l'attaque n'est pas dans la chaîne ou est au rang 0 (attaque de base), on ne remplace rien
+        if (incomingIndex <= 0) continue;
+
+        const incomingMove = chain.moves[incomingIndex];
+        // Si cette attaque spécifique est désactivée par le joueur, on passe au-dessus (elle ne remplace rien)
+        if (this.isUniversalMoveDisabled(chain.id, incomingMove.id)) {
+          continue;
+        }
+
+        // Récupérer les attaques actuelles du Pokémon
+        const currentMoveset = (target && typeof target.getMoveset === 'function')
+          ? target.getMoveset()
+          : (target?.moveset || []);
+
+        // Chercher s'il possède une attaque de rang inférieur active dans cette même chaîne (en partant du rang inférieur le plus proche)
+        for (let i = incomingIndex - 1; i >= 0; i--) {
+          const lowerMove = chain.moves[i];
+          // Si l'attaque inférieure a été exclue de l'automatisation, on ne la remplace pas
+          if (this.isUniversalMoveDisabled(chain.id, lowerMove.id)) {
+            continue;
+          }
+
+          const lowerNorm = normalize(lowerMove.name);
+          const lowerNormEn = normalize(lowerMove.nameEn);
+          const lowerId = lowerMove.id ? Number(lowerMove.id) : null;
+
+          const hasLowerMove = currentMoveset.some(m => {
+            if (!m) return false;
+            const mId = m.moveId ?? m.id ?? (typeof m === 'number' ? m : null);
+            if (lowerId && mId && Number(mId) === lowerId) return true;
+
+            const names = [];
+            if (typeof m.getName === 'function') {
+              try { names.push(m.getName()); } catch (_) {}
+            }
+            if (m.name) names.push(m.name);
+            if (typeof m.getMove === 'function') {
+              try { const mv = m.getMove(); if (mv?.name) names.push(mv.name); } catch (_) {}
+            }
+            for (const n of names) {
+              if (n && (normalize(n) === lowerNorm || normalize(n) === lowerNormEn)) return true;
+            }
+            return false;
+          });
+
+          if (hasLowerMove) {
+            // S'assurer que le joueur n'a PAS spécifiquement configuré une règle contradictoire pour cette espèce
+            const familyRule = this.getFamilyRule(target);
+            if (familyRule && Array.isArray(familyRule.replacements)) {
+              const conflict = familyRule.replacements.some(r => {
+                if (!r.enabled) return false;
+                const rOldNorm = normalize(r.oldMoveName);
+                const rOldId = r.oldMoveId ? Number(r.oldMoveId) : null;
+                return (lowerId && rOldId && rOldId === lowerId) || (rOldNorm && (rOldNorm === lowerNorm || rOldNorm === lowerNormEn));
+              });
+              if (conflict) {
+                continue;
+              }
+            }
+
+            return {
+              id: `univ_${chain.id}_${lowerMove.id}_${chain.moves[incomingIndex].id}`,
+              isUniversal: true,
+              chainId: chain.id,
+              chainName: isEnglish() ? chain.nameEn : chain.nameFr,
+              newMoveName: isEnglish() ? chain.moves[incomingIndex].nameEn : chain.moves[incomingIndex].name,
+              newMoveId: chain.moves[incomingIndex].id,
+              oldMoveName: isEnglish() ? lowerMove.nameEn : lowerMove.name,
+              oldMoveId: lowerMove.id,
+              enabled: true
+            };
+          }
+        }
+      }
+
+      return null;
+    },
+
+    isUniversalMoveDisabled(chainId, moveId) {
+      if (!this.settings.disabledUniversalMoves || typeof this.settings.disabledUniversalMoves !== 'object') {
         return false;
-      }) || null;
+      }
+      const key = `${chainId}:${moveId}`;
+      return Boolean(this.settings.disabledUniversalMoves[key] || this.settings.disabledUniversalMoves[moveId]);
+    },
+
+    toggleUniversalMove(chainId, moveId, enabled = null) {
+      if (!this.settings.disabledUniversalMoves || typeof this.settings.disabledUniversalMoves !== 'object') {
+        this.settings.disabledUniversalMoves = {};
+      }
+      const key = `${chainId}:${moveId}`;
+      const isCurrentlyDisabled = Boolean(this.settings.disabledUniversalMoves[key] || this.settings.disabledUniversalMoves[moveId]);
+      const shouldBeDisabled = enabled !== null ? !enabled : !isCurrentlyDisabled;
+
+      if (shouldBeDisabled) {
+        this.settings.disabledUniversalMoves[key] = true;
+      } else {
+        delete this.settings.disabledUniversalMoves[key];
+        delete this.settings.disabledUniversalMoves[moveId];
+      }
+      this.saveSettings();
+      return !shouldBeDisabled;
+    },
+
+    toggleUniversalChain(chainId, enabled) {
+      if (!this.settings.disabledUniversalChains || typeof this.settings.disabledUniversalChains !== 'object') {
+        this.settings.disabledUniversalChains = {};
+      }
+      if (enabled) {
+        delete this.settings.disabledUniversalChains[chainId];
+      } else {
+        this.settings.disabledUniversalChains[chainId] = true;
+      }
+      this.saveSettings();
+    },
+
+    setAllUniversalChains(enabled) {
+      if (!this.settings.disabledUniversalChains || typeof this.settings.disabledUniversalChains !== 'object') {
+        this.settings.disabledUniversalChains = {};
+      }
+      if (enabled) {
+        this.settings.disabledUniversalChains = {};
+      } else {
+        for (const chain of MOVE_UPGRADE_CHAINS) {
+          this.settings.disabledUniversalChains[chain.id] = true;
+        }
+      }
+      this.saveSettings();
     }
 };

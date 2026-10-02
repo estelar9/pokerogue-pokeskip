@@ -10,6 +10,7 @@ import { Hotkeys } from './hotkeys.js';
 import { TeamTab } from './tabs/team-tab.js';
 import { SavedSpeciesTab } from './tabs/saved-species-tab.js';
 import { ReplacementsTab } from './tabs/replacements-tab.js';
+import { GlobalTab } from './tabs/global-tab.js';
 import { SettingsTab } from './tabs/settings-tab.js';
 import { QuickPrompt } from './quick-prompt.js';
 
@@ -65,6 +66,7 @@ export const UI = {
   ...TeamTab,
   ...SavedSpeciesTab,
   ...ReplacementsTab,
+  ...GlobalTab,
   ...SettingsTab,
 
   // Quick Prompt

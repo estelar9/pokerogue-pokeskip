@@ -35,6 +35,7 @@ export const Modal = {
         <div class="pokeskip-modal-tabs">
           <button class="pokeskip-tab-btn active" data-tab="team"><span>⚔️</span> <span>${t('tab_team')}</span></button>
           <button class="pokeskip-tab-btn" data-tab="saved"><span>🧬</span> <span>${t('tab_saved')}</span></button>
+          ${PokeSkip.settings.advancedMode ? `<button class="pokeskip-tab-btn" data-tab="global"><span>🌐</span> <span>${t('tab_global')}</span></button>` : ''}
           <button class="pokeskip-tab-btn" data-tab="settings"><span>⚙️</span> <span>${t('tab_settings')}</span></button>
         </div>
 
@@ -45,6 +46,10 @@ export const Modal = {
 
         <div class="pokeskip-modal-body" id="pokeskip-body-saved" style="display: none;">
           <div id="pokeskip-saved-species-list"></div>
+        </div>
+
+        <div class="pokeskip-modal-body" id="pokeskip-body-global" style="display: none;">
+          <div id="pokeskip-global-rules-content"></div>
         </div>
 
         <div class="pokeskip-modal-body" id="pokeskip-body-settings" style="display: none;">
@@ -95,8 +100,11 @@ export const Modal = {
         const tab = btn.dataset.tab;
         document.getElementById('pokeskip-body-team').style.display = tab === 'team' ? 'block' : 'none';
         document.getElementById('pokeskip-body-saved').style.display = tab === 'saved' ? 'block' : 'none';
+        const bodyGlobal = document.getElementById('pokeskip-body-global');
+        if (bodyGlobal) bodyGlobal.style.display = tab === 'global' ? 'block' : 'none';
         document.getElementById('pokeskip-body-settings').style.display = tab === 'settings' ? 'block' : 'none';
         if (tab === 'saved') this.renderSavedSpeciesTab();
+        if (tab === 'global' && typeof this.renderGlobalTab === 'function') this.renderGlobalTab();
       });
     });
 
@@ -121,6 +129,11 @@ export const Modal = {
   },
 
   closeModal() {
+    const tooltip = document.getElementById('pokeskip-move-rich-tooltip');
+    if (tooltip) {
+      tooltip.style.opacity = '0';
+      tooltip.style.display = 'none';
+    }
     if (this.modalContainer) {
       this.modalContainer.classList.remove('active');
     }
@@ -134,6 +147,9 @@ export const Modal = {
     let activeTab = 'settings';
     const activeBtn = this.modalContainer?.querySelector('.pokeskip-tab-btn.active');
     if (activeBtn) activeTab = activeBtn.dataset.tab;
+    if (activeTab === 'global' && !PokeSkip.settings.advancedMode) {
+      activeTab = 'settings';
+    }
 
     if (this.modalContainer) {
       this.modalContainer.remove();

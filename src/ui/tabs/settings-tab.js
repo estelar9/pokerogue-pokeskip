@@ -177,24 +177,17 @@ export const SettingsTab = {
     if (optAdvancedMode) {
       optAdvancedMode.addEventListener('change', (e) => {
         PokeSkip.settings.advancedMode = e.target.checked;
+        if (!PokeSkip.settings.universalUpgradesManual) {
+          PokeSkip.settings.universalUpgradesEnabled = false;
+        }
         PokeSkip.saveSettings();
-        const statusDesc = container.querySelector('#pokeskip-advanced-status-desc');
-        if (statusDesc) {
-          statusDesc.textContent = e.target.checked
-            ? t('settings_advanced_status_on')
-            : t('settings_advanced_status_off');
-          statusDesc.style.color = e.target.checked ? '#a855f7' : '#64748b';
-        }
-        if (optPromptAutoReplacement) {
-          optPromptAutoReplacement.disabled = !e.target.checked;
-        }
-        if (promptAutoRepContainer) {
-          promptAutoRepContainer.style.opacity = e.target.checked ? '1' : '0.4';
-        }
         ui.showToast(
           e.target.checked ? '⚡ ' + t('settings_advanced_status_on') : t('settings_advanced_status_off'),
           e.target.checked ? 'success' : 'info'
         );
+        if (typeof ui.rebuildModal === 'function') {
+          ui.rebuildModal();
+        }
       });
     }
 
