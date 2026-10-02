@@ -1,9 +1,9 @@
-// Visualiseur d'efficacité des types & analyse de combat
 import { PokeSkip } from '../core/state.js';
 import { POKEMON_TYPES, TYPE_CHART } from '../constants/types.js';
 import { getActiveEnemyTypes } from '../core/battle-analyzer.js';
 import { PokeStorage } from '../core/storage.js';
 import { UI } from './index.js';
+import { t, isFrench } from '../core/i18n.js';
 
 export const TypeChart = {
     createTypeChartContainer() {
@@ -56,17 +56,17 @@ export const TypeChart = {
                   <tr>
                     <th class="pokeskip-th-corner">
                       <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; font-size: 8.5px; padding: 3px 2px; box-sizing: border-box;">
-                        <span style="align-self: flex-end; color: #38bdf8; font-weight: 800;">🛡️ Déf. ➔</span>
-                        <span style="align-self: flex-start; color: #f8fafc; font-weight: 800;">⬇ ⚔️ Att.</span>
+                        <span style="align-self: flex-end; color: #38bdf8; font-weight: 800;">${t('tc_def_header')}</span>
+                        <span style="align-self: flex-start; color: #f8fafc; font-weight: 800;">${t('tc_att_header')}</span>
                       </div>
                     </th>
-                    ${types18.map((t, colIdx) => {
+                    ${types18.map((tItem, colIdx) => {
                       const isHigh = enemyTypeIndices.includes(colIdx);
                       return `
-                        <th class="pokeskip-th-col ${isHigh ? 'highlighted-col' : ''}" data-col="${colIdx}" style="background-color: ${t.bg};" title="Défenseur : ${t.name}">
+                        <th class="pokeskip-th-col ${isHigh ? 'highlighted-col' : ''}" data-col="${colIdx}" style="background-color: ${tItem.bg};" title="${t('tc_type')} : ${tItem.name}">
                           <div class="pokeskip-th-col-content">
                             ${isHigh ? '<span class="pokeskip-col-marker">🎯</span>' : ''}
-                            <span class="pokeskip-th-col-name">${t.name}</span>
+                            <span class="pokeskip-th-col-name">${tItem.name}</span>
                           </div>
                         </th>
                       `;
@@ -76,7 +76,7 @@ export const TypeChart = {
                 <tbody>
                   ${types18.map((rowType, rowIdx) => `
                     <tr>
-                      <th class="pokeskip-th-row" data-row="${rowIdx}" style="background-color: ${rowType.bg};" title="Attaquant : ${rowType.name}">
+                      <th class="pokeskip-th-row" data-row="${rowIdx}" style="background-color: ${rowType.bg};" title="${rowType.name}">
                         ${rowType.name}
                       </th>
                       ${types18.map((colType, colIdx) => {
@@ -111,13 +111,13 @@ export const TypeChart = {
         footerHtml = `
           <div class="pokeskip-typechart-footer">
             <div class="pokeskip-typechart-legend">
-              <span class="legend-badge super">2</span> <span>×2 Super</span>
-              <span class="legend-badge half">½</span> <span>×0.5 Peu</span>
-              <span class="legend-badge zero">0</span> <span>×0 Inefficace</span>
-              <span class="legend-badge neutral">—</span> <span>×1 Neutre</span>
+              <span class="legend-badge super">2</span> <span>${t('tc_legend_super')}</span>
+              <span class="legend-badge half">½</span> <span>${t('tc_legend_half')}</span>
+              <span class="legend-badge zero">0</span> <span>${t('tc_legend_zero')}</span>
+              <span class="legend-badge neutral">—</span> <span>${t('tc_legend_neutral')}</span>
             </div>
             <div style="font-size: 10px; color: #94a3b8;">
-              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> ou <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Échap</kbd> Fermer
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> / <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Esc</kbd>
             </div>
           </div>
         `;
@@ -131,9 +131,9 @@ export const TypeChart = {
         ];
 
         const getRowHtml = (name, isEnemy) => {
-          const idx = types18.findIndex(item => item.name === name);
+          const idx = types18.findIndex(item => item.key === name || item.nameFr === name || item.name === name);
           if (idx === -1) return '';
-          const t = types18[idx];
+          const tItem = types18[idx];
           const weaknesses = [];
           const strengths = [];
           const immunities = [];
@@ -145,13 +145,13 @@ export const TypeChart = {
           }
 
           const weakPills = weaknesses.map(w => `
-            <span class="pokeskip-badge-pill" data-type="${w.name}" style="background-color: ${w.bg};" title="Subit ×2 de ${w.name}">
+            <span class="pokeskip-badge-pill" data-type="${w.name}" style="background-color: ${w.bg};" title="${t('tc_takes_double', { type: w.name })}">
               ${w.name}
             </span>
           `).join('');
 
           const strongPills = strengths.map(s => `
-            <span class="pokeskip-badge-pill" data-type="${s.name}" style="background-color: ${s.bg};" title="Inflige ×2 à ${s.name}">
+            <span class="pokeskip-badge-pill" data-type="${s.name}" style="background-color: ${s.bg};" title="${t('tc_deals_double', { type: s.name })}">
               ${s.name}
             </span>
           `).join('');
@@ -160,7 +160,7 @@ export const TypeChart = {
             <div class="pokeskip-ref-immunity-wrap" style="${showImmunities ? '' : 'display: none;'}">
               <div style="display: inline-flex; align-items: center; margin-right: 4px; padding-right: 4px; border-right: 1px solid rgba(255,255,255,0.12);">
                 ${immunities.map(imm => `
-                  <span class="pokeskip-badge-pill" data-type="${imm.name}" style="background-color: ${imm.bg}; opacity: 0.85;" title="Immunisé contre ${imm.name} (×0)">
+                  <span class="pokeskip-badge-pill" data-type="${imm.name}" style="background-color: ${imm.bg}; opacity: 0.85;" title="${t('tc_immune_against', { type: imm.name })}">
                     ${imm.name}<span class="pokeskip-mult-tag x0">×0</span>
                   </span>
                 `).join('')}
@@ -176,8 +176,8 @@ export const TypeChart = {
               </div>
               <div class="pokeskip-ref-arrow-left">➔</div>
               <div class="pokeskip-ref-center">
-                <span class="pokeskip-badge-pill" data-type="${t.name}" style="background-color: ${t.bg};" title="${t.name}">
-                  ${t.name}
+                <span class="pokeskip-badge-pill" data-type="${tItem.name}" style="background-color: ${tItem.bg};" title="${tItem.name}">
+                  ${tItem.name}
                 </span>
               </div>
               <div class="pokeskip-ref-arrow-right">➔</div>
@@ -189,7 +189,7 @@ export const TypeChart = {
         };
 
         const isEnemyList = SIMPLIFIED_ORDER_NAMES.map(name => {
-          const idx = types18.findIndex(item => item.name === name);
+          const idx = types18.findIndex(item => item.key === name || item.nameFr === name || item.name === name);
           return idx !== -1 && enemyTypeIndices.includes(idx);
         });
 
@@ -228,15 +228,15 @@ export const TypeChart = {
           <div class="pokeskip-ref-container ${showImmunities ? '' : 'pks-hide-immunities'}">
             <div class="pokeskip-ref-header">
               <div class="pokeskip-ref-left-label">
-                <label class="pokeskip-tc-switch" title="Afficher ou masquer les immunités (×0)">
+                <label class="pokeskip-tc-switch" title="${t('tc_immunities')}">
                   <input type="checkbox" class="pks-immunity-checkbox" ${showImmunities ? 'checked' : ''}>
                   <span class="pks-tc-slider"></span>
-                  <span class="pks-tc-label">🛡️ Immunités (×0)</span>
+                  <span class="pks-tc-label">${t('tc_immunities')}</span>
                 </label>
-                <span>⚠️ Faiblesses (reçoit ×2)</span>
+                <span>${t('tc_weaknesses')}</span>
               </div>
-              <div class="pokeskip-ref-center-label">Type</div>
-              <div class="pokeskip-ref-right-label">Forces (inflige ×2) ⚔️</div>
+              <div class="pokeskip-ref-center-label">${t('tc_type')}</div>
+              <div class="pokeskip-ref-right-label">${t('tc_strengths')}</div>
             </div>
             ${rowNodesHtml.join('')}
           </div>
@@ -245,12 +245,12 @@ export const TypeChart = {
         footerHtml = `
           <div class="pokeskip-typechart-footer">
             <div class="pokeskip-typechart-legend">
-              <span style="color: #fca5a5; font-weight: 700;">Faiblesses ➔</span> <span>Types reçus ×2</span>
+              <span style="color: #fca5a5; font-weight: 700;">${t('tc_weaknesses')}</span>
               <span style="margin: 0 4px; color: #475569;">•</span>
-              <span style="color: #86efac; font-weight: 700;">➔ Forces</span> <span>Types infligés ×2</span>
+              <span style="color: #86efac; font-weight: 700;">${t('tc_strengths')}</span>
             </div>
             <div style="font-size: 10px; color: #94a3b8;">
-              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> ou <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Échap</kbd> Fermer
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> / <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Esc</kbd>
             </div>
           </div>
         `;
@@ -403,9 +403,10 @@ export const TypeChart = {
           `;
         }).join('<span style="color: #64748b; font-size: 11px; margin: 0 4px; font-weight: bold;">•</span>');
 
+        const targetLabel = enemiesList.length > 1 ? (isFrench() ? 'Cibles :' : 'Targets:') : (isFrench() ? 'Cible :' : 'Target:');
         targetHeaderHtml = `
           <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.4); padding: 2px 8px; border-radius: 6px; font-size: 11px; flex-wrap: wrap;">
-            <span style="color: #38bdf8; font-weight: 800;">🎯 ${enemiesList.length > 1 ? 'Cibles :' : 'Cible :'}</span>
+            <span style="color: #38bdf8; font-weight: 800;">🎯 ${targetLabel}</span>
             ${targetBlocks}
           </div>
         `;
@@ -418,16 +419,16 @@ export const TypeChart = {
           <div class="pokeskip-typechart-header">
             <div class="pokeskip-typechart-title-wrap">
               <span style="font-size: 16px;">⚔️</span>
-              <span class="pokeskip-typechart-title">Forces & Faiblesses</span>
+              <span class="pokeskip-typechart-title">${t('tc_title')}</span>
               <div class="pokeskip-mode-switch">
-                <button class="pokeskip-mode-btn ${mode === 'simplified' ? 'active' : ''}" data-mode="simplified" title="Vue simplifiée">⚡ Simplifié</button>
-                <button class="pokeskip-mode-btn ${mode === 'table' ? 'active' : ''}" data-mode="table" title="Matrice complète 18×18">📊 Complet</button>
+                <button class="pokeskip-mode-btn ${mode === 'simplified' ? 'active' : ''}" data-mode="simplified" title="${t('tc_tab_simplified')}">${t('tc_tab_simplified')}</button>
+                <button class="pokeskip-mode-btn ${mode === 'table' ? 'active' : ''}" data-mode="table" title="${t('tc_tab_complete')}">${t('tc_tab_complete')}</button>
               </div>
               <div class="pokeskip-typechart-targets-wrap">
                 ${targetHeaderHtml}
               </div>
             </div>
-            <button class="pokeskip-typechart-close" title="Fermer (T ou Échap)">&times;</button>
+            <button class="pokeskip-typechart-close" title="${t('close_btn_title')}">&times;</button>
           </div>
 
           <div class="pokeskip-typechart-body pks-tab-fade">

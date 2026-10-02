@@ -1,4 +1,3 @@
-// Gestionnaire des lignées évolutives (profils partagés par famille)
 import { families } from '../data/families.js';
 import { branchedPrevolutions } from '../data/branched-prevolutions.js';
 import { megaFamilies } from '../data/megas.js';
@@ -6,6 +5,7 @@ import { staticSpeciesNames } from '../data/species-names.js';
 import { AssetLoader } from './asset-loader.js';
 import { PokeSkip } from './state.js';
 import { POKEMON_TYPES, MOVE_CATEGORIES } from '../constants/types.js';
+import { t, isFrench, isEnglish } from './i18n.js';
 
 export const LineageManager = {
   families,
@@ -62,8 +62,38 @@ export const LineageManager = {
       // Méga vérification
       const isMega = pokemon ? this.isPokemonMega(pokemon) : false;
 
+      // En mode anglais, tenter d'abord d'obtenir le nom en anglais depuis le jeu ou pokemon
+      if (isEnglish()) {
+        try {
+          if (pokemon?.species && typeof pokemon.species.getName === 'function') {
+            const loc = pokemon.species.getName(formIndex);
+            if (loc && typeof loc === 'string' && loc.trim()) {
+              return isMega && !loc.toLowerCase().includes('mega') ? `Mega ${loc.trim()}` : loc.trim();
+            }
+          }
+          if (pokemon?.species?.name) {
+            const n = pokemon.species.name;
+            return isMega && !n.toLowerCase().includes('mega') ? `Mega ${n}` : n;
+          }
+          const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+          const scene = PokeSkip.scene || win.globalScene;
+          const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry
+                      || (scene && scene.speciesDataRegistry)
+                      || (scene && scene.gameData && scene.gameData.speciesDataRegistry);
+          if (sdr) {
+            const sp = sdr.data ? sdr.data[sid] : (typeof sdr.get === 'function' ? sdr.get(sid) : null);
+            if (sp) {
+              const n = typeof sp.getName === 'function' ? sp.getName(formIndex) : (sp.name || sp.speciesName);
+              if (n && typeof n === 'string' && n.trim()) {
+                return isMega && !n.toLowerCase().includes('mega') ? `Mega ${n.trim()}` : n.trim();
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
       // 1. Formes régionales par tranches d'ID PokéRogue (2000+, 4000+, 6000+, 8000+)
-      if (this.speciesNames[sid]) {
+      if (this.speciesNames[sid] && isFrench()) {
         let n = this.speciesNames[sid];
         if (isMega && !n.toLowerCase().includes('méga') && !n.toLowerCase().includes('mega')) {
           n = `Méga-${n}`;
@@ -71,20 +101,20 @@ export const LineageManager = {
         return n;
       }
       if (sid >= 8000 && sid < 10000) {
-        const base = this.getSpeciesName(sid - 8000);
-        if (base) return `${base} de Paldea`;
+        const base = this.getSpeciesName(sid - 8000, 0, pokemon);
+        if (base) return t('regional_paldea', { base });
       }
       if (sid >= 6000 && sid < 8000) {
-        const base = this.getSpeciesName(sid - 6000);
-        if (base) return `${base} de Hisui`;
+        const base = this.getSpeciesName(sid - 6000, 0, pokemon);
+        if (base) return t('regional_hisui', { base });
       }
       if (sid >= 4000 && sid < 6000) {
-        const base = this.getSpeciesName(sid - 4000);
-        if (base) return `${base} de Galar`;
+        const base = this.getSpeciesName(sid - 4000, 0, pokemon);
+        if (base) return t('regional_galar', { base });
       }
       if (sid >= 2000 && sid < 4000) {
-        const base = this.getSpeciesName(sid - 2000);
-        if (base) return `${base} d'Alola`;
+        const base = this.getSpeciesName(sid - 2000, 0, pokemon);
+        if (base) return t('regional_alola', { base });
       }
 
       // 2. Formes régionales par formIndex (si sid < 1025 mais formIndex > 0)
@@ -102,22 +132,25 @@ export const LineageManager = {
           } catch (_) {}
         }
 
-        const base = this.speciesNames[sid] || (this.staticSpeciesNames && this.staticSpeciesNames[sid]) || '';
+        const base = (isFrench() ? (this.speciesNames[sid] || (this.staticSpeciesNames && this.staticSpeciesNames[sid])) : '')
+                     || (pokemon?.species?.name)
+                     || (this.staticSpeciesNames && this.staticSpeciesNames[sid])
+                     || '';
         if (base) {
           const alolanIds = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
           const galarianIds = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
           const hisuianIds = [58, 59, 100, 101, 157, 211, 215, 503, 549, 550, 570, 571, 628, 706, 713, 724];
           const paldeanIds = [128, 194];
 
-          if (alolanIds.includes(sid) && fIdx === 1) return `${base} d'Alola`;
-          if (galarianIds.includes(sid) && (fIdx === 1 || (sid === 52 && fIdx === 2))) return `${base} de Galar`;
-          if (hisuianIds.includes(sid) && fIdx === 1) return `${base} de Hisui`;
-          if (paldeanIds.includes(sid) && fIdx === 1) return `${base} de Paldea`;
+          if (alolanIds.includes(sid) && fIdx === 1) return t('regional_alola', { base });
+          if (galarianIds.includes(sid) && (fIdx === 1 || (sid === 52 && fIdx === 2))) return t('regional_galar', { base });
+          if (hisuianIds.includes(sid) && fIdx === 1) return t('regional_hisui', { base });
+          if (paldeanIds.includes(sid) && fIdx === 1) return t('regional_paldea', { base });
         }
       }
 
-      // 3. Dictionnaire statique officiel
-      if (this.staticSpeciesNames && this.staticSpeciesNames[sid]) {
+      // 3. Dictionnaire statique officiel (en français)
+      if (isFrench() && this.staticSpeciesNames && this.staticSpeciesNames[sid]) {
         let n = this.staticSpeciesNames[sid];
         this.speciesNames[sid] = n;
         if (isMega && !n.toLowerCase().includes('méga') && !n.toLowerCase().includes('mega')) {
@@ -639,16 +672,13 @@ export const LineageManager = {
         return pokemon.nickname.trim();
       }
 
-      // 2. Détection de la langue de jeu PokéRogue
-      const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-      const gameLang = win.i18next?.language || (typeof localStorage !== 'undefined' && localStorage.getItem('i18nextLng')) || 'fr';
-      const isFrench = !gameLang || gameLang.startsWith('fr');
-
+      // 2. Détection de la langue de jeu
+      const isFr = isFrench();
       const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? pokemon?.id);
       const isMega = this.isPokemonMega(pokemon);
 
-      // 3. En français : résolution prioritaire via notre dictionnaire complet et officiel (100% garanti en français)
-      if (isFrench && sid && !isNaN(sid)) {
+      // 3. En français : résolution prioritaire via notre dictionnaire complet et officiel
+      if (isFr && sid && !isNaN(sid)) {
         let frName = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
         if (frName) {
           if (isMega && !frName.toLowerCase().includes('méga') && !frName.toLowerCase().includes('mega')) {
@@ -658,21 +688,19 @@ export const LineageManager = {
         }
       }
 
-      // 4. Si une autre langue est sélectionnée (ex: es, en, de, it) ou si forme spéciale in-game :
+      // 4. Si anglais ou autre langue sélectionnée :
       if (typeof pokemon.getName === 'function') {
         try {
           const n = pokemon.getName();
           if (n && typeof n === 'string' && n.trim()) {
-            if (isFrench && sid && this.speciesNames[sid]) {
-              let fr = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-              if (isMega && !fr.toLowerCase().includes('méga') && !fr.toLowerCase().includes('mega')) {
-                fr = `Méga-${fr}`;
-              }
-              return fr;
-            }
             return n.trim();
           }
         } catch (_) {}
+      }
+
+      if (pokemon?.species?.name) {
+        const n = pokemon.species.name;
+        return isMega && !n.toLowerCase().includes('mega') ? `Mega ${n}` : n;
       }
 
       if (pokemon.species && typeof pokemon.species.getName === 'function') {

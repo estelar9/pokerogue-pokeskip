@@ -3,6 +3,21 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.15.0] - 2026-10-02
+
+### 🌐 Support Multilingue Complet (Français & Anglais)
+- **Internationalisation Intégrale (i18n)** :
+  - Traduction bilingue complète de l'interface utilisateur : pastille HUD, en-têtes, tableau des types, onglet Équipe, onglet Espèces, mode avancé de remplacements, alertes et notifications toast.
+  - Traduction des 19 types Pokémon et des 3 catégories d'attaques (*Physique*, *Spéciale*, *Statut* / *Physical*, *Special*, *Status*).
+  - Intégration des noms officiels anglais des Pokémon et des formes régionales (*Alolan*, *Galarian*, *Hisuian*, *Paldean*).
+- **Détection Automatique & Sélecteur de Langue** :
+  - Synchronisation automatique avec la langue choisie dans PokéRogue (`i18next`) et repli sur la langue du navigateur.
+  - Sélecteur dédié dans l'onglet *Paramètres* avec rechargement dynamique immédiat de l'interface.
+- **Déploiement Automatisé Multi-Stores** :
+  - Intégration du workflow de publication automatique pour Microsoft Edge Add-ons et Chrome Web Store en complément de Firefox AMO.
+
+---
+
 ## [v1.14.3] - 2026-10-01
 
 ### 💾 Sauvegarde & Importation Complète (Règles + Paramètres)

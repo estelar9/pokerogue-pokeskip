@@ -4,6 +4,7 @@ import { LineageManager } from '../../core/lineage-manager.js';
 import { AssetLoader } from '../../core/asset-loader.js';
 import { getPokemonFullLearnset } from '../../core/moves-resolver.js';
 import { POKEMON_TYPES, MOVE_CATEGORIES } from '../../constants/types.js';
+import { t, getCurrentLang } from '../../core/i18n.js';
 import { UI } from '../index.js';
 
 export const ReplacementsTab = {
@@ -26,10 +27,10 @@ export const ReplacementsTab = {
         }
         if (typeof lvl === 'string') {
           const s = lvl.trim().toLowerCase();
-          if (s.includes('départ') || s.includes('depart')) return 0;
+          if (s.includes('départ') || s.includes('depart') || s.includes('start')) return 0;
           if (s.includes('œuf') || s.includes('oeuf') || s.includes('egg')) return 0.2;
           if (s.includes('évol') || s.includes('evol')) return 0.5;
-          if (s.includes('actuelle')) return 0.1;
+          if (s.includes('actuelle') || s.includes('current')) return 0.1;
           const match = s.match(/\d+/);
           if (match) return parseInt(match[0], 10);
         }
@@ -104,31 +105,32 @@ export const ReplacementsTab = {
         if (a.weight !== b.weight) {
           return a.weight - b.weight;
         }
-        return a.name.localeCompare(b.name, 'fr');
+        return a.name.localeCompare(b.name, getCurrentLang());
       });
 
       const formatOptionText = (m, showCurrentBadge = true) => {
         let prefix = '';
         if (m.level !== undefined && m.level !== null && m.level !== '') {
           if (typeof m.level === 'number') {
-            if (m.level < 0) prefix = '[Départ] ';
-            else if (m.level === 0) prefix = '[Évolution] ';
-            else prefix = `[Niv. ${m.level}] `;
+            if (m.level < 0) prefix = t('rep_opt_start');
+            else if (m.level === 0) prefix = t('rep_opt_evol');
+            else prefix = t('rep_opt_level', { level: m.level });
           } else {
             const s = String(m.level).trim();
-            if (/^\d+$/.test(s)) prefix = `[Niv. ${s}] `;
-            else if (/œuf|oeuf|egg/i.test(s)) prefix = '[🥚 Œuf] ';
-            else if (/évol/i.test(s)) prefix = '[Évolution] ';
-            else if (/départ|depart/i.test(s)) prefix = '[Départ] ';
-            else if (/actuelle/i.test(s)) prefix = '[Actuelle] ';
+            if (/^\d+$/.test(s)) prefix = t('rep_opt_level', { level: s });
+            else if (/œuf|oeuf|egg/i.test(s)) prefix = t('rep_opt_egg');
+            else if (/évol/i.test(s)) prefix = t('rep_opt_evol');
+            else if (/départ|depart|start/i.test(s)) prefix = t('rep_opt_start');
+            else if (/actuelle|current/i.test(s)) prefix = t('rep_opt_current');
             else prefix = `[${s}] `;
           }
         } else if (m.isCurrent && showCurrentBadge) {
-          prefix = '[Actuelle] ';
+          prefix = t('rep_opt_current');
         }
 
         const evoSuffix = m.evolutionSpecies ? ` (${m.evolutionSpecies})` : '';
-        const suffix = (m.isCurrent && showCurrentBadge && prefix !== '[Actuelle] ') ? ' (Actuelle)' : '';
+        const currentPrefix = t('rep_opt_current');
+        const suffix = (m.isCurrent && showCurrentBadge && prefix !== currentPrefix) ? t('rep_opt_suffix_current') : '';
         return `${prefix}${m.name}${evoSuffix}${suffix}`;
       };
 
@@ -145,42 +147,42 @@ export const ReplacementsTab = {
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 15px;">⚡</span>
             <span style="font-size: 13px; font-weight: 700; color: #c084fc;">
-              Mode Avancé : Remplacement Automatique de Capacités
+              ${t('rep_header')}
             </span>
             <span style="font-size: 11px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; padding: 2px 7px; border-radius: 10px; font-weight: 600;">
-              ${activeCount}/${replacements.length} active(s)
+              ${t('rep_active_count', { active: activeCount, total: replacements.length })}
             </span>
           </div>
           ${replacements.length > 0 ? `
             <button class="pokeskip-btn-clear-rep" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;">
-              🗑️ Tout supprimer (${replacements.length})
+              ${t('rep_clear_all', { count: replacements.length })}
             </button>
           ` : ''}
         </div>
 
         <div style="font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.4;">
-          Définit les attaques à remplacer automatiquement : dès que la nouvelle capacité est débloquée et que le Pokémon possède 4 attaques, l'ancienne est remplacée sans interrompre le jeu.
+          ${t('rep_desc')}
         </div>
 
         <!-- Formulaire d'ajout : Ancienne attaque d'abord, puis Nouvelle attaque -->
         <div style="background: #111a2e; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
           <div style="font-size: 12px; font-weight: 600; color: #f8fafc; margin-bottom: 8px;">
-            ➕ Ajouter une règle de remplacement :
+            ${t('rep_add_title')}
           </div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 170px;">
-              <div style="font-size: 11px; color: #f43f5e; font-weight: 600; margin-bottom: 3px;">Toujours remplacer :</div>
-              <input type="text" class="pokeskip-rep-input-old" list="${oldDatalistId}" placeholder="Ancienne capacité..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <div style="font-size: 11px; color: #f43f5e; font-weight: 600; margin-bottom: 3px;">${t('rep_label_old')}</div>
+              <input type="text" class="pokeskip-rep-input-old" list="${oldDatalistId}" placeholder="${t('rep_placeholder_old')}" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
               <datalist id="${oldDatalistId}">
                 ${sortedMoves.map(m => `<option value="${formatOptionText(m, true)}" label="${formatOptionText(m, true)}">`).join('')}
               </datalist>
             </div>
 
-            <div style="color: #c084fc; font-weight: bold; font-size: 14px; padding-top: 16px; white-space: nowrap;">➔ par ➔</div>
+            <div style="color: #c084fc; font-weight: bold; font-size: 14px; padding-top: 16px; white-space: nowrap;">${t('rep_arrow')}</div>
 
             <div style="flex: 1; min-width: 170px;">
-              <div style="font-size: 11px; color: #38bdf8; font-weight: 600; margin-bottom: 3px;">Par la nouvelle :</div>
-              <input type="text" class="pokeskip-rep-input-new" list="${newDatalistId}" placeholder="Nouvelle capacité..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <div style="font-size: 11px; color: #38bdf8; font-weight: 600; margin-bottom: 3px;">${t('rep_label_new')}</div>
+              <input type="text" class="pokeskip-rep-input-new" list="${newDatalistId}" placeholder="${t('rep_placeholder_new')}" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
               <datalist id="${newDatalistId}">
                 ${sortedMoves.map(m => `<option value="${formatOptionText(m, false)}" label="${formatOptionText(m, false)}">`).join('')}
               </datalist>
@@ -188,7 +190,7 @@ export const ReplacementsTab = {
 
             <div style="padding-top: 16px;">
               <button class="pokeskip-btn-add-rep" style="background: #7e22ce; color: #fff; border: 1px solid #c084fc; padding: 7px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; white-space: nowrap;">
-                + Enregistrer
+                ${t('rep_save_btn')}
               </button>
             </div>
           </div>
@@ -198,25 +200,24 @@ export const ReplacementsTab = {
         <div class="pokeskip-rep-list-container" style="display: flex; flex-direction: column; gap: 6px;">
           ${replacements.length === 0 ? `
             <div style="color: #64748b; font-size: 12px; text-align: center; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px;">
-              Aucune règle de remplacement pour <b>${familyInfo.lineageName}</b>.<br>
-              Créez une règle ci-dessus pour remplacer automatiquement une ancienne attaque dès le déblocage d'une nouvelle.
+              ${t('rep_empty', { name: familyInfo.lineageName })}
             </div>
           ` : replacements.map(r => `
             <div style="background: #111a2e; border: 1px solid ${r.enabled ? 'rgba(168, 85, 247, 0.35)' : 'rgba(255, 255, 255, 0.08)'}; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; opacity: ${r.enabled ? '1' : '0.6'};">
               <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 12px; color: #94a3b8;">Toujours remplacer</span>
+                <span style="font-size: 12px; color: #94a3b8;">${t('rep_label_old').replace(' :', '').replace(':', '')}</span>
                 <span style="font-weight: 700; color: #f43f5e; font-size: 13px;">${r.oldMoveName}</span>
-                <span style="color: #a855f7; font-size: 12px; font-weight: bold;">➔ par ➔</span>
+                <span style="color: #a855f7; font-size: 12px; font-weight: bold;">${t('rep_arrow')}</span>
                 <span style="font-weight: 700; color: #38bdf8; font-size: 13px;">${r.newMoveName}</span>
                 <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: ${r.enabled ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.06)'}; color: ${r.enabled ? '#c084fc' : '#94a3b8'};">
-                  ${r.enabled ? 'Active' : 'Désactivée'}
+                  ${r.enabled ? t('rep_status_active') : t('rep_status_disabled')}
                 </span>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
                 <button class="pokeskip-btn-toggle-single-rep" data-id="${r.id}" style="background: ${r.enabled ? '#334155' : '#7e22ce'}; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">
-                  ${r.enabled ? 'Désactiver' : 'Activer'}
+                  ${r.enabled ? t('rep_toggle_disable') : t('rep_toggle_enable')}
                 </button>
-                <button class="pokeskip-btn-delete-single-rep" data-id="${r.id}" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;" title="Supprimer cette règle">
+                <button class="pokeskip-btn-delete-single-rep" data-id="${r.id}" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;" title="${t('saved_del_btn')}">
                   🗑️
                 </button>
               </div>
@@ -246,11 +247,11 @@ export const ReplacementsTab = {
         const newM = cleanMoveName(rawNew);
 
         if (!oldM || !newM) {
-          UI.showToast('Veuillez renseigner l\'ancienne capacité à remplacer et la nouvelle capacité.', 'warning');
+          UI.showToast(t('toast_rep_missing_inputs'), 'warning');
           return;
         }
         if (newM.toLowerCase() === oldM.toLowerCase()) {
-          UI.showToast('La nouvelle capacité et l\'ancienne doivent être différentes.', 'warning');
+          UI.showToast(t('toast_rep_identical_inputs'), 'warning');
           return;
         }
 
@@ -308,8 +309,8 @@ export const ReplacementsTab = {
         const newMoveDetails = resolveMoveInfo(newM);
 
         const getMoveTypeColor = (m) => (m && m.type && m.type.bg) ? (
-          m.type.name === 'Combat' ? '#ea580c' :
-          m.type.name === 'Ténèbres' ? '#c4a482' :
+          m.type.name === 'Combat' || m.type.name === 'Fighting' ? '#ea580c' :
+          m.type.name === 'Ténèbres' || m.type.name === 'Dark' ? '#c4a482' :
           m.type.name === 'Poison' ? '#a855f7' :
           m.type.bg
         ) : '#38bdf8';
@@ -322,8 +323,12 @@ export const ReplacementsTab = {
         const newTooltip = [newMoveDetails?.type?.name, newMoveDetails?.category?.name].filter(Boolean).join(' • ');
         const pokemonName = LineageManager.getSinglePokemonName(target);
 
+        const oldHtml = `<span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${oldMoveDetails.name || oldM}</b></span>`;
+        const newHtml = `<span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name || newM}</b></span>`;
+        const pokeHtml = `<b style="color: #38bdf8 !important;">${pokemonName}</b>`;
+
         UI.showToast(
-          `⚡ Règle enregistrée : remplacer <span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${oldMoveDetails.name || oldM}</b></span> par <span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name || newM}</b></span> sur <b style="color: #38bdf8 !important;">${pokemonName}</b> !`,
+          t('rep_toast_success', { oldHtml, newHtml, pokeHtml }),
           'advanced',
           PokeSkip.settings.toastDuration || 2800
         );
@@ -381,7 +386,7 @@ export const ReplacementsTab = {
         btn.addEventListener('click', () => {
           const ruleId = btn.getAttribute('data-id');
           PokeSkip.deleteReplacementRule(target, ruleId);
-          UI.showToast('Règle de remplacement supprimée.', 'info');
+          UI.showToast(t('toast_rep_deleted'), 'info');
           if (typeof onUpdate === 'function') onUpdate();
         });
       });
@@ -389,10 +394,10 @@ export const ReplacementsTab = {
       const btnClear = secEl.querySelector('.pokeskip-btn-clear-rep');
       if (btnClear) {
         btnClear.addEventListener('click', () => {
-          if (confirm(`Supprimer toutes les règles de remplacement pour ${familyInfo.lineageName} ?`)) {
+          if (confirm(t('rep_confirm_clear', { name: familyInfo.lineageName }))) {
             PokeSkip.clearAllReplacements(target);
             const targetName = LineageManager.getSinglePokemonName(target);
-            UI.showToast(`Toutes les règles de remplacement supprimées pour <b>${targetName}</b>.`, 'info');
+            UI.showToast(t('toast_rep_all_deleted', { name: targetName }), 'info');
             if (typeof onUpdate === 'function') onUpdate();
           }
         });

@@ -1,6 +1,7 @@
 import { PokeSkip } from '../core/state.js';
 import { PokeStorage } from '../core/storage.js';
 import { UI } from './index.js';
+import { t } from '../core/i18n.js';
 
 export const Hud = {
     getPokeballSvg(size = 20, enabled = true) {
@@ -35,17 +36,18 @@ export const Hud = {
       hud.id = 'pokeskip-hud';
       const enabled = PokeSkip.settings.enabled;
       hud.className = enabled ? 'on' : 'off';
-      hud.title = `PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Raccourci P • Glisser pour déplacer`;
+      hud.title = enabled ? t('hud_active') : t('hud_paused');
       const runCount = PokeSkip.getRunSkippedCount();
       const showCount = PokeSkip.settings.showHudCount !== false;
+      const countLabel = runCount > 1 ? t('hud_count_passed_many', { count: runCount }) : t('hud_count_passed_one', { count: runCount });
       hud.innerHTML = `
-        <div class="pokeskip-hud-pill" title="PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Clic pour gérer les capacités • Raccourci P">
-          <div class="pokeskip-hud-ball-wrap" title="${enabled ? 'PokéSkip : ACTIF (ON)' : 'PokéSkip : EN PAUSE (OFF)'}">
+        <div class="pokeskip-hud-pill" title="${enabled ? t('hud_pill_title_on') : t('hud_pill_title_off')}">
+          <div class="pokeskip-hud-ball-wrap" title="${enabled ? t('hud_pill_title_on') : t('hud_pill_title_off')}">
             ${this.getPokeballSvg(20, enabled)}
           </div>
-          <span class="pokeskip-hud-badge" id="pokeskip-hud-count" style="display: ${showCount ? 'inline-block' : 'none'};">${runCount} passée${runCount > 1 ? 's' : ''}</span>
+          <span class="pokeskip-hud-badge" id="pokeskip-hud-count" style="display: ${showCount ? 'inline-block' : 'none'};">${countLabel}</span>
         </div>
-        <button id="pokeskip-hud-type-btn" title="Tableau des Types (Touche T)">⚔️</button>
+        <button id="pokeskip-hud-type-btn" title="${t('hud_type_btn_title')}">⚔️</button>
       `;
       this.makeHudDraggable(hud);
 
@@ -207,13 +209,13 @@ export const Hud = {
       if (hud) {
         hud.classList.toggle('on', !!enabled);
         hud.classList.toggle('off', !enabled);
-        hud.title = `PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Raccourci P • Glisser pour déplacer`;
+        hud.title = enabled ? t('hud_active') : t('hud_paused');
       }
       if (pill) {
-        pill.title = `PokéSkip (${enabled ? 'Actif - ON' : 'En pause - OFF'}) • Clic pour gérer les capacités • Raccourci P`;
+        pill.title = enabled ? t('hud_pill_title_on') : t('hud_pill_title_off');
       }
       if (ballWrap) {
-        ballWrap.title = enabled ? 'PokéSkip : ACTIF (ON)' : 'PokéSkip : EN PAUSE (OFF)';
+        ballWrap.title = enabled ? t('hud_pill_title_on') : t('hud_pill_title_off');
       }
       if (ball) {
         ball.classList.toggle('on', !!enabled);
@@ -224,7 +226,8 @@ export const Hud = {
         }
       }
       if (countEl) {
-        countEl.textContent = `${runCount} passée${runCount > 1 ? 's' : ''}`;
+        const countLabel = runCount > 1 ? t('hud_count_passed_many', { count: runCount }) : t('hud_count_passed_one', { count: runCount });
+        countEl.textContent = countLabel;
         countEl.style.display = showCount ? 'inline-block' : 'none';
       }
       if (dividerEl) {

@@ -1,10 +1,10 @@
-// Onglet Équipe : affichage des Pokémon actifs et configuration des capacités à ignorer
 import { PokeSkip } from '../../core/state.js';
 import { LineageManager } from '../../core/lineage-manager.js';
 import { AssetLoader } from '../../core/asset-loader.js';
 import { getPokemonFullLearnset } from '../../core/moves-resolver.js';
 import { POKEMON_TYPES, MOVE_CATEGORIES } from '../../constants/types.js';
 import { UI } from '../index.js';
+import { t, isFrench } from '../../core/i18n.js';
 
 export const TeamTab = {
     refreshPartyFromGame() {
@@ -31,8 +31,7 @@ export const TeamTab = {
       if (!party || party.length === 0) {
         teamContainer.innerHTML = `
           <div style="grid-column: 1 / -1; padding: 24px; text-align: center; color: #94a3b8; background: #111a2e; border-radius: 12px;">
-            ⚠️ Aucune partie en cours détectée ou équipe vide.<br>
-            Lancez une partie dans PokéRogue pour voir votre équipe active, ou utilisez l'onglet <b>"Espèces Mémorisées"</b> !
+            ${t('team_empty_msg')}
           </div>
         `;
         return;
@@ -59,7 +58,7 @@ export const TeamTab = {
             <div style="display:none; font-size: 24px;">⚡</div>
           </div>
           <div class="pokeskip-member-name">${name}</div>
-          <div style="font-size: 11px; color: #94a3b8;">Niv. ${level}</div>
+          <div style="font-size: 11px; color: #94a3b8;">${t('team_level_prefix')}${level}</div>
           ${isMega ? '<div class="pokeskip-mega-badge">🧬 MÉGA</div>' : ''}
         `;
         card.addEventListener('click', () => {
@@ -85,7 +84,7 @@ export const TeamTab = {
             </div>
           </div>
           <div class="pokeskip-member-name empty-name">Slot #${emptyIdx + 1}</div>
-          <div style="font-size: 11px; color: #475569; margin-top: 2px;">Libre</div>
+          <div style="font-size: 11px; color: #475569; margin-top: 2px;">${isFrench() ? 'Libre' : 'Empty'}</div>
         `;
         teamContainer.appendChild(emptyCard);
       }
@@ -109,20 +108,23 @@ export const TeamTab = {
       // Récupération de TOUTES les attaques apprenables (futures + actuelles)
       const learnable = getPokemonFullLearnset(pokemon);
 
+      const lineageLabel = isFrench() ? `Lignée de <b>${currentName}</b>` : `<b>${currentName}</b>'s Line`;
+      const ruleStatusLabel = isRuleActive ? (isFrench() ? 'Paramétrage actif' : 'Rules active') : (isFrench() ? 'Paramétrage en pause' : 'Rules paused');
+
       container.innerHTML = `
         <div class="pokeskip-lineage-header-box">
           <div class="pokeskip-lineage-title-row">
             <div class="pokeskip-lineage-title">
-              <span>Lignée de <b>${currentName}</b></span>
-              <span class="pokeskip-lineage-lvl">Niv. ${pokemon.level || 1}</span>
+              <span>${lineageLabel}</span>
+              <span class="pokeskip-lineage-lvl">${t('team_level_prefix')}${pokemon.level || 1}</span>
               ${shinyInfo.isShiny ? `<span class="pokeskip-shiny-badge ${shinyInfo.className}" style="position:static;" title="${shinyInfo.title}">${shinyInfo.stars}</span>` : ''}
               ${isMega ? '<span class="pokeskip-mega-badge">🧬 MÉGA</span>' : ''}
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
-              <label class="pokeskip-switch-label" title="Activer ou mettre en pause l'auto-skip pour cette lignée">
+              <label class="pokeskip-switch-label" title="${t('team_pause_rules')}">
                 <span class="pokeskip-switch-text ${isRuleActive ? 'active' : ''}" id="pokeskip-lineage-switch-text">
-                  ${isRuleActive ? 'Paramétrage actif' : 'Paramétrage en pause'}
+                  ${ruleStatusLabel}
                 </span>
                 <span class="pokeskip-switch">
                   <input type="checkbox" id="pokeskip-toggle-lineage-active" ${isRuleActive ? 'checked' : ''}>
@@ -139,7 +141,7 @@ export const TeamTab = {
           <div id="pokeskip-pokemon-replacements-slot"></div>
 
           <div style="display: flex; gap: 10px; margin-bottom: 14px; margin-top: 14px;">
-            <input type="text" id="pokeskip-move-filter" placeholder="Filtrer une attaque par nom ou espèce..." style="background:#111a2e; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; flex:1;">
+            <input type="text" id="pokeskip-move-filter" placeholder="${t('team_search_placeholder')}" style="background:#111a2e; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; flex:1;">
           </div>
 
           <div class="pokeskip-moves-container" id="pokeskip-moves-grid-el"></div>
@@ -155,7 +157,7 @@ export const TeamTab = {
         if (lineageToggleInput) lineageToggleInput.checked = active;
         if (lineageToggleText) {
           lineageToggleText.className = `pokeskip-switch-text ${active ? 'active' : ''}`;
-          lineageToggleText.textContent = active ? 'Paramétrage actif' : 'Paramétrage en pause';
+          lineageToggleText.textContent = active ? (isFrench() ? 'Paramétrage actif' : 'Rules active') : (isFrench() ? 'Paramétrage en pause' : 'Rules paused');
         }
       };
 
@@ -164,9 +166,9 @@ export const TeamTab = {
           const isNowActive = PokeSkip.toggleFamilyRuleEnabled(familyInfo.familyKey);
           updateLineageToggle();
           if (isNowActive) {
-            UI.showToast(`✅ Paramétrage réactivé pour <b>${currentName}</b>`, 'success');
+            UI.showToast(t('toast_lineage_resumed', { name: currentName }), 'success');
           } else {
-            UI.showToast(`⏸️ Paramétrage mis en pause pour <b>${currentName}</b> (sélections conservées)`, 'info');
+            UI.showToast(t('toast_lineage_paused', { name: currentName }), 'info');
           }
         });
       }
@@ -185,12 +187,12 @@ export const TeamTab = {
         });
 
         if (filtered.length === 0) {
-          grid.innerHTML = `<div style="color: #64748b; font-size: 13px; text-align: center; padding: 20px;">Aucune capacité trouvée.</div>`;
+          grid.innerHTML = `<div style="color: #64748b; font-size: 13px; text-align: center; padding: 20px;">${t('team_no_moves')}</div>`;
           return;
         }
 
         filtered.forEach(moveItem => {
-          const isEggMove = moveItem.isEgg || moveItem.level === 'Œuf';
+          const isEggMove = moveItem.isEgg || moveItem.level === 'Œuf' || moveItem.level === 'Egg';
           const isSkipped = !isEggMove && PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
           const isKept = !isSkipped;
 
@@ -199,10 +201,10 @@ export const TeamTab = {
           const isPromptSuppressed = isAutoReplacement || (!isEggMove && PokeSkip.isMovePromptSuppressed(pokemon, moveItem.name, moveItem.moveId));
           const isSilenceDisabled = isAutoReplacement;
           const silenceTooltip = isAutoReplacement
-            ? "Cette attaque remplace automatiquement une autre capacité (Mode Avancé) : elle ne peut pas être promptée pour être ignorée."
+            ? (isFrench() ? "Cette attaque remplace automatiquement une autre capacité (Mode Avancé) : elle ne peut pas être promptée pour être ignorée." : "This move automatically replaces another move (Advanced Mode): it cannot be prompted for skip.")
             : (isPromptSuppressed
-              ? "Ne plus demander d'ignorer cette attaque en combat (cliquer pour réactiver le prompt)"
-              : "Cliquer pour ne plus être interrogé en combat pour ignorer cette attaque");
+              ? (isFrench() ? "Ne plus demander d'ignorer cette attaque en combat (cliquer pour réactiver le prompt)" : "Do not ask to skip this move in battle (click to re-enable prompt)")
+              : (isFrench() ? "Cliquer pour ne plus être interrogé en combat pour ignorer cette attaque" : "Click to no longer be prompted to skip this move in battle"));
 
           const cardEl = document.createElement('div');
           cardEl.className = `pokeskip-move-card ${isSkipped ? 'skipped' : ''}`;
@@ -219,22 +221,25 @@ export const TeamTab = {
             lvlStyle = 'style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);"';
           }
 
-          let lvlLabel = typeof moveItem.level === 'number' ? `Niv. ${moveItem.level}` : moveItem.level;
+          let lvlLabel = typeof moveItem.level === 'number' ? `${t('team_level_prefix')}${moveItem.level}` : (moveItem.level === 'Œuf' || moveItem.level === 'Egg' ? t('team_egg_badge') : moveItem.level);
           if (isEggMove) {
-            lvlLabel = '🥚 Œuf';
+            lvlLabel = t('team_egg_badge');
           }
+
+          const keptText = isKept ? (isFrench() ? '✓ Gardée' : '✓ Kept') : (isFrench() ? '✕ Ignorée' : '✕ Skipped');
+          const silenceText = isAutoReplacement ? (isFrench() ? '🔄 Remplacement auto' : '🔄 Auto replace') : (isFrench() ? '🔕 Ne plus demander' : '🔕 Never ask');
 
           cardEl.innerHTML = `
             <div class="pokeskip-move-action">
               ${isEggMove ? `
-                <span class="pokeskip-egg-badge" title="Capacité œuf obtenue au départ : le jeu ne propose jamais de l'apprendre par montée de niveau.">🥚 Capacité Œuf</span>
+                <span class="pokeskip-egg-badge" title="${t('team_egg_badge')}">${t('team_egg_badge')}</span>
               ` : `
                 <label class="pokeskip-silence-label ${isAutoReplacement ? 'disabled' : ''}" title="${silenceTooltip}">
                   <input type="checkbox" class="pokeskip-checkbox pokeskip-silence-checkbox" ${isPromptSuppressed ? 'checked' : ''} ${isSilenceDisabled ? 'disabled' : ''}>
-                  <span class="pokeskip-silence-badge ${isPromptSuppressed ? 'silenced' : ''} ${isAutoReplacement ? 'auto' : ''}">${isAutoReplacement ? '🔄 Remplacement auto' : '🔕 Ne plus demander'}</span>
+                  <span class="pokeskip-silence-badge ${isPromptSuppressed ? 'silenced' : ''} ${isAutoReplacement ? 'auto' : ''}">${silenceText}</span>
                 </label>
-                <div class="pokeskip-keep-action" title="${isKept ? 'Attaque gardée (décocher pour ignorer)' : 'Attaque ignorée (cocher pour garder)'}">
-                  <span class="pokeskip-keep-badge ${isKept ? 'kept' : 'skip'}">${isKept ? '✓ Gardée' : '✕ Ignorée'}</span>
+                <div class="pokeskip-keep-action" title="${isKept ? t('team_keep_title') : t('team_skip_title')}">
+                  <span class="pokeskip-keep-badge ${isKept ? 'kept' : 'skip'}">${keptText}</span>
                   <input type="checkbox" class="pokeskip-checkbox pokeskip-keep-checkbox" ${isKept ? 'checked' : ''}>
                 </div>
               `}
@@ -243,13 +248,13 @@ export const TeamTab = {
               <div class="pokeskip-move-left">
                 <span class="pokeskip-move-lvl-pill" ${lvlStyle}>${lvlLabel}</span>
                 <span class="pokeskip-move-name-txt">${moveItem.name}</span>
-                ${moveItem.evolutionSpecies ? `<span class="pokeskip-evo-tag" title="Capacité apprise par ${moveItem.evolutionSpecies} dans cette lignée">🧬 ${moveItem.evolutionSpecies}</span>` : ''}
+                ${moveItem.evolutionSpecies ? `<span class="pokeskip-evo-tag" title="${moveItem.evolutionSpecies}">🧬 ${moveItem.evolutionSpecies}</span>` : ''}
                 <span class="pokeskip-type-tag" style="background:${moveItem.type.bg}; color:${moveItem.type.color};">${moveItem.type.name}</span>
                 <span class="pokeskip-cat-tag" style="color:${moveItem.category.color};">${moveItem.category.icon} ${moveItem.category.name}</span>
               </div>
               <div class="pokeskip-move-stats">
-                <span class="pokeskip-stat-pill">⚔️ Puissance : <b>${moveItem.power}</b></span>
-                <span class="pokeskip-stat-pill" style="border-color: rgba(56, 189, 248, 0.3);">🎯 Précision : <b style="color: #38bdf8;">${moveItem.accuracy}</b></span>
+                <span class="pokeskip-stat-pill">⚔️ ${t('team_th_power')} : <b>${moveItem.power}</b></span>
+                <span class="pokeskip-stat-pill" style="border-color: rgba(56, 189, 248, 0.3);">🎯 ${t('team_th_acc')} : <b style="color: #38bdf8;">${moveItem.accuracy}</b></span>
                 <span class="pokeskip-stat-pill">🔋 PP : <b>${moveItem.pp}</b></span>
               </div>
             </div>
@@ -268,7 +273,7 @@ export const TeamTab = {
               cardEl.classList.toggle('skipped', !kept);
               if (keepBadge) {
                 keepBadge.className = `pokeskip-keep-badge ${kept ? 'kept' : 'skip'}`;
-                keepBadge.textContent = kept ? '✓ Gardée' : '✕ Ignorée';
+                keepBadge.textContent = kept ? (isFrench() ? '✓ Gardée' : '✓ Kept') : (isFrench() ? '✕ Ignorée' : '✕ Skipped');
               }
               PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
               UI.updateHudBadge();

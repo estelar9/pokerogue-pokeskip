@@ -8,6 +8,7 @@ export const PokeSkip = {
     settings: (() => {
       const s = Object.assign({
         enabled: true,
+        language: 'auto',
         showToasts: true,
         toastDuration: 2800,
         soundFeedback: false,

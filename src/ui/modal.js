@@ -1,6 +1,6 @@
-// Conteneur principal de la boîte de dialogue modale
 import { PokeSkip } from '../core/state.js';
 import { SettingsTab } from './tabs/settings-tab.js';
+import { t } from '../core/i18n.js';
 
 export const Modal = {
   createModal() {
@@ -15,27 +15,27 @@ export const Modal = {
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <h2 style="margin: 0; font-size: 16px; font-weight: 700; color: #f8fafc; letter-spacing: -0.2px;">PokéSkip</h2>
-                <span class="pokeskip-header-badge">Auto-Skip Intelligent</span>
+                <span class="pokeskip-header-badge">${t('header_badge')}</span>
               </div>
-              <span style="font-size: 11.5px; color: #94a3b8;">Gestion automatisée des nouvelles capacités par Pokémon</span>
+              <span style="font-size: 11.5px; color: #94a3b8;">${t('header_subtitle')}</span>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 14px;">
-            <label class="pokeskip-switch-label" title="Activer / Désactiver PokéSkip">
-              <span class="pokeskip-switch-text ${PokeSkip.settings.enabled ? 'active' : ''}" id="pokeskip-switch-status-text">${PokeSkip.settings.enabled ? 'Actif' : 'Inactif'}</span>
+            <label class="pokeskip-switch-label" title="${t('switch_title')}">
+              <span class="pokeskip-switch-text ${PokeSkip.settings.enabled ? 'active' : ''}" id="pokeskip-switch-status-text">${PokeSkip.settings.enabled ? t('status_active') : t('status_inactive')}</span>
               <span class="pokeskip-switch">
                 <input type="checkbox" id="pokeskip-toggle-enabled" ${PokeSkip.settings.enabled ? 'checked' : ''}>
                 <span class="pokeskip-slider"></span>
               </span>
             </label>
-            <button id="pokeskip-modal-close" class="pokeskip-close-btn" title="Fermer la fenêtre (Échap)">✕</button>
+            <button id="pokeskip-modal-close" class="pokeskip-close-btn" title="${t('close_btn_title')}">✕</button>
           </div>
         </div>
 
         <div class="pokeskip-modal-tabs">
-          <button class="pokeskip-tab-btn active" data-tab="team"><span>⚔️</span> <span>Mon Équipe</span></button>
-          <button class="pokeskip-tab-btn" data-tab="saved"><span>🧬</span> <span>Règles & Espèces</span></button>
-          <button class="pokeskip-tab-btn" data-tab="settings"><span>⚙️</span> <span>Paramètres</span></button>
+          <button class="pokeskip-tab-btn active" data-tab="team"><span>⚔️</span> <span>${t('tab_team')}</span></button>
+          <button class="pokeskip-tab-btn" data-tab="saved"><span>🧬</span> <span>${t('tab_saved')}</span></button>
+          <button class="pokeskip-tab-btn" data-tab="settings"><span>⚙️</span> <span>${t('tab_settings')}</span></button>
         </div>
 
         <div class="pokeskip-modal-body" id="pokeskip-body-team">
@@ -82,10 +82,10 @@ export const Modal = {
       this.updateHudBadge();
       const statusText = document.getElementById('pokeskip-switch-status-text');
       if (statusText) {
-        statusText.textContent = PokeSkip.settings.enabled ? 'Actif' : 'Inactif';
+        statusText.textContent = PokeSkip.settings.enabled ? t('status_active') : t('status_inactive');
         statusText.classList.toggle('active', PokeSkip.settings.enabled);
       }
-      this.showToast(PokeSkip.settings.enabled ? 'PokéSkip activé' : 'PokéSkip en pause', 'info');
+      this.showToast(PokeSkip.settings.enabled ? t('toast_enabled') : t('toast_paused'), 'info');
     });
 
     backdrop.querySelectorAll('.pokeskip-tab-btn').forEach(btn => {
@@ -126,6 +126,27 @@ export const Modal = {
     }
     if (!this.isModalOpen()) {
       this.enableGameKeyboard();
+    }
+  },
+
+  rebuildModal() {
+    const wasOpen = this.modalContainer && this.modalContainer.classList.contains('active');
+    let activeTab = 'settings';
+    const activeBtn = this.modalContainer?.querySelector('.pokeskip-tab-btn.active');
+    if (activeBtn) activeTab = activeBtn.dataset.tab;
+
+    if (this.modalContainer) {
+      this.modalContainer.remove();
+      this.modalContainer = null;
+    }
+    this.createModal();
+    if (wasOpen) {
+      this.modalContainer.classList.add('active');
+      const targetBtn = this.modalContainer.querySelector(`.pokeskip-tab-btn[data-tab="${activeTab}"]`);
+      if (targetBtn) targetBtn.click();
+    }
+    if (typeof this.updateHudBadge === 'function') {
+      this.updateHudBadge();
     }
   },
 

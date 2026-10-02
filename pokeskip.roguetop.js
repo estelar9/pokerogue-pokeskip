@@ -1,8 +1,8 @@
 // ==PokéSkip RogueTop Plugin==
-// Auto-updating plugin loader for RogueTop Desktop Client v1.14.3
+// Auto-updating plugin loader for RogueTop Desktop Client v1.15.0
 (function () {
   'use strict';
-  const EMBEDDED_VERSION = '1.14.3';
+  const EMBEDDED_VERSION = '1.15.0';
   const CACHE_KEY = 'pokeskip_roguetop_cached_code';
   const CACHE_VER_KEY = 'pokeskip_roguetop_cached_version';
 
@@ -39,7 +39,7 @@
 
   if (!executed) {
     console.log('[PokéSkip RogueTop] Lancement de la version intégrée v' + EMBEDDED_VERSION);
-    // PokéSkip RogueTop Bundle v1.14.3
+    // PokéSkip RogueTop Bundle v1.15.0
 
 (() => {
   // src/data/megas.js
@@ -4445,6 +4445,7 @@
     settings: (() => {
       const s = Object.assign({
         enabled: true,
+        language: "auto",
         showToasts: true,
         toastDuration: 2800,
         soundFeedback: false,
@@ -4810,34 +4811,513 @@
     }
   };
 
+  // src/core/i18n.js
+  var TRANSLATIONS = {
+    fr: {
+      // HUD
+      hud_active: "Pok\xE9Skip (Actif - ON) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer",
+      hud_paused: "Pok\xE9Skip (En pause - OFF) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer",
+      hud_pill_title_on: "Pok\xE9Skip (Actif - ON) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P",
+      hud_pill_title_off: "Pok\xE9Skip (En pause - OFF) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P",
+      hud_type_btn_title: "Tableau des Types (Touche T)",
+      hud_count_passed_one: "{count} pass\xE9e",
+      hud_count_passed_many: "{count} pass\xE9es",
+      // Modal Header & Tabs
+      header_badge: "Auto-Skip Intelligent",
+      header_subtitle: "Gestion automatis\xE9e des nouvelles capacit\xE9s par Pok\xE9mon",
+      status_active: "Actif",
+      status_inactive: "Inactif",
+      switch_title: "Activer / D\xE9sactiver Pok\xE9Skip",
+      close_btn_title: "Fermer la fen\xEAtre (\xC9chap)",
+      tab_team: "Mon \xC9quipe",
+      tab_saved: "R\xE8gles & Esp\xE8ces",
+      tab_settings: "Param\xE8tres",
+      // Team Tab
+      team_empty_msg: `\u26A0\uFE0F Aucune partie en cours d\xE9tect\xE9e ou \xE9quipe vide.<br>Lancez une partie dans Pok\xE9Rogue pour voir votre \xE9quipe active, ou utilisez l'onglet <b>"Esp\xE8ces M\xE9moris\xE9es"</b> !`,
+      team_pause_rules: "Mettre en pause les r\xE8gles de ce Pok\xE9mon",
+      team_resume_rules: "R\xE9activer les r\xE8gles pour ce Pok\xE9mon",
+      team_search_placeholder: "Filtrer une capacit\xE9 ou \xE9volution...",
+      team_th_move: "Capacit\xE9",
+      team_th_type: "Type",
+      team_th_cat: "Cat\xE9gorie",
+      team_th_power: "Puissance",
+      team_th_acc: "Pr\xE9cision",
+      team_th_pp: "PP",
+      team_th_effect: "Description & Effet",
+      team_th_skip: "Ignorer ?",
+      team_no_moves: "Aucune capacit\xE9 ne correspond \xE0 votre filtre.",
+      team_evo_badge: "\u{1F9EC} {name}",
+      team_egg_badge: "\u{1F95A} \u0152uf",
+      team_level_prefix: "Niv. ",
+      team_keep_title: "Coch\xE9 = Apprendre normalement",
+      team_skip_title: "D\xE9coch\xE9 = Ignorer automatiquement",
+      // Saved Species Tab
+      saved_empty: "Aucune r\xE8gle m\xE9moris\xE9e pour le moment.<br>D\xE9cochez des attaques dans l'\xE9quipe actuelle pour les ignorer : elles resteront enregistr\xE9es pour toute la lign\xE9e !",
+      saved_subtitle: "Retrouvez ici toutes les lign\xE9es d'esp\xE8ces configur\xE9es. Vos r\xE9glages s'appliquent automatiquement \xE0 tous leurs stades \xE9volutifs et formes, d'une partie \xE0 l'autre.",
+      saved_search_placeholder: "Rechercher une esp\xE8ce...",
+      saved_edit_btn: "\u270F\uFE0F Modifier",
+      saved_del_btn: "Supprimer la r\xE8gle",
+      saved_confirm_del: "Supprimer les r\xE8gles enregistr\xE9es pour {name} ?",
+      saved_skipped_summary: "Capacit\xE9s ignor\xE9es ({count}) : <b>{moves}</b>",
+      saved_none_skipped: "<i>Aucune capacit\xE9 ignor\xE9e</i>",
+      saved_back_btn: "\u2190 Retour aux esp\xE8ces",
+      saved_view_in_team: "\u{1F465} Voir dans l'\xC9quipe Actuelle",
+      saved_lineage_label: "Lign\xE9e : <b>{name}</b>",
+      saved_lineage_desc: "Modifiez les capacit\xE9s ignor\xE9es pour toute la lign\xE9e (tous stades et formes).",
+      saved_add_placeholder: "Ajouter une capacit\xE9 \xE0 ignorer (ex: Tornade, Charge)...",
+      saved_add_btn: "+ Ignorer",
+      saved_current_ignored_title: "Capacit\xE9s actuellement ignor\xE9es ({count}) :",
+      saved_restore_all_btn: "Tout r\xE9tablir (Ne rien ignorer)",
+      saved_no_moves_ignored: "Aucune capacit\xE9 n'est ignor\xE9e pour cette lign\xE9e.<br>Toutes les attaques propos\xE9es seront apprises ou pr\xE9sent\xE9es normalement.",
+      saved_badge_ignored: "\u2715 Ignor\xE9e",
+      saved_keep_again: "\u2713 Garder \xE0 nouveau",
+      saved_lineage_fallback: "Lign\xE9e #{id}",
+      saved_count_skipped_one: "{count} capacit\xE9 ignor\xE9e",
+      saved_count_skipped_many: "{count} capacit\xE9s ignor\xE9es",
+      saved_paused: "\u23F8\uFE0F En pause",
+      saved_restore_all: "Tout r\xE9tablir",
+      saved_back: "\u2B05 Retour \xE0 la liste",
+      // Replacements Tab
+      rep_header: "Mode Avanc\xE9 : Remplacement Automatique de Capacit\xE9s",
+      rep_active_count: "{active}/{total} active(s)",
+      rep_clear_all: "\u{1F5D1}\uFE0F Tout supprimer ({count})",
+      rep_desc: "D\xE9finit les attaques \xE0 remplacer automatiquement : d\xE8s que la nouvelle capacit\xE9 est d\xE9bloqu\xE9e et que le Pok\xE9mon poss\xE8de 4 attaques, l'ancienne est remplac\xE9e sans interrompre le jeu.",
+      rep_add_title: "\u2795 Ajouter une r\xE8gle de remplacement :",
+      rep_label_old: "Toujours remplacer :",
+      rep_label_new: "Par la nouvelle :",
+      rep_placeholder_old: "Ancienne capacit\xE9...",
+      rep_placeholder_new: "Nouvelle capacit\xE9...",
+      rep_save_btn: "+ Enregistrer",
+      rep_arrow: "\u2794 par \u2794",
+      rep_empty: "Aucune r\xE8gle de remplacement pour <b>{name}</b>.<br>Cr\xE9ez une r\xE8gle ci-dessus pour remplacer automatiquement une ancienne attaque d\xE8s le d\xE9blocage d'une nouvelle.",
+      rep_toggle_disable: "D\xE9sactiver",
+      rep_toggle_enable: "Activer",
+      rep_status_active: "Active",
+      rep_status_disabled: "D\xE9sactiv\xE9e",
+      rep_opt_start: "[D\xE9part] ",
+      rep_opt_evol: "[\xC9volution] ",
+      rep_opt_level: "[Niv. {level}] ",
+      rep_opt_egg: "[\u{1F95A} \u0152uf] ",
+      rep_opt_current: "[Actuelle] ",
+      rep_opt_suffix_current: " (Actuelle)",
+      rep_confirm_clear: "Supprimer toutes les r\xE8gles de remplacement pour {name} ?",
+      // Settings Tab
+      settings_lang_title: "Langue de l'interface",
+      settings_lang_desc: "Choisissez la langue d'affichage de Pok\xE9Skip (ou synchronisez-la automatiquement avec Pok\xE9Rogue).",
+      settings_lang_auto: "Automatique (selon Pok\xE9Rogue)",
+      settings_lang_fr: "Fran\xE7ais",
+      settings_lang_en: "English (Anglais)",
+      settings_notif_title: "Notifications & Alertes",
+      settings_toasts_label: "Afficher les notifications toast lors d'un auto-skip",
+      settings_toast_duration: "Dur\xE9e d'affichage des notifications :",
+      settings_hud_count_label: "Afficher le compteur de capacit\xE9s pass\xE9es sur la pastille",
+      settings_quick_prompt_label: "Proposer d'ignorer pour toujours une nouvelle attaque en combat",
+      settings_quick_prompt_duration: "Dur\xE9e d'affichage du message rapide :",
+      settings_seconds: "secondes",
+      settings_advanced_title: "\u26A1 Mode Avanc\xE9 : Remplacement d'Attaques",
+      settings_advanced_enable: "Activer",
+      settings_advanced_desc: "Permet de configurer des remplacements automatiques d'anciennes attaques lorsqu'une nouvelle capacit\xE9 (non ignor\xE9e) est apprise et que le Pok\xE9mon poss\xE8de d\xE9j\xE0 4 attaques.",
+      settings_advanced_status_on: "\u2713 Actif : les sections de remplacement sont visibles dans les onglets.",
+      settings_advanced_status_off: "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es.",
+      settings_prompt_auto_rep: "Proposer d'enregistrer les remplacements manuels d\xE9tect\xE9s",
+      settings_prompt_auto_rep_desc: "Affiche un toast interactif lorsqu'un remplacement est effectu\xE9 manuellement en jeu pour l'enregistrer dans les r\xE8gles de remplacement automatique.",
+      settings_io_title: "Exportation / Importation",
+      settings_io_desc: "Transf\xE9rez vos r\xE8gles de skip et vos param\xE8tres d'options vers un autre navigateur ou ordinateur.",
+      settings_export_btn: "\u{1F4E4} Exporter (JSON)",
+      settings_import_btn: "\u{1F4E5} Importer (JSON)",
+      settings_reset_title: "R\xE9initialisation",
+      settings_reset_desc: "Effacer l'ensemble de vos r\xE8gles de skip ou restaurer les r\xE9glages par d\xE9faut.",
+      settings_reset_rules_btn: "\u{1F5D1}\uFE0F R\xE9initialiser toutes les r\xE8gles",
+      settings_reset_settings_btn: "\u21BA Restaurer les options par d\xE9faut",
+      // Type Chart
+      tc_title: "Forces & Faiblesses",
+      tc_tab_simplified: "\u26A1 Simplifi\xE9",
+      tc_tab_complete: "\u{1F4CA} Complet",
+      tc_immunities: "\u{1F6E1}\uFE0F Immunit\xE9s (\xD70)",
+      tc_weaknesses: "\u26A0\uFE0F Faiblesses (re\xE7oit \xD72)",
+      tc_type: "Type",
+      tc_strengths: "Forces (inflige \xD72) \u2694\uFE0F",
+      tc_def_header: "\u{1F6E1}\uFE0F D\xE9f. \u2794",
+      tc_att_header: "\u2B07 \u2694\uFE0F Att.",
+      tc_legend_super: "\xD72 Super",
+      tc_legend_half: "\xD70.5 Peu",
+      tc_legend_zero: "\xD70 Inefficace",
+      tc_legend_neutral: "\xD71 Neutre",
+      tc_close_tip: "{t_key} ou {esc_key} Fermer",
+      tc_takes_double: "Subit \xD72 de {type}",
+      tc_deals_double: "Inflige \xD72 \xE0 {type}",
+      tc_immune_against: "Immunis\xE9 contre {type} (\xD70)",
+      // Quick Prompt
+      qp_prompt_text: "\u26A1 Ignorer {move} sur <b>{pokemon}</b> ?",
+      qp_skip_always: "Toujours ignorer",
+      qp_never_ask: "Ne plus demander",
+      qp_never_ask_title: "Ne plus proposer d'ignorer cette attaque pour ce Pok\xE9mon",
+      // Toasts & Messages
+      toast_enabled: "Pok\xE9Skip activ\xE9",
+      toast_paused: "Pok\xE9Skip en pause",
+      toast_ready: "Pok\xE9Skip activ\xE9 et pr\xEAt !",
+      toast_never_ask_ack: "\u2139\uFE0F Vous ne serez plus interrog\xE9 pour <b>{move}</b> sur <b>{pokemon}</b>.",
+      toast_rule_saved: "\u2705 R\xE8gle enregistr\xE9e : <b>{pokemon}</b> ignorera {move} !",
+      toast_move_skipped: "\u{1F6E1}\uFE0F Capacit\xE9 <b>{move}</b> ignor\xE9e pour <b>{pokemon}</b> !",
+      toast_auto_replaced: "\u{1F504} <b>{newMove}</b> a automatiquement remplac\xE9 <b>{oldMove}</b> sur <b>{pokemon}</b> !",
+      toast_save_manual_rep: "\u{1F4BE} Remplacement manuel : Enregistrer {oldMove} \u2794 {newMove} sur {pokemon} ?",
+      toast_save_btn: "Enregistrer",
+      toast_export_success: "R\xE8gles et param\xE8tres export\xE9s en fichier JSON",
+      toast_import_invalid: "Erreur : le fichier JSON est invalide ou vide.",
+      toast_import_success: "Succ\xE8s : {details} import\xE9(s) !",
+      toast_import_empty: "Aucune r\xE8gle ou param\xE8tre trouv\xE9 dans ce fichier.",
+      toast_import_error: "Erreur : impossible de lire ou parser ce fichier JSON.",
+      toast_read_error: "Erreur lors de la lecture du fichier.",
+      toast_rules_cleared: "Toutes les r\xE8gles ont \xE9t\xE9 effac\xE9es.",
+      toast_settings_reset: "Options r\xE9initialis\xE9es par d\xE9faut.",
+      toast_lineage_paused: "\u23F8\uFE0F Param\xE9trage mis en pause pour <b>{name}</b> (s\xE9lections conserv\xE9es)",
+      toast_lineage_resumed: "\u2705 Param\xE9trage r\xE9activ\xE9 pour <b>{name}</b>",
+      toast_rep_added: "\u2705 R\xE8gle de remplacement enregistr\xE9e pour <b>{name}</b> !",
+      toast_rep_deleted: "R\xE8gle de remplacement supprim\xE9e.",
+      toast_rep_all_deleted: "Toutes les r\xE8gles de remplacement supprim\xE9es pour <b>{name}</b>.",
+      toast_rep_missing_inputs: "Veuillez renseigner l'ancienne capacit\xE9 \xE0 remplacer et la nouvelle capacit\xE9.",
+      toast_rep_identical_inputs: "La nouvelle capacit\xE9 et l'ancienne doivent \xEAtre diff\xE9rentes.",
+      toast_all_moves_restored: "Toutes les capacit\xE9s sont r\xE9tablies pour <b>{name}</b>",
+      toast_single_move_restored: "Capacit\xE9 <b>{move}</b> r\xE9tablie pour <b>{name}</b>",
+      toast_single_move_skipped: "Capacit\xE9 <b>{move}</b> ignor\xE9e pour <b>{name}</b>",
+      toast_single_rule_deleted: "R\xE8gle supprim\xE9e pour <b>{name}</b>",
+      // Move Resolver
+      move_infallible: "Infaillible",
+      move_egg: "\u0152uf",
+      move_default_name: "Capacit\xE9 #{id}",
+      move_default_desc: "Inflige des d\xE9g\xE2ts ou applique un effet.",
+      // Regional
+      regional_alola: "{base} d'Alola",
+      regional_galar: "{base} de Galar",
+      regional_hisui: "{base} de Hisui",
+      regional_paldea: "{base} de Paldea"
+    },
+    en: {
+      // HUD
+      hud_active: "Pok\xE9Skip (Active - ON) \u2022 Shortcut P \u2022 Drag to move",
+      hud_paused: "Pok\xE9Skip (Paused - OFF) \u2022 Shortcut P \u2022 Drag to move",
+      hud_pill_title_on: "Pok\xE9Skip (Active - ON) \u2022 Click to manage moves \u2022 Shortcut P",
+      hud_pill_title_off: "Pok\xE9Skip (Paused - OFF) \u2022 Click to manage moves \u2022 Shortcut P",
+      hud_type_btn_title: "Type Chart (Key T)",
+      hud_count_passed_one: "{count} skipped",
+      hud_count_passed_many: "{count} skipped",
+      // Modal Header & Tabs
+      header_badge: "Smart Auto-Skip",
+      header_subtitle: "Automated move management per Pok\xE9mon",
+      status_active: "Active",
+      status_inactive: "Paused",
+      switch_title: "Enable / Disable Pok\xE9Skip",
+      close_btn_title: "Close window (Esc)",
+      tab_team: "My Team",
+      tab_saved: "Rules & Species",
+      tab_settings: "Settings",
+      // Team Tab
+      team_empty_msg: '\u26A0\uFE0F No active game detected or party is empty.<br>Start a game in Pok\xE9Rogue to view your party, or check the <b>"Rules & Species"</b> tab!',
+      team_pause_rules: "Pause rules for this Pok\xE9mon",
+      team_resume_rules: "Resume rules for this Pok\xE9mon",
+      team_search_placeholder: "Filter a move or evolution...",
+      team_th_move: "Move",
+      team_th_type: "Type",
+      team_th_cat: "Category",
+      team_th_power: "Power",
+      team_th_acc: "Accuracy",
+      team_th_pp: "PP",
+      team_th_effect: "Description & Effect",
+      team_th_skip: "Skip?",
+      team_no_moves: "No moves match your filter.",
+      team_evo_badge: "\u{1F9EC} {name}",
+      team_egg_badge: "\u{1F95A} Egg",
+      team_level_prefix: "Lv. ",
+      team_keep_title: "Checked = Learn normally",
+      team_skip_title: "Unchecked = Auto-skip",
+      // Saved Species Tab
+      saved_empty: "No saved rules yet.<br>Uncheck moves in your active team to auto-skip them: they will stay saved for the whole evolutionary line!",
+      saved_subtitle: "Find all configured species lines here. Your preferences automatically apply to all evolutionary stages and forms across runs.",
+      saved_search_placeholder: "Search a species...",
+      saved_edit_btn: "\u270F\uFE0F Edit",
+      saved_del_btn: "Delete rule",
+      saved_confirm_del: "Delete saved rules for {name}?",
+      saved_skipped_summary: "Ignored moves ({count}): <b>{moves}</b>",
+      saved_none_skipped: "<i>No ignored moves</i>",
+      saved_back_btn: "\u2190 Back to species",
+      saved_view_in_team: "\u{1F465} View in Active Team",
+      saved_lineage_label: "Lineage: <b>{name}</b>",
+      saved_lineage_desc: "Manage ignored moves for the entire lineage (all stages and forms).",
+      saved_add_placeholder: "Add a move to ignore (e.g. Tackle, Scratch)...",
+      saved_add_btn: "+ Ignore",
+      saved_current_ignored_title: "Currently ignored moves ({count}):",
+      saved_restore_all_btn: "Restore all (Ignore nothing)",
+      saved_no_moves_ignored: "No moves are ignored for this lineage.<br>All moves offered will be learned or shown normally.",
+      saved_badge_ignored: "\u2715 Ignored",
+      saved_keep_again: "\u2713 Keep again",
+      saved_lineage_fallback: "Lineage #{id}",
+      saved_count_skipped_one: "{count} move skipped",
+      saved_count_skipped_many: "{count} moves skipped",
+      saved_paused: "\u23F8\uFE0F Paused",
+      saved_restore_all: "Restore all",
+      saved_back: "\u2B05 Back to list",
+      // Replacements Tab
+      rep_header: "Advanced Mode: Auto Move Replacements",
+      rep_active_count: "{active}/{total} active",
+      rep_clear_all: "\u{1F5D1}\uFE0F Clear all ({count})",
+      rep_desc: "Configure moves to automatically replace: once the new move is learned and the Pok\xE9mon already has 4 moves, the old one is replaced seamlessly.",
+      rep_add_title: "\u2795 Add a replacement rule:",
+      rep_label_old: "Always replace:",
+      rep_label_new: "With new move:",
+      rep_placeholder_old: "Old move...",
+      rep_placeholder_new: "New move...",
+      rep_save_btn: "+ Save",
+      rep_arrow: "\u2794 with \u2794",
+      rep_empty: "No replacement rules for <b>{name}</b>.<br>Add a rule above to automatically replace an old move when learning a new one.",
+      rep_toggle_disable: "Disable",
+      rep_toggle_enable: "Enable",
+      rep_status_active: "Active",
+      rep_status_disabled: "Disabled",
+      rep_opt_start: "[Start] ",
+      rep_opt_evol: "[Evolution] ",
+      rep_opt_level: "[Lv. {level}] ",
+      rep_opt_egg: "[\u{1F95A} Egg] ",
+      rep_opt_current: "[Current] ",
+      rep_opt_suffix_current: " (Current)",
+      rep_confirm_clear: "Delete all replacement rules for {name}?",
+      // Settings Tab
+      settings_lang_title: "Interface Language",
+      settings_lang_desc: "Choose Pok\xE9Skip's display language (or synchronize automatically with Pok\xE9Rogue).",
+      settings_lang_auto: "Automatic (match Pok\xE9Rogue)",
+      settings_lang_fr: "Fran\xE7ais (French)",
+      settings_lang_en: "English",
+      settings_notif_title: "Notifications & Alerts",
+      settings_toasts_label: "Show toast notifications on auto-skip",
+      settings_toast_duration: "Toast notification duration:",
+      settings_hud_count_label: "Show skipped moves count on HUD pill",
+      settings_quick_prompt_label: "Prompt to decline new moves in battle (Quick Prompt)",
+      settings_quick_prompt_duration: "Quick prompt duration:",
+      settings_seconds: "seconds",
+      settings_advanced_title: "\u26A1 Advanced Mode: Move Replacements",
+      settings_advanced_enable: "Enable",
+      settings_advanced_desc: "Configure automated replacements for old moves when a new move is learned and the Pok\xE9mon already has 4 moves.",
+      settings_advanced_status_on: "\u2713 Active: replacement sections are visible in tabs.",
+      settings_advanced_status_off: "\u2715 Disabled: rules are preserved but not executed.",
+      settings_prompt_auto_rep: "Prompt to save manual replacements detected in-game",
+      settings_prompt_auto_rep_desc: "Displays an interactive toast when a replacement is performed manually in-game to save it as an auto-replacement rule.",
+      settings_io_title: "Export / Import",
+      settings_io_desc: "Transfer your skip rules and settings to another browser or computer.",
+      settings_export_btn: "\u{1F4E4} Export (JSON)",
+      settings_import_btn: "\u{1F4E5} Import (JSON)",
+      settings_reset_title: "Reset",
+      settings_reset_desc: "Clear all your skip rules or restore default settings.",
+      settings_reset_rules_btn: "\u{1F5D1}\uFE0F Reset all rules",
+      settings_reset_settings_btn: "\u21BA Restore default settings",
+      // Type Chart
+      tc_title: "Strengths & Weaknesses",
+      tc_tab_simplified: "\u26A1 Simplified",
+      tc_tab_complete: "\u{1F4CA} Complete",
+      tc_immunities: "\u{1F6E1}\uFE0F Immunities (\xD70)",
+      tc_weaknesses: "\u26A0\uFE0F Weaknesses (takes \xD72)",
+      tc_type: "Type",
+      tc_strengths: "Strengths (deals \xD72) \u2694\uFE0F",
+      tc_def_header: "\u{1F6E1}\uFE0F Def. \u2794",
+      tc_att_header: "\u2B07 \u2694\uFE0F Att.",
+      tc_legend_super: "\xD72 Super",
+      tc_legend_half: "\xD70.5 Resisted",
+      tc_legend_zero: "\xD70 Immune",
+      tc_legend_neutral: "\xD71 Neutral",
+      tc_close_tip: "{t_key} or {esc_key} Close",
+      tc_takes_double: "Takes \xD72 from {type}",
+      tc_deals_double: "Deals \xD72 to {type}",
+      tc_immune_against: "Immune to {type} (\xD70)",
+      // Quick Prompt
+      qp_prompt_text: "\u26A1 Skip {move} on <b>{pokemon}</b>?",
+      qp_skip_always: "Always Skip",
+      qp_never_ask: "Never ask again",
+      qp_never_ask_title: "Do not prompt to skip this move for this Pok\xE9mon",
+      // Toasts & Messages
+      toast_enabled: "Pok\xE9Skip enabled",
+      toast_paused: "Pok\xE9Skip paused",
+      toast_ready: "Pok\xE9Skip enabled and ready!",
+      toast_never_ask_ack: "\u2139\uFE0F You will no longer be asked about <b>{move}</b> on <b>{pokemon}</b>.",
+      toast_rule_saved: "\u2705 Rule saved: <b>{pokemon}</b> will skip {move}!",
+      toast_move_skipped: "\u{1F6E1}\uFE0F Move <b>{move}</b> skipped for <b>{pokemon}</b>!",
+      toast_auto_replaced: "\u{1F504} <b>{newMove}</b> automatically replaced <b>{oldMove}</b> on <b>{pokemon}</b>!",
+      toast_save_manual_rep: "\u{1F4BE} Manual replacement: Save {oldMove} \u2794 {newMove} on {pokemon}?",
+      toast_save_btn: "Save",
+      toast_export_success: "Rules and settings exported to JSON file",
+      toast_import_invalid: "Error: JSON file is invalid or empty.",
+      toast_import_success: "Success: {details} imported!",
+      toast_import_empty: "No rules or settings found in this file.",
+      toast_import_error: "Error: unable to read or parse this JSON file.",
+      toast_read_error: "Error reading file.",
+      toast_rules_cleared: "All rules have been cleared.",
+      toast_settings_reset: "Settings reset to default.",
+      toast_lineage_paused: "\u23F8\uFE0F Settings paused for <b>{name}</b> (selections kept)",
+      toast_lineage_resumed: "\u2705 Settings resumed for <b>{name}</b>",
+      toast_rep_added: "\u2705 Replacement rule saved for <b>{name}</b>!",
+      toast_rep_deleted: "Replacement rule deleted.",
+      toast_rep_all_deleted: "All replacement rules deleted for <b>{name}</b>.",
+      toast_rep_missing_inputs: "Please enter both the old move to replace and the new move.",
+      toast_rep_identical_inputs: "The new move and old move must be different.",
+      toast_all_moves_restored: "All moves restored for <b>{name}</b>",
+      toast_single_move_restored: "Move <b>{move}</b> restored for <b>{name}</b>",
+      toast_single_move_skipped: "Move <b>{move}</b> skipped for <b>{name}</b>",
+      toast_single_rule_deleted: "Rule deleted for <b>{name}</b>",
+      // Move Resolver
+      move_infallible: "Never-miss",
+      move_egg: "Egg",
+      move_default_name: "Move #{id}",
+      move_default_desc: "Deals damage or applies an effect.",
+      // Regional
+      regional_alola: "Alolan {base}",
+      regional_galar: "Galarian {base}",
+      regional_hisui: "Hisuian {base}",
+      regional_paldea: "Paldean {base}"
+    }
+  };
+  function getCurrentLang() {
+    const pref = PokeSkip.settings?.language || "auto";
+    if (pref === "fr") return "fr";
+    if (pref === "en") return "en";
+    try {
+      const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+      const gameLang = win.i18next?.language || typeof localStorage !== "undefined" && localStorage.getItem("i18nextLng");
+      if (gameLang) {
+        if (gameLang.toLowerCase().startsWith("fr")) return "fr";
+        return "en";
+      }
+    } catch (_) {
+    }
+    if (typeof navigator !== "undefined" && navigator.language) {
+      if (navigator.language.toLowerCase().startsWith("fr")) return "fr";
+    }
+    return "en";
+  }
+  function isFrench() {
+    return getCurrentLang() === "fr";
+  }
+  function isEnglish() {
+    return getCurrentLang() === "en";
+  }
+  function t(key, params = {}) {
+    const lang = getCurrentLang();
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    let text = dict[key] ?? (TRANSLATIONS.fr[key] || key);
+    if (params && typeof params === "object") {
+      for (const [pKey, pVal] of Object.entries(params)) {
+        text = text.replace(new RegExp(`\\{${pKey}\\}`, "g"), String(pVal));
+      }
+    }
+    return text;
+  }
+
   // src/constants/categories.js
   var MOVE_CATEGORIES = [
-    { name: "Physique", icon: "\u{1F4A5}", color: "#f87171" },
-    { name: "Sp\xE9ciale", icon: "\u2728", color: "#60a5fa" },
-    { name: "Statut", icon: "\u{1F300}", color: "#94a3b8" }
+    { id: 0, nameFr: "Physique", nameEn: "Physical", icon: "\u{1F4A5}", color: "#f87171", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    } },
+    { id: 1, nameFr: "Sp\xE9ciale", nameEn: "Special", icon: "\u2728", color: "#60a5fa", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    } },
+    { id: 2, nameFr: "Statut", nameEn: "Status", icon: "\u{1F300}", color: "#94a3b8", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    } }
   ];
 
   // src/constants/types.js
   var POKEMON_TYPES = [
-    { name: "Normal", code: "NOR", color: "#ffffff", bg: "#ada594" },
-    { name: "Combat", code: "COM", color: "#ffffff", bg: "#a55239" },
-    { name: "Vol", code: "VOL", color: "#ffffff", bg: "#9cadf7" },
-    { name: "Poison", code: "POI", color: "#ffffff", bg: "#9141cb" },
-    { name: "Sol", code: "SOL", color: "#ffffff", bg: "#ae7a3b" },
-    { name: "Roche", code: "ROC", color: "#ffffff", bg: "#bda55a" },
-    { name: "Insecte", code: "INS", color: "#ffffff", bg: "#adbd21" },
-    { name: "Spectre", code: "SPE", color: "#ffffff", bg: "#6363b5" },
-    { name: "Acier", code: "ACI", color: "#ffffff", bg: "#81a6be" },
-    { name: "Feu", code: "FEU", color: "#ffffff", bg: "#f75231" },
-    { name: "Eau", code: "EAU", color: "#ffffff", bg: "#399cff" },
-    { name: "Plante", code: "PLA", color: "#ffffff", bg: "#7bce52" },
-    { name: "\xC9lectrik", code: "\xC9LE", color: "#ffffff", bg: "#ffc631" },
-    { name: "Psy", code: "PSY", color: "#ffffff", bg: "#ef4179" },
-    { name: "Glace", code: "GLA", color: "#ffffff", bg: "#5acee7" },
-    { name: "Dragon", code: "DRA", color: "#ffffff", bg: "#7b63e7" },
-    { name: "T\xE9n\xE8bres", code: "T\xC9N", color: "#ffffff", bg: "#735a4a" },
-    { name: "F\xE9e", code: "F\xC9E", color: "#ffffff", bg: "#ef70ef" },
-    { name: "Stellaire", code: "STE", color: "#ffffff", bg: "#6299bd" }
+    { id: 0, key: "Normal", nameFr: "Normal", nameEn: "Normal", codeFr: "NOR", codeEn: "NOR", color: "#ffffff", bg: "#ada594", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 1, key: "Combat", nameFr: "Combat", nameEn: "Fighting", codeFr: "COM", codeEn: "FIG", color: "#ffffff", bg: "#a55239", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 2, key: "Vol", nameFr: "Vol", nameEn: "Flying", codeFr: "VOL", codeEn: "FLY", color: "#ffffff", bg: "#9cadf7", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 3, key: "Poison", nameFr: "Poison", nameEn: "Poison", codeFr: "POI", codeEn: "POI", color: "#ffffff", bg: "#9141cb", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 4, key: "Sol", nameFr: "Sol", nameEn: "Ground", codeFr: "SOL", codeEn: "GRO", color: "#ffffff", bg: "#ae7a3b", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 5, key: "Roche", nameFr: "Roche", nameEn: "Rock", codeFr: "ROC", codeEn: "ROC", color: "#ffffff", bg: "#bda55a", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 6, key: "Insecte", nameFr: "Insecte", nameEn: "Bug", codeFr: "INS", codeEn: "BUG", color: "#ffffff", bg: "#adbd21", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 7, key: "Spectre", nameFr: "Spectre", nameEn: "Ghost", codeFr: "SPE", codeEn: "GHO", color: "#ffffff", bg: "#6363b5", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 8, key: "Acier", nameFr: "Acier", nameEn: "Steel", codeFr: "ACI", codeEn: "STE", color: "#ffffff", bg: "#81a6be", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 9, key: "Feu", nameFr: "Feu", nameEn: "Fire", codeFr: "FEU", codeEn: "FIR", color: "#ffffff", bg: "#f75231", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 10, key: "Eau", nameFr: "Eau", nameEn: "Water", codeFr: "EAU", codeEn: "WAT", color: "#ffffff", bg: "#399cff", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 11, key: "Plante", nameFr: "Plante", nameEn: "Grass", codeFr: "PLA", codeEn: "GRA", color: "#ffffff", bg: "#7bce52", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 12, key: "\xC9lectrik", nameFr: "\xC9lectrik", nameEn: "Electric", codeFr: "\xC9LE", codeEn: "ELE", color: "#ffffff", bg: "#ffc631", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 13, key: "Psy", nameFr: "Psy", nameEn: "Psychic", codeFr: "PSY", codeEn: "PSY", color: "#ffffff", bg: "#ef4179", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 14, key: "Glace", nameFr: "Glace", nameEn: "Ice", codeFr: "GLA", codeEn: "ICE", color: "#ffffff", bg: "#5acee7", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 15, key: "Dragon", nameFr: "Dragon", nameEn: "Dragon", codeFr: "DRA", codeEn: "DRA", color: "#ffffff", bg: "#7b63e7", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 16, key: "T\xE9n\xE8bres", nameFr: "T\xE9n\xE8bres", nameEn: "Dark", codeFr: "T\xC9N", codeEn: "DAR", color: "#ffffff", bg: "#735a4a", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 17, key: "F\xE9e", nameFr: "F\xE9e", nameEn: "Fairy", codeFr: "F\xC9E", codeEn: "FAI", color: "#ffffff", bg: "#ef70ef", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } },
+    { id: 18, key: "Stellaire", nameFr: "Stellaire", nameEn: "Stellar", codeFr: "STE", codeEn: "STL", color: "#ffffff", bg: "#6299bd", get name() {
+      return isEnglish() ? this.nameEn : this.nameFr;
+    }, get code() {
+      return isEnglish() ? this.codeEn : this.codeFr;
+    } }
   ];
   var TYPE_CHART = [
     // 0: Normal
@@ -4927,7 +5407,34 @@
       const sid = Number(speciesId);
       if (isNaN(sid)) return "";
       const isMega = pokemon ? this.isPokemonMega(pokemon) : false;
-      if (this.speciesNames[sid]) {
+      if (isEnglish()) {
+        try {
+          if (pokemon?.species && typeof pokemon.species.getName === "function") {
+            const loc = pokemon.species.getName(formIndex);
+            if (loc && typeof loc === "string" && loc.trim()) {
+              return isMega && !loc.toLowerCase().includes("mega") ? `Mega ${loc.trim()}` : loc.trim();
+            }
+          }
+          if (pokemon?.species?.name) {
+            const n = pokemon.species.name;
+            return isMega && !n.toLowerCase().includes("mega") ? `Mega ${n}` : n;
+          }
+          const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+          const scene = PokeSkip.scene || win.globalScene;
+          const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry || scene && scene.speciesDataRegistry || scene && scene.gameData && scene.gameData.speciesDataRegistry;
+          if (sdr) {
+            const sp = sdr.data ? sdr.data[sid] : typeof sdr.get === "function" ? sdr.get(sid) : null;
+            if (sp) {
+              const n = typeof sp.getName === "function" ? sp.getName(formIndex) : sp.name || sp.speciesName;
+              if (n && typeof n === "string" && n.trim()) {
+                return isMega && !n.toLowerCase().includes("mega") ? `Mega ${n.trim()}` : n.trim();
+              }
+            }
+          }
+        } catch (_) {
+        }
+      }
+      if (this.speciesNames[sid] && isFrench()) {
         let n = this.speciesNames[sid];
         if (isMega && !n.toLowerCase().includes("m\xE9ga") && !n.toLowerCase().includes("mega")) {
           n = `M\xE9ga-${n}`;
@@ -4935,20 +5442,20 @@
         return n;
       }
       if (sid >= 8e3 && sid < 1e4) {
-        const base = this.getSpeciesName(sid - 8e3);
-        if (base) return `${base} de Paldea`;
+        const base = this.getSpeciesName(sid - 8e3, 0, pokemon);
+        if (base) return t("regional_paldea", { base });
       }
       if (sid >= 6e3 && sid < 8e3) {
-        const base = this.getSpeciesName(sid - 6e3);
-        if (base) return `${base} de Hisui`;
+        const base = this.getSpeciesName(sid - 6e3, 0, pokemon);
+        if (base) return t("regional_hisui", { base });
       }
       if (sid >= 4e3 && sid < 6e3) {
-        const base = this.getSpeciesName(sid - 4e3);
-        if (base) return `${base} de Galar`;
+        const base = this.getSpeciesName(sid - 4e3, 0, pokemon);
+        if (base) return t("regional_galar", { base });
       }
       if (sid >= 2e3 && sid < 4e3) {
-        const base = this.getSpeciesName(sid - 2e3);
-        if (base) return `${base} d'Alola`;
+        const base = this.getSpeciesName(sid - 2e3, 0, pokemon);
+        if (base) return t("regional_alola", { base });
       }
       const fIdx = formIndex !== void 0 && formIndex !== null && formIndex > 0 ? Number(formIndex) : pokemon?.formIndex ? Number(pokemon.formIndex) : 0;
       if (fIdx > 0 && sid > 0 && sid < 1025) {
@@ -4961,19 +5468,19 @@
           } catch (_) {
           }
         }
-        const base = this.speciesNames[sid] || this.staticSpeciesNames && this.staticSpeciesNames[sid] || "";
+        const base = (isFrench() ? this.speciesNames[sid] || this.staticSpeciesNames && this.staticSpeciesNames[sid] : "") || pokemon?.species?.name || this.staticSpeciesNames && this.staticSpeciesNames[sid] || "";
         if (base) {
           const alolanIds = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
           const galarianIds = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
           const hisuianIds = [58, 59, 100, 101, 157, 211, 215, 503, 549, 550, 570, 571, 628, 706, 713, 724];
           const paldeanIds = [128, 194];
-          if (alolanIds.includes(sid) && fIdx === 1) return `${base} d'Alola`;
-          if (galarianIds.includes(sid) && (fIdx === 1 || sid === 52 && fIdx === 2)) return `${base} de Galar`;
-          if (hisuianIds.includes(sid) && fIdx === 1) return `${base} de Hisui`;
-          if (paldeanIds.includes(sid) && fIdx === 1) return `${base} de Paldea`;
+          if (alolanIds.includes(sid) && fIdx === 1) return t("regional_alola", { base });
+          if (galarianIds.includes(sid) && (fIdx === 1 || sid === 52 && fIdx === 2)) return t("regional_galar", { base });
+          if (hisuianIds.includes(sid) && fIdx === 1) return t("regional_hisui", { base });
+          if (paldeanIds.includes(sid) && fIdx === 1) return t("regional_paldea", { base });
         }
       }
-      if (this.staticSpeciesNames && this.staticSpeciesNames[sid]) {
+      if (isFrench() && this.staticSpeciesNames && this.staticSpeciesNames[sid]) {
         let n = this.staticSpeciesNames[sid];
         this.speciesNames[sid] = n;
         if (isMega && !n.toLowerCase().includes("m\xE9ga") && !n.toLowerCase().includes("mega")) {
@@ -5438,12 +5945,10 @@
       if (pokemon.nickname && typeof pokemon.nickname === "string" && pokemon.nickname.trim()) {
         return pokemon.nickname.trim();
       }
-      const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
-      const gameLang = win.i18next?.language || typeof localStorage !== "undefined" && localStorage.getItem("i18nextLng") || "fr";
-      const isFrench = !gameLang || gameLang.startsWith("fr");
+      const isFr = isFrench();
       const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? pokemon?.id);
       const isMega = this.isPokemonMega(pokemon);
-      if (isFrench && sid && !isNaN(sid)) {
+      if (isFr && sid && !isNaN(sid)) {
         let frName = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
         if (frName) {
           if (isMega && !frName.toLowerCase().includes("m\xE9ga") && !frName.toLowerCase().includes("mega")) {
@@ -5456,17 +5961,14 @@
         try {
           const n = pokemon.getName();
           if (n && typeof n === "string" && n.trim()) {
-            if (isFrench && sid && this.speciesNames[sid]) {
-              let fr = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-              if (isMega && !fr.toLowerCase().includes("m\xE9ga") && !fr.toLowerCase().includes("mega")) {
-                fr = `M\xE9ga-${fr}`;
-              }
-              return fr;
-            }
             return n.trim();
           }
         } catch (_) {
         }
+      }
+      if (pokemon?.species?.name) {
+        const n = pokemon.species.name;
+        return isMega && !n.toLowerCase().includes("mega") ? `Mega ${n}` : n;
       }
       if (pokemon.species && typeof pokemon.species.getName === "function") {
         try {
@@ -5565,10 +6067,10 @@
         if (typeof moveObj.type === "number") {
           typeIdx = moveObj.type;
         } else if (typeof moveObj.type === "string") {
-          const idx = POKEMON_TYPES.findIndex((t) => t.name.toLowerCase() === moveObj.type.toLowerCase() || t.code.toLowerCase() === moveObj.type.toLowerCase());
+          const idx = POKEMON_TYPES.findIndex((t2) => t2.name.toLowerCase() === moveObj.type.toLowerCase() || t2.code.toLowerCase() === moveObj.type.toLowerCase());
           if (idx !== -1) typeIdx = idx;
         } else if (typeof moveObj.type === "object" && moveObj.type.name) {
-          const idx = POKEMON_TYPES.findIndex((t) => t.name.toLowerCase() === moveObj.type.name.toLowerCase());
+          const idx = POKEMON_TYPES.findIndex((t2) => t2.name.toLowerCase() === moveObj.type.name.toLowerCase());
           if (idx !== -1) typeIdx = idx;
         }
       }
@@ -7898,8 +8400,8 @@ canvas:focus-visible,
       applyPhaseManagerHooks(found.scene);
       PokeSkip.hooked = true;
       console.log("\u{1F389} [Pok\xE9Skip] Connect\xE9 avec succ\xE8s \xE0 Pok\xE9Rogue !");
-      UI.showToast("Pok\xE9Skip activ\xE9 et pr\xEAt !", "success", 2e3);
-      UI.updateHudBadge();
+      UI2.showToast("Pok\xE9Skip activ\xE9 et pr\xEAt !", "success", 2e3);
+      UI2.updateHudBadge();
     }
     checkAndHook();
     setInterval(() => {
@@ -8050,7 +8552,7 @@ canvas:focus-visible,
         const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
         const message = `\u{1F504} Toujours remplacer <b>${replacedMove.name}</b> par <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> ?`;
         console.log(`\u{1F4A1} [Pok\xE9Skip] Remplacement manuel d\xE9tect\xE9 : "${replacedMove.name}" -> "${incoming.name}" sur ${currentPokemonName}. Proposition d'enregistrement.`);
-        UI.showActionToast(
+        UI2.showActionToast(
           message,
           "Enregistrer",
           () => {
@@ -8061,20 +8563,20 @@ canvas:focus-visible,
               incoming.id,
               replacedMove.id
             );
-            UI.showToast(
+            UI2.showToast(
               `\u2705 R\xE8gle enregistr\xE9e : <b>${replacedMove.name}</b> \u279C <b>${incoming.name}</b> sur <b>${currentPokemonName}</b> !`,
               "success",
               3500
             );
-            UI.updateHudBadge();
-            if (UI.isModalOpen()) {
+            UI2.updateHudBadge();
+            if (UI2.isModalOpen()) {
               const teamBody = document.getElementById("pokeskip-body-team");
-              if (teamBody && teamBody.style.display !== "none" && typeof UI.renderTeamTab === "function") {
-                UI.renderTeamTab();
+              if (teamBody && teamBody.style.display !== "none" && typeof UI2.renderTeamTab === "function") {
+                UI2.renderTeamTab();
               }
               const savedBody = document.getElementById("pokeskip-body-saved");
-              if (savedBody && savedBody.style.display !== "none" && typeof UI.renderSavedSpeciesList === "function") {
-                UI.renderSavedSpeciesList();
+              if (savedBody && savedBody.style.display !== "none" && typeof UI2.renderSavedSpeciesList === "function") {
+                UI2.renderSavedSpeciesList();
               }
             }
           },
@@ -8100,7 +8602,7 @@ canvas:focus-visible,
     const origEnd = proto.end;
     if (typeof origEnd === "function") {
       proto.end = function() {
-        UI.dismissQuickSkipPrompt();
+        UI2.dismissQuickSkipPrompt();
         if (this._pokeskipEnded) return origEnd.apply(this, arguments);
         this._pokeskipEnded = true;
         if (typeof this._restoreUi === "function") {
@@ -8173,15 +8675,15 @@ canvas:focus-visible,
           if (targetMoveIndex !== -1) {
             phase._pokeskipAutoReplaced = true;
             console.log(`\u{1F504} [Pok\xE9Skip] Remplacement auto : "${replacement.oldMoveName}" -> "${moveName}" sur ${familyInfo.lineageName} (slot ${targetMoveIndex})`);
-            if (typeof UI.dismissQuickSkipPrompt === "function") {
-              UI.dismissQuickSkipPrompt();
+            if (typeof UI2.dismissQuickSkipPrompt === "function") {
+              UI2.dismissQuickSkipPrompt();
             }
             PokeSkip.recordSkip();
             if (PokeSkip.settings.showToasts) {
               const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
-              UI.showToast(`\u{1F504} <b>${moveName}</b> a automatiquement remplac\xE9 <b>${replacement.oldMoveName}</b> sur <b>${currentPokemonName}</b> !`, "info", PokeSkip.settings.toastDuration || 3e3);
+              UI2.showToast(`\u{1F504} <b>${moveName}</b> a automatiquement remplac\xE9 <b>${replacement.oldMoveName}</b> sur <b>${currentPokemonName}</b> !`, "info", PokeSkip.settings.toastDuration || 3e3);
             }
-            UI.updateHudBadge();
+            UI2.updateHudBadge();
             const effectiveMove = move || { id: moveId, name: moveName };
             if (phase.moveId === void 0 && moveId !== void 0) {
               phase.moveId = moveId;
@@ -8224,18 +8726,18 @@ canvas:focus-visible,
           PokeSkip.recordSkip();
           if (PokeSkip.settings.showToasts) {
             const currentPokemonName = LineageManager.getCurrentFormName(pokemon);
-            UI.showToast(`\u{1F6E1}\uFE0F Capacit\xE9 <b>${moveName}</b> ignor\xE9e pour <b>${currentPokemonName}</b> !`, "info", PokeSkip.settings.toastDuration);
+            UI2.showToast(`\u{1F6E1}\uFE0F Capacit\xE9 <b>${moveName}</b> ignor\xE9e pour <b>${currentPokemonName}</b> !`, "info", PokeSkip.settings.toastDuration);
           }
-          UI.updateHudBadge();
+          UI2.updateHudBadge();
           phase.end();
           return;
         }
         if (PokeSkip.settings.showQuickPrompt !== false) {
-          UI.showQuickSkipPrompt(phase, pokemon, move);
+          UI2.showQuickSkipPrompt(phase, pokemon, move);
         }
       }
       if (phase._pokeskipIgnored) {
-        UI.dismissQuickSkipPrompt();
+        UI2.dismissQuickSkipPrompt();
         phase.end();
         return;
       }
@@ -8515,17 +9017,18 @@ canvas:focus-visible,
       hud.id = "pokeskip-hud";
       const enabled = PokeSkip.settings.enabled;
       hud.className = enabled ? "on" : "off";
-      hud.title = `Pok\xE9Skip (${enabled ? "Actif - ON" : "En pause - OFF"}) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer`;
+      hud.title = enabled ? t("hud_active") : t("hud_paused");
       const runCount = PokeSkip.getRunSkippedCount();
       const showCount = PokeSkip.settings.showHudCount !== false;
+      const countLabel = runCount > 1 ? t("hud_count_passed_many", { count: runCount }) : t("hud_count_passed_one", { count: runCount });
       hud.innerHTML = `
-        <div class="pokeskip-hud-pill" title="Pok\xE9Skip (${enabled ? "Actif - ON" : "En pause - OFF"}) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P">
-          <div class="pokeskip-hud-ball-wrap" title="${enabled ? "Pok\xE9Skip : ACTIF (ON)" : "Pok\xE9Skip : EN PAUSE (OFF)"}">
+        <div class="pokeskip-hud-pill" title="${enabled ? t("hud_pill_title_on") : t("hud_pill_title_off")}">
+          <div class="pokeskip-hud-ball-wrap" title="${enabled ? t("hud_pill_title_on") : t("hud_pill_title_off")}">
             ${this.getPokeballSvg(20, enabled)}
           </div>
-          <span class="pokeskip-hud-badge" id="pokeskip-hud-count" style="display: ${showCount ? "inline-block" : "none"};">${runCount} pass\xE9e${runCount > 1 ? "s" : ""}</span>
+          <span class="pokeskip-hud-badge" id="pokeskip-hud-count" style="display: ${showCount ? "inline-block" : "none"};">${countLabel}</span>
         </div>
-        <button id="pokeskip-hud-type-btn" title="Tableau des Types (Touche T)">\u2694\uFE0F</button>
+        <button id="pokeskip-hud-type-btn" title="${t("hud_type_btn_title")}">\u2694\uFE0F</button>
       `;
       this.makeHudDraggable(hud);
       const typeBtn = hud.querySelector("#pokeskip-hud-type-btn");
@@ -8662,13 +9165,13 @@ canvas:focus-visible,
       if (hud) {
         hud.classList.toggle("on", !!enabled);
         hud.classList.toggle("off", !enabled);
-        hud.title = `Pok\xE9Skip (${enabled ? "Actif - ON" : "En pause - OFF"}) \u2022 Raccourci P \u2022 Glisser pour d\xE9placer`;
+        hud.title = enabled ? t("hud_active") : t("hud_paused");
       }
       if (pill) {
-        pill.title = `Pok\xE9Skip (${enabled ? "Actif - ON" : "En pause - OFF"}) \u2022 Clic pour g\xE9rer les capacit\xE9s \u2022 Raccourci P`;
+        pill.title = enabled ? t("hud_pill_title_on") : t("hud_pill_title_off");
       }
       if (ballWrap) {
-        ballWrap.title = enabled ? "Pok\xE9Skip : ACTIF (ON)" : "Pok\xE9Skip : EN PAUSE (OFF)";
+        ballWrap.title = enabled ? t("hud_pill_title_on") : t("hud_pill_title_off");
       }
       if (ball) {
         ball.classList.toggle("on", !!enabled);
@@ -8679,7 +9182,8 @@ canvas:focus-visible,
         }
       }
       if (countEl) {
-        countEl.textContent = `${runCount} pass\xE9e${runCount > 1 ? "s" : ""}`;
+        const countLabel = runCount > 1 ? t("hud_count_passed_many", { count: runCount }) : t("hud_count_passed_one", { count: runCount });
+        countEl.textContent = countLabel;
         countEl.style.display = showCount ? "inline-block" : "none";
       }
       if (dividerEl) {
@@ -8695,93 +9199,126 @@ canvas:focus-visible,
   // src/ui/tabs/settings-tab.js
   var SettingsTab = {
     getSettingsTabHtml() {
+      const lang = PokeSkip.settings.language || "auto";
       return `
       <div style="max-width: 500px; display: flex; flex-direction: column; gap: 16px;">
+        <!-- Choix de la langue -->
+        <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px;">
+          <h4 style="margin: 0; font-size: 14px; color: #38bdf8;">\u{1F310} ${t("settings_lang_title")}</h4>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">${t("settings_lang_desc")}</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <select id="pokeskip-opt-language" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #f8fafc; padding: 6px 12px; font-size: 13px; cursor: pointer; outline: none;">
+              <option value="auto" ${lang === "auto" ? "selected" : ""}>\u{1F310} ${t("settings_lang_auto")}</option>
+              <option value="fr" ${lang === "fr" ? "selected" : ""}>\u{1F1EB}\u{1F1F7} ${t("settings_lang_fr")}</option>
+              <option value="en" ${lang === "en" ? "selected" : ""}>\u{1F1EC}\u{1F1E7} ${t("settings_lang_en")}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Notifications & Alertes -->
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 12px;">
-          <h4 style="margin: 0 0 2px 0; font-size: 14px; color: #38bdf8;">Notifications & Alertes</h4>
+          <h4 style="margin: 0 0 2px 0; font-size: 14px; color: #38bdf8;">${t("settings_notif_title")}</h4>
           
           <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
             <input type="checkbox" id="pokeskip-opt-toasts" ${PokeSkip.settings.showToasts ? "checked" : ""} style="accent-color: #38bdf8;">
-            Afficher les notifications toast lors d'un auto-skip
+            ${t("settings_toasts_label")}
           </label>
 
           <div id="pokeskip-opt-toast-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.showToasts ? "1" : "0.4"};">
-            <span>Dur\xE9e d'affichage des notifications :</span>
+            <span>${t("settings_toast_duration")}</span>
             <div style="display: flex; align-items: center; gap: 6px;">
               <input type="number" id="pokeskip-opt-toast-duration" min="1" max="15" step="0.5" value="${(PokeSkip.settings.toastDuration || 2800) / 1e3}" ${!PokeSkip.settings.showToasts ? "disabled" : ""} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
-              <span>secondes</span>
+              <span>${t("settings_seconds")}</span>
             </div>
           </div>
 
           <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
             <input type="checkbox" id="pokeskip-opt-hud-count" ${PokeSkip.settings.showHudCount !== false ? "checked" : ""} style="accent-color: #38bdf8;">
-            Afficher le compteur de capacit\xE9s pass\xE9es sur la pastille
+            ${t("settings_hud_count_label")}
           </label>
 
           <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 10px;">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
               <input type="checkbox" id="pokeskip-opt-quick-prompt" ${PokeSkip.settings.showQuickPrompt !== false ? "checked" : ""} style="accent-color: #38bdf8;">
-              Proposer d'ignorer pour toujours une nouvelle attaque en combat
+              ${t("settings_quick_prompt_label")}
             </label>
             
             <div id="pokeskip-opt-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.showQuickPrompt !== false ? "1" : "0.4"};">
-              <span>Dur\xE9e d'affichage du message rapide :</span>
+              <span>${t("settings_quick_prompt_duration")}</span>
               <div style="display: flex; align-items: center; gap: 6px;">
                 <input type="number" id="pokeskip-opt-quick-duration" min="3" max="60" value="${PokeSkip.settings.quickPromptDuration || 15}" ${PokeSkip.settings.showQuickPrompt === false ? "disabled" : ""} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
-                <span>secondes</span>
+                <span>${t("settings_seconds")}</span>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Mode Avanc\xE9 : Remplacement d'Attaques -->
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(168, 85, 247, 0.25); display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <h4 style="margin: 0; font-size: 14px; color: #c084fc; display: flex; align-items: center; gap: 6px;">
-              <span>\u26A1 Mode Avanc\xE9 : Remplacement d'Attaques</span>
+              <span>${t("settings_advanced_title")}</span>
             </h4>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: #fff; font-weight: 600;">
               <input type="checkbox" id="pokeskip-opt-advanced-mode" ${PokeSkip.settings.advancedMode ? "checked" : ""} style="accent-color: #a855f7; width: 16px; height: 16px;">
-              Activer
+              ${t("settings_advanced_enable")}
             </label>
           </div>
           <div style="font-size: 12px; color: #94a3b8; line-height: 1.4;">
-            Permet de configurer des remplacements automatiques d'anciennes attaques lorsqu'une nouvelle capacit\xE9 (non ignor\xE9e) est apprise et que le Pok\xE9mon poss\xE8de d\xE9j\xE0 4 attaques.
+            ${t("settings_advanced_desc")}
           </div>
           <div id="pokeskip-advanced-status-desc" style="font-size: 11px; color: ${PokeSkip.settings.advancedMode ? "#a855f7" : "#64748b"};">
-            ${PokeSkip.settings.advancedMode ? "\u2713 Actif : les sections de remplacement sont visibles dans les onglets." : "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es."}
+            ${PokeSkip.settings.advancedMode ? t("settings_advanced_status_on") : t("settings_advanced_status_off")}
           </div>
 
           <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; opacity: ${PokeSkip.settings.advancedMode ? "1" : "0.4"};">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
               <input type="checkbox" id="pokeskip-opt-prompt-auto-replacement" ${PokeSkip.settings.promptAutoReplacement !== false ? "checked" : ""} ${!PokeSkip.settings.advancedMode ? "disabled" : ""} style="accent-color: #a855f7;">
-              Proposer d'enregistrer les remplacements manuels d\xE9tect\xE9s
+              ${t("settings_prompt_auto_rep")}
             </label>
             <div style="font-size: 11px; color: #94a3b8; padding-left: 24px; line-height: 1.3;">
-              Affiche un toast interactif lorsqu'un remplacement est effectu\xE9 manuellement en jeu pour l'enregistrer dans les r\xE8gles de remplacement automatique.
+              ${t("settings_prompt_auto_rep_desc")}
             </div>
           </div>
         </div>
 
+        <!-- Exportation / Importation -->
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-          <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #38bdf8;">Exportation / Importation</h4>
-          <p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8;">Transf\xE9rez vos r\xE8gles de skip et vos param\xE8tres d'options vers un autre navigateur ou ordinateur.</p>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button id="pokeskip-btn-export" style="background:#0284c7; color:#fff; border:1px solid #38bdf8; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">\u{1F4E4} Exporter (JSON)</button>
-            <button id="pokeskip-btn-import" style="background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">\u{1F4E5} Importer (JSON)</button>
+          <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #38bdf8;">${t("settings_io_title")}</h4>
+          <p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8;">${t("settings_io_desc")}</p>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button id="pokeskip-btn-export" style="background:#0284c7; color:#fff; border:1px solid #38bdf8; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">${t("settings_export_btn")}</button>
+            <button id="pokeskip-btn-import" style="background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">${t("settings_import_btn")}</button>
             <input type="file" id="pokeskip-file-import" accept=".json,application/json" style="display: none;" />
           </div>
         </div>
 
+        <!-- R\xE9initialisation -->
         <div style="background: rgba(225,29,72,0.1); padding: 14px; border-radius: 10px; border: 1px solid rgba(225,29,72,0.25);">
-          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: #f43f5e;">R\xE9initialisation</h4>
+          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: #f43f5e;">${t("settings_reset_title")}</h4>
           <button id="pokeskip-btn-reset-rules" style="background:#be123c; border:1px solid #f43f5e; color:#fff; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">
-            Supprimer toutes mes r\xE8gles enregistr\xE9es
+            ${t("settings_reset_rules_btn")}
           </button>
         </div>
       </div>
     `;
     },
     bindSettingsTabEvents(container, ui) {
+      const optLang = container.querySelector("#pokeskip-opt-language");
+      if (optLang) {
+        optLang.addEventListener("change", (e) => {
+          PokeSkip.settings.language = e.target.value;
+          PokeSkip.saveSettings();
+          if (typeof ui?.rebuildModal === "function") {
+            ui.rebuildModal();
+          } else if (typeof UI?.rebuildModal === "function") {
+            UI.rebuildModal();
+          } else {
+            SettingsTab.renderSettingsTab();
+            if (typeof ui?.updateHudBadge === "function") ui.updateHudBadge();
+          }
+        });
+      }
       const optToasts = container.querySelector("#pokeskip-opt-toasts");
       if (optToasts) {
         optToasts.addEventListener("change", (e) => {
@@ -8832,7 +9369,7 @@ canvas:focus-visible,
           PokeSkip.saveSettings();
           const statusDesc = container.querySelector("#pokeskip-advanced-status-desc");
           if (statusDesc) {
-            statusDesc.textContent = e.target.checked ? "\u2713 Actif : les sections de remplacement sont visibles dans les onglets." : "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es.";
+            statusDesc.textContent = e.target.checked ? t("settings_advanced_status_on") : t("settings_advanced_status_off");
             statusDesc.style.color = e.target.checked ? "#a855f7" : "#64748b";
           }
           if (optPromptAutoReplacement) {
@@ -8842,7 +9379,7 @@ canvas:focus-visible,
             promptAutoRepContainer.style.opacity = e.target.checked ? "1" : "0.4";
           }
           ui.showToast(
-            e.target.checked ? "\u26A1 Mode Avanc\xE9 activ\xE9" : "Mode Avanc\xE9 d\xE9sactiv\xE9 (r\xE8gles conserv\xE9es)",
+            e.target.checked ? "\u26A1 " + t("settings_advanced_status_on") : t("settings_advanced_status_off"),
             e.target.checked ? "success" : "info"
           );
         });
@@ -8901,7 +9438,7 @@ canvas:focus-visible,
           document.body.appendChild(a);
           a.click();
           a.remove();
-          ui.showToast("R\xE8gles et param\xE8tres export\xE9s en fichier JSON", "success");
+          ui.showToast(t("toast_export_success"), "success");
         });
       }
       const btnImport = container.querySelector("#pokeskip-btn-import");
@@ -8919,7 +9456,7 @@ canvas:focus-visible,
             try {
               const parsed = JSON.parse(event.target.result);
               if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-                ui.showToast("Erreur : le fichier JSON est invalide ou vide.", "error");
+                ui.showToast(t("toast_import_invalid"), "error");
                 return;
               }
               let importedRulesCount = 0;
@@ -8949,16 +9486,16 @@ canvas:focus-visible,
               if (importedRulesCount > 0) details.push(`${importedRulesCount} r\xE8gle(s)`);
               if (importedSettingsCount > 0) details.push(`${importedSettingsCount} param\xE8tre(s)`);
               if (details.length > 0) {
-                ui.showToast(`Succ\xE8s : ${details.join(" et ")} import\xE9(s) !`, "success");
+                ui.showToast(t("toast_import_success", { details: details.join(" & ") }), "success");
               } else {
-                ui.showToast("Aucune r\xE8gle ou param\xE8tre trouv\xE9 dans ce fichier.", "warning");
+                ui.showToast(t("toast_import_empty"), "warning");
               }
             } catch (err) {
-              ui.showToast("Erreur : impossible de lire ou parser ce fichier JSON.", "error");
+              ui.showToast(t("toast_import_error"), "error");
             }
           };
           reader.onerror = () => {
-            ui.showToast("Erreur lors de la lecture du fichier.", "error");
+            ui.showToast(t("toast_read_error"), "error");
           };
           reader.readAsText(file);
         });
@@ -8966,10 +9503,10 @@ canvas:focus-visible,
       const btnReset = container.querySelector("#pokeskip-btn-reset-rules");
       if (btnReset) {
         btnReset.addEventListener("click", () => {
-          if (confirm("Voulez-vous vraiment effacer TOUTES les r\xE8gles enregistr\xE9es ? Rien ne sera plus skip.")) {
+          if (confirm(t("settings_reset_desc") + "?")) {
             PokeSkip.rules = {};
             PokeSkip.saveRules();
-            ui.showToast("Toutes les r\xE8gles ont \xE9t\xE9 effac\xE9es.", "warning");
+            ui.showToast(t("toast_rules_cleared"), "warning");
             ui.renderTeamTab();
           }
         });
@@ -9001,27 +9538,27 @@ canvas:focus-visible,
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <h2 style="margin: 0; font-size: 16px; font-weight: 700; color: #f8fafc; letter-spacing: -0.2px;">Pok\xE9Skip</h2>
-                <span class="pokeskip-header-badge">Auto-Skip Intelligent</span>
+                <span class="pokeskip-header-badge">${t("header_badge")}</span>
               </div>
-              <span style="font-size: 11.5px; color: #94a3b8;">Gestion automatis\xE9e des nouvelles capacit\xE9s par Pok\xE9mon</span>
+              <span style="font-size: 11.5px; color: #94a3b8;">${t("header_subtitle")}</span>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 14px;">
-            <label class="pokeskip-switch-label" title="Activer / D\xE9sactiver Pok\xE9Skip">
-              <span class="pokeskip-switch-text ${PokeSkip.settings.enabled ? "active" : ""}" id="pokeskip-switch-status-text">${PokeSkip.settings.enabled ? "Actif" : "Inactif"}</span>
+            <label class="pokeskip-switch-label" title="${t("switch_title")}">
+              <span class="pokeskip-switch-text ${PokeSkip.settings.enabled ? "active" : ""}" id="pokeskip-switch-status-text">${PokeSkip.settings.enabled ? t("status_active") : t("status_inactive")}</span>
               <span class="pokeskip-switch">
                 <input type="checkbox" id="pokeskip-toggle-enabled" ${PokeSkip.settings.enabled ? "checked" : ""}>
                 <span class="pokeskip-slider"></span>
               </span>
             </label>
-            <button id="pokeskip-modal-close" class="pokeskip-close-btn" title="Fermer la fen\xEAtre (\xC9chap)">\u2715</button>
+            <button id="pokeskip-modal-close" class="pokeskip-close-btn" title="${t("close_btn_title")}">\u2715</button>
           </div>
         </div>
 
         <div class="pokeskip-modal-tabs">
-          <button class="pokeskip-tab-btn active" data-tab="team"><span>\u2694\uFE0F</span> <span>Mon \xC9quipe</span></button>
-          <button class="pokeskip-tab-btn" data-tab="saved"><span>\u{1F9EC}</span> <span>R\xE8gles & Esp\xE8ces</span></button>
-          <button class="pokeskip-tab-btn" data-tab="settings"><span>\u2699\uFE0F</span> <span>Param\xE8tres</span></button>
+          <button class="pokeskip-tab-btn active" data-tab="team"><span>\u2694\uFE0F</span> <span>${t("tab_team")}</span></button>
+          <button class="pokeskip-tab-btn" data-tab="saved"><span>\u{1F9EC}</span> <span>${t("tab_saved")}</span></button>
+          <button class="pokeskip-tab-btn" data-tab="settings"><span>\u2699\uFE0F</span> <span>${t("tab_settings")}</span></button>
         </div>
 
         <div class="pokeskip-modal-body" id="pokeskip-body-team">
@@ -9063,10 +9600,10 @@ canvas:focus-visible,
         this.updateHudBadge();
         const statusText = document.getElementById("pokeskip-switch-status-text");
         if (statusText) {
-          statusText.textContent = PokeSkip.settings.enabled ? "Actif" : "Inactif";
+          statusText.textContent = PokeSkip.settings.enabled ? t("status_active") : t("status_inactive");
           statusText.classList.toggle("active", PokeSkip.settings.enabled);
         }
-        this.showToast(PokeSkip.settings.enabled ? "Pok\xE9Skip activ\xE9" : "Pok\xE9Skip en pause", "info");
+        this.showToast(PokeSkip.settings.enabled ? t("toast_enabled") : t("toast_paused"), "info");
       });
       backdrop.querySelectorAll(".pokeskip-tab-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -9101,6 +9638,25 @@ canvas:focus-visible,
       }
       if (!this.isModalOpen()) {
         this.enableGameKeyboard();
+      }
+    },
+    rebuildModal() {
+      const wasOpen = this.modalContainer && this.modalContainer.classList.contains("active");
+      let activeTab = "settings";
+      const activeBtn = this.modalContainer?.querySelector(".pokeskip-tab-btn.active");
+      if (activeBtn) activeTab = activeBtn.dataset.tab;
+      if (this.modalContainer) {
+        this.modalContainer.remove();
+        this.modalContainer = null;
+      }
+      this.createModal();
+      if (wasOpen) {
+        this.modalContainer.classList.add("active");
+        const targetBtn = this.modalContainer.querySelector(`.pokeskip-tab-btn[data-tab="${activeTab}"]`);
+        if (targetBtn) targetBtn.click();
+      }
+      if (typeof this.updateHudBadge === "function") {
+        this.updateHudBadge();
       }
     },
     typeChartContainer: null,
@@ -9196,14 +9752,14 @@ canvas:focus-visible,
           if (poke.species.type2 !== void 0 && poke.species.type2 !== poke.species.type1) rawTypes.push(poke.species.type2);
         }
         const indices = [];
-        for (const t of rawTypes) {
-          if (typeof t === "number" && t >= 0 && t < 18) {
-            if (!indices.includes(t)) indices.push(t);
-          } else if (typeof t === "string") {
-            const idx = POKEMON_TYPES.findIndex((pt) => pt.name.toLowerCase() === t.toLowerCase());
+        for (const t2 of rawTypes) {
+          if (typeof t2 === "number" && t2 >= 0 && t2 < 18) {
+            if (!indices.includes(t2)) indices.push(t2);
+          } else if (typeof t2 === "string") {
+            const idx = POKEMON_TYPES.findIndex((pt) => pt.name.toLowerCase() === t2.toLowerCase());
             if (idx !== -1 && idx < 18 && !indices.includes(idx)) indices.push(idx);
-          } else if (t && typeof t === "object" && t.name) {
-            const idx = POKEMON_TYPES.findIndex((pt) => pt.name.toLowerCase() === t.name.toLowerCase());
+          } else if (t2 && typeof t2 === "object" && t2.name) {
+            const idx = POKEMON_TYPES.findIndex((pt) => pt.name.toLowerCase() === t2.name.toLowerCase());
             if (idx !== -1 && idx < 18 && !indices.includes(idx)) indices.push(idx);
           }
         }
@@ -9287,17 +9843,17 @@ canvas:focus-visible,
                   <tr>
                     <th class="pokeskip-th-corner">
                       <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; font-size: 8.5px; padding: 3px 2px; box-sizing: border-box;">
-                        <span style="align-self: flex-end; color: #38bdf8; font-weight: 800;">\u{1F6E1}\uFE0F D\xE9f. \u2794</span>
-                        <span style="align-self: flex-start; color: #f8fafc; font-weight: 800;">\u2B07 \u2694\uFE0F Att.</span>
+                        <span style="align-self: flex-end; color: #38bdf8; font-weight: 800;">${t("tc_def_header")}</span>
+                        <span style="align-self: flex-start; color: #f8fafc; font-weight: 800;">${t("tc_att_header")}</span>
                       </div>
                     </th>
-                    ${types18.map((t, colIdx) => {
+                    ${types18.map((tItem, colIdx) => {
           const isHigh = enemyTypeIndices.includes(colIdx);
           return `
-                        <th class="pokeskip-th-col ${isHigh ? "highlighted-col" : ""}" data-col="${colIdx}" style="background-color: ${t.bg};" title="D\xE9fenseur : ${t.name}">
+                        <th class="pokeskip-th-col ${isHigh ? "highlighted-col" : ""}" data-col="${colIdx}" style="background-color: ${tItem.bg};" title="${t("tc_type")} : ${tItem.name}">
                           <div class="pokeskip-th-col-content">
                             ${isHigh ? '<span class="pokeskip-col-marker">\u{1F3AF}</span>' : ""}
-                            <span class="pokeskip-th-col-name">${t.name}</span>
+                            <span class="pokeskip-th-col-name">${tItem.name}</span>
                           </div>
                         </th>
                       `;
@@ -9307,7 +9863,7 @@ canvas:focus-visible,
                 <tbody>
                   ${types18.map((rowType, rowIdx) => `
                     <tr>
-                      <th class="pokeskip-th-row" data-row="${rowIdx}" style="background-color: ${rowType.bg};" title="Attaquant : ${rowType.name}">
+                      <th class="pokeskip-th-row" data-row="${rowIdx}" style="background-color: ${rowType.bg};" title="${rowType.name}">
                         ${rowType.name}
                       </th>
                       ${types18.map((colType, colIdx) => {
@@ -9341,13 +9897,13 @@ canvas:focus-visible,
         footerHtml = `
           <div class="pokeskip-typechart-footer">
             <div class="pokeskip-typechart-legend">
-              <span class="legend-badge super">2</span> <span>\xD72 Super</span>
-              <span class="legend-badge half">\xBD</span> <span>\xD70.5 Peu</span>
-              <span class="legend-badge zero">0</span> <span>\xD70 Inefficace</span>
-              <span class="legend-badge neutral">\u2014</span> <span>\xD71 Neutre</span>
+              <span class="legend-badge super">2</span> <span>${t("tc_legend_super")}</span>
+              <span class="legend-badge half">\xBD</span> <span>${t("tc_legend_half")}</span>
+              <span class="legend-badge zero">0</span> <span>${t("tc_legend_zero")}</span>
+              <span class="legend-badge neutral">\u2014</span> <span>${t("tc_legend_neutral")}</span>
             </div>
             <div style="font-size: 10px; color: #94a3b8;">
-              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> ou <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">\xC9chap</kbd> Fermer
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> / <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Esc</kbd>
             </div>
           </div>
         `;
@@ -9374,9 +9930,9 @@ canvas:focus-visible,
           "Normal"
         ];
         const getRowHtml = (name, isEnemy) => {
-          const idx = types18.findIndex((item) => item.name === name);
+          const idx = types18.findIndex((item) => item.key === name || item.nameFr === name || item.name === name);
           if (idx === -1) return "";
-          const t = types18[idx];
+          const tItem = types18[idx];
           const weaknesses = [];
           const strengths = [];
           const immunities = [];
@@ -9386,12 +9942,12 @@ canvas:focus-visible,
             if (TYPE_CHART[otherIdx][idx] === 0) immunities.push(types18[otherIdx]);
           }
           const weakPills = weaknesses.map((w) => `
-            <span class="pokeskip-badge-pill" data-type="${w.name}" style="background-color: ${w.bg};" title="Subit \xD72 de ${w.name}">
+            <span class="pokeskip-badge-pill" data-type="${w.name}" style="background-color: ${w.bg};" title="${t("tc_takes_double", { type: w.name })}">
               ${w.name}
             </span>
           `).join("");
           const strongPills = strengths.map((s) => `
-            <span class="pokeskip-badge-pill" data-type="${s.name}" style="background-color: ${s.bg};" title="Inflige \xD72 \xE0 ${s.name}">
+            <span class="pokeskip-badge-pill" data-type="${s.name}" style="background-color: ${s.bg};" title="${t("tc_deals_double", { type: s.name })}">
               ${s.name}
             </span>
           `).join("");
@@ -9399,7 +9955,7 @@ canvas:focus-visible,
             <div class="pokeskip-ref-immunity-wrap" style="${showImmunities ? "" : "display: none;"}">
               <div style="display: inline-flex; align-items: center; margin-right: 4px; padding-right: 4px; border-right: 1px solid rgba(255,255,255,0.12);">
                 ${immunities.map((imm) => `
-                  <span class="pokeskip-badge-pill" data-type="${imm.name}" style="background-color: ${imm.bg}; opacity: 0.85;" title="Immunis\xE9 contre ${imm.name} (\xD70)">
+                  <span class="pokeskip-badge-pill" data-type="${imm.name}" style="background-color: ${imm.bg}; opacity: 0.85;" title="${t("tc_immune_against", { type: imm.name })}">
                     ${imm.name}<span class="pokeskip-mult-tag x0">\xD70</span>
                   </span>
                 `).join("")}
@@ -9414,8 +9970,8 @@ canvas:focus-visible,
               </div>
               <div class="pokeskip-ref-arrow-left">\u2794</div>
               <div class="pokeskip-ref-center">
-                <span class="pokeskip-badge-pill" data-type="${t.name}" style="background-color: ${t.bg};" title="${t.name}">
-                  ${t.name}
+                <span class="pokeskip-badge-pill" data-type="${tItem.name}" style="background-color: ${tItem.bg};" title="${tItem.name}">
+                  ${tItem.name}
                 </span>
               </div>
               <div class="pokeskip-ref-arrow-right">\u2794</div>
@@ -9426,7 +9982,7 @@ canvas:focus-visible,
           `;
         };
         const isEnemyList = SIMPLIFIED_ORDER_NAMES.map((name) => {
-          const idx = types18.findIndex((item) => item.name === name);
+          const idx = types18.findIndex((item) => item.key === name || item.nameFr === name || item.name === name);
           return idx !== -1 && enemyTypeIndices.includes(idx);
         });
         const rowNodesHtml = [];
@@ -9458,15 +10014,15 @@ canvas:focus-visible,
           <div class="pokeskip-ref-container ${showImmunities ? "" : "pks-hide-immunities"}">
             <div class="pokeskip-ref-header">
               <div class="pokeskip-ref-left-label">
-                <label class="pokeskip-tc-switch" title="Afficher ou masquer les immunit\xE9s (\xD70)">
+                <label class="pokeskip-tc-switch" title="${t("tc_immunities")}">
                   <input type="checkbox" class="pks-immunity-checkbox" ${showImmunities ? "checked" : ""}>
                   <span class="pks-tc-slider"></span>
-                  <span class="pks-tc-label">\u{1F6E1}\uFE0F Immunit\xE9s (\xD70)</span>
+                  <span class="pks-tc-label">${t("tc_immunities")}</span>
                 </label>
-                <span>\u26A0\uFE0F Faiblesses (re\xE7oit \xD72)</span>
+                <span>${t("tc_weaknesses")}</span>
               </div>
-              <div class="pokeskip-ref-center-label">Type</div>
-              <div class="pokeskip-ref-right-label">Forces (inflige \xD72) \u2694\uFE0F</div>
+              <div class="pokeskip-ref-center-label">${t("tc_type")}</div>
+              <div class="pokeskip-ref-right-label">${t("tc_strengths")}</div>
             </div>
             ${rowNodesHtml.join("")}
           </div>
@@ -9474,12 +10030,12 @@ canvas:focus-visible,
         footerHtml = `
           <div class="pokeskip-typechart-footer">
             <div class="pokeskip-typechart-legend">
-              <span style="color: #fca5a5; font-weight: 700;">Faiblesses \u2794</span> <span>Types re\xE7us \xD72</span>
+              <span style="color: #fca5a5; font-weight: 700;">${t("tc_weaknesses")}</span>
               <span style="margin: 0 4px; color: #475569;">\u2022</span>
-              <span style="color: #86efac; font-weight: 700;">\u2794 Forces</span> <span>Types inflig\xE9s \xD72</span>
+              <span style="color: #86efac; font-weight: 700;">${t("tc_strengths")}</span>
             </div>
             <div style="font-size: 10px; color: #94a3b8;">
-              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> ou <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">\xC9chap</kbd> Fermer
+              <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">T</kbd> / <kbd style="background: #1e293b; border: 1px solid #475569; padding: 1px 4px; border-radius: 3px; color: #fff;">Esc</kbd>
             </div>
           </div>
         `;
@@ -9594,8 +10150,8 @@ canvas:focus-visible,
       if (hasEnemy && enemiesList.length > 0) {
         const targetBlocks = enemiesList.map((en) => {
           const badges = en.types.map((idx) => {
-            const t = POKEMON_TYPES[idx];
-            return `<span class="pokeskip-badge-pill" style="background-color: ${t.bg}; margin-left: 2px;">${t.name}</span>`;
+            const t2 = POKEMON_TYPES[idx];
+            return `<span class="pokeskip-badge-pill" style="background-color: ${t2.bg}; margin-left: 2px;">${t2.name}</span>`;
           }).join("");
           return `
             <div style="display: inline-flex; align-items: center; gap: 4px;">
@@ -9604,9 +10160,10 @@ canvas:focus-visible,
             </div>
           `;
         }).join('<span style="color: #64748b; font-size: 11px; margin: 0 4px; font-weight: bold;">\u2022</span>');
+        const targetLabel = enemiesList.length > 1 ? isFrench() ? "Cibles :" : "Targets:" : isFrench() ? "Cible :" : "Target:";
         targetHeaderHtml = `
           <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.4); padding: 2px 8px; border-radius: 6px; font-size: 11px; flex-wrap: wrap;">
-            <span style="color: #38bdf8; font-weight: 800;">\u{1F3AF} ${enemiesList.length > 1 ? "Cibles :" : "Cible :"}</span>
+            <span style="color: #38bdf8; font-weight: 800;">\u{1F3AF} ${targetLabel}</span>
             ${targetBlocks}
           </div>
         `;
@@ -9617,16 +10174,16 @@ canvas:focus-visible,
           <div class="pokeskip-typechart-header">
             <div class="pokeskip-typechart-title-wrap">
               <span style="font-size: 16px;">\u2694\uFE0F</span>
-              <span class="pokeskip-typechart-title">Forces & Faiblesses</span>
+              <span class="pokeskip-typechart-title">${t("tc_title")}</span>
               <div class="pokeskip-mode-switch">
-                <button class="pokeskip-mode-btn ${mode === "simplified" ? "active" : ""}" data-mode="simplified" title="Vue simplifi\xE9e">\u26A1 Simplifi\xE9</button>
-                <button class="pokeskip-mode-btn ${mode === "table" ? "active" : ""}" data-mode="table" title="Matrice compl\xE8te 18\xD718">\u{1F4CA} Complet</button>
+                <button class="pokeskip-mode-btn ${mode === "simplified" ? "active" : ""}" data-mode="simplified" title="${t("tc_tab_simplified")}">${t("tc_tab_simplified")}</button>
+                <button class="pokeskip-mode-btn ${mode === "table" ? "active" : ""}" data-mode="table" title="${t("tc_tab_complete")}">${t("tc_tab_complete")}</button>
               </div>
               <div class="pokeskip-typechart-targets-wrap">
                 ${targetHeaderHtml}
               </div>
             </div>
-            <button class="pokeskip-typechart-close" title="Fermer (T ou \xC9chap)">&times;</button>
+            <button class="pokeskip-typechart-close" title="${t("close_btn_title")}">&times;</button>
           </div>
 
           <div class="pokeskip-typechart-body pks-tab-fade">
@@ -9737,14 +10294,14 @@ canvas:focus-visible,
         return !!(el.closest("#pokeskip-modal") || el.closest("#pokeskip-type-chart") || el.closest("#pokeskip-quick-prompt") || el.closest("#pokeskip-hud") || el.closest(".pokeskip-container"));
       };
       document.addEventListener("focusin", (e) => {
-        const t = e.target;
-        if (t && isPokeSkipElement(t) && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) {
+        const t2 = e.target;
+        if (t2 && isPokeSkipElement(t2) && (t2.tagName === "INPUT" || t2.tagName === "TEXTAREA" || t2.tagName === "SELECT" || t2.isContentEditable)) {
           this.disableGameKeyboard();
         }
       }, true);
       document.addEventListener("focusout", (e) => {
-        const t = e.target;
-        if (t && isPokeSkipElement(t) && !this.isModalOpen()) {
+        const t2 = e.target;
+        if (t2 && isPokeSkipElement(t2) && !this.isModalOpen()) {
           this.enableGameKeyboard();
         }
       }, true);
@@ -9781,7 +10338,7 @@ canvas:focus-visible,
         } catch (e) {
         }
       }
-      const name = moveObj?.name || PokeSkip.knownMovesCache[moveId] || `Capacit\xE9 #${moveId}`;
+      const name = moveObj?.name || PokeSkip.knownMovesCache[moveId] || t("move_default_name", { id: moveId });
       const typeIdx = moveObj && moveObj.type !== void 0 ? moveObj.type : 0;
       const catIdx = moveObj && moveObj.category !== void 0 ? moveObj.category : 2;
       const power = moveObj && moveObj.power > 0 ? moveObj.power : "\u2014";
@@ -9790,13 +10347,13 @@ canvas:focus-visible,
         if (moveObj.accuracy > 0) {
           accuracyText = `${moveObj.accuracy}%`;
         } else if (moveObj.accuracy < 0) {
-          accuracyText = "Infaillible";
+          accuracyText = t("move_infallible");
         } else {
           accuracyText = "\u2014";
         }
       }
       const pp = moveObj && moveObj.pp !== void 0 && moveObj.pp > 0 ? moveObj.pp : moveObj && moveObj.maxPp ? moveObj.maxPp : "\u2014";
-      const desc = moveObj?.effect || "Inflige des d\xE9g\xE2ts ou applique un effet.";
+      const desc = moveObj?.effect || t("move_default_desc");
       return {
         moveId,
         level,
@@ -9808,7 +10365,7 @@ canvas:focus-visible,
         pp,
         desc,
         evolutionSpecies: evolutionSpecies || null,
-        isEgg: level === "\u0152uf"
+        isEgg: level === "\u0152uf" || level === "Egg"
       };
     }
     const lineage = LineageManager.getLineageMembers(pokemon);
@@ -10164,8 +10721,7 @@ canvas:focus-visible,
       if (!party || party.length === 0) {
         teamContainer.innerHTML = `
           <div style="grid-column: 1 / -1; padding: 24px; text-align: center; color: #94a3b8; background: #111a2e; border-radius: 12px;">
-            \u26A0\uFE0F Aucune partie en cours d\xE9tect\xE9e ou \xE9quipe vide.<br>
-            Lancez une partie dans Pok\xE9Rogue pour voir votre \xE9quipe active, ou utilisez l'onglet <b>"Esp\xE8ces M\xE9moris\xE9es"</b> !
+            ${t("team_empty_msg")}
           </div>
         `;
         return;
@@ -10190,7 +10746,7 @@ canvas:focus-visible,
             <div style="display:none; font-size: 24px;">\u26A1</div>
           </div>
           <div class="pokeskip-member-name">${name}</div>
-          <div style="font-size: 11px; color: #94a3b8;">Niv. ${level}</div>
+          <div style="font-size: 11px; color: #94a3b8;">${t("team_level_prefix")}${level}</div>
           ${isMega ? '<div class="pokeskip-mega-badge">\u{1F9EC} M\xC9GA</div>' : ""}
         `;
         card.addEventListener("click", () => {
@@ -10214,7 +10770,7 @@ canvas:focus-visible,
             </div>
           </div>
           <div class="pokeskip-member-name empty-name">Slot #${emptyIdx + 1}</div>
-          <div style="font-size: 11px; color: #475569; margin-top: 2px;">Libre</div>
+          <div style="font-size: 11px; color: #475569; margin-top: 2px;">${isFrench() ? "Libre" : "Empty"}</div>
         `;
         teamContainer.appendChild(emptyCard);
       }
@@ -10233,20 +10789,22 @@ canvas:focus-visible,
       const rule = PokeSkip.getFamilyRule(familyInfo.familyKey) || { skippedMoves: {}, skipAll: false };
       const isRuleActive = PokeSkip.isFamilyRuleEnabled(familyInfo.familyKey);
       const learnable = getPokemonFullLearnset(pokemon);
+      const lineageLabel = isFrench() ? `Lign\xE9e de <b>${currentName}</b>` : `<b>${currentName}</b>'s Line`;
+      const ruleStatusLabel = isRuleActive ? isFrench() ? "Param\xE9trage actif" : "Rules active" : isFrench() ? "Param\xE9trage en pause" : "Rules paused";
       container.innerHTML = `
         <div class="pokeskip-lineage-header-box">
           <div class="pokeskip-lineage-title-row">
             <div class="pokeskip-lineage-title">
-              <span>Lign\xE9e de <b>${currentName}</b></span>
-              <span class="pokeskip-lineage-lvl">Niv. ${pokemon.level || 1}</span>
+              <span>${lineageLabel}</span>
+              <span class="pokeskip-lineage-lvl">${t("team_level_prefix")}${pokemon.level || 1}</span>
               ${shinyInfo.isShiny ? `<span class="pokeskip-shiny-badge ${shinyInfo.className}" style="position:static;" title="${shinyInfo.title}">${shinyInfo.stars}</span>` : ""}
               ${isMega ? '<span class="pokeskip-mega-badge">\u{1F9EC} M\xC9GA</span>' : ""}
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
-              <label class="pokeskip-switch-label" title="Activer ou mettre en pause l'auto-skip pour cette lign\xE9e">
+              <label class="pokeskip-switch-label" title="${t("team_pause_rules")}">
                 <span class="pokeskip-switch-text ${isRuleActive ? "active" : ""}" id="pokeskip-lineage-switch-text">
-                  ${isRuleActive ? "Param\xE9trage actif" : "Param\xE9trage en pause"}
+                  ${ruleStatusLabel}
                 </span>
                 <span class="pokeskip-switch">
                   <input type="checkbox" id="pokeskip-toggle-lineage-active" ${isRuleActive ? "checked" : ""}>
@@ -10263,7 +10821,7 @@ canvas:focus-visible,
           <div id="pokeskip-pokemon-replacements-slot"></div>
 
           <div style="display: flex; gap: 10px; margin-bottom: 14px; margin-top: 14px;">
-            <input type="text" id="pokeskip-move-filter" placeholder="Filtrer une attaque par nom ou esp\xE8ce..." style="background:#111a2e; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; flex:1;">
+            <input type="text" id="pokeskip-move-filter" placeholder="${t("team_search_placeholder")}" style="background:#111a2e; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; flex:1;">
           </div>
 
           <div class="pokeskip-moves-container" id="pokeskip-moves-grid-el"></div>
@@ -10277,7 +10835,7 @@ canvas:focus-visible,
         if (lineageToggleInput) lineageToggleInput.checked = active;
         if (lineageToggleText) {
           lineageToggleText.className = `pokeskip-switch-text ${active ? "active" : ""}`;
-          lineageToggleText.textContent = active ? "Param\xE9trage actif" : "Param\xE9trage en pause";
+          lineageToggleText.textContent = active ? isFrench() ? "Param\xE9trage actif" : "Rules active" : isFrench() ? "Param\xE9trage en pause" : "Rules paused";
         }
       };
       if (lineageToggleInput) {
@@ -10285,9 +10843,9 @@ canvas:focus-visible,
           const isNowActive = PokeSkip.toggleFamilyRuleEnabled(familyInfo.familyKey);
           updateLineageToggle();
           if (isNowActive) {
-            UI.showToast(`\u2705 Param\xE9trage r\xE9activ\xE9 pour <b>${currentName}</b>`, "success");
+            UI2.showToast(t("toast_lineage_resumed", { name: currentName }), "success");
           } else {
-            UI.showToast(`\u23F8\uFE0F Param\xE9trage mis en pause pour <b>${currentName}</b> (s\xE9lections conserv\xE9es)`, "info");
+            UI2.showToast(t("toast_lineage_paused", { name: currentName }), "info");
           }
         });
       }
@@ -10301,17 +10859,17 @@ canvas:focus-visible,
           return m.name.toLowerCase().includes(f) || m.evolutionSpecies && m.evolutionSpecies.toLowerCase().includes(f) || isEggFilter && (m.level === "\u0152uf" || m.isEgg);
         });
         if (filtered.length === 0) {
-          grid.innerHTML = `<div style="color: #64748b; font-size: 13px; text-align: center; padding: 20px;">Aucune capacit\xE9 trouv\xE9e.</div>`;
+          grid.innerHTML = `<div style="color: #64748b; font-size: 13px; text-align: center; padding: 20px;">${t("team_no_moves")}</div>`;
           return;
         }
         filtered.forEach((moveItem) => {
-          const isEggMove = moveItem.isEgg || moveItem.level === "\u0152uf";
+          const isEggMove = moveItem.isEgg || moveItem.level === "\u0152uf" || moveItem.level === "Egg";
           const isSkipped = !isEggMove && PokeSkip.isMoveSkipped(pokemon, moveItem.name, moveItem.moveId);
           const isKept = !isSkipped;
           const isAutoReplacement = !isEggMove && PokeSkip.settings.advancedMode && PokeSkip.isMoveAutoReplacementTarget(pokemon, moveItem.name, moveItem.moveId);
           const isPromptSuppressed = isAutoReplacement || !isEggMove && PokeSkip.isMovePromptSuppressed(pokemon, moveItem.name, moveItem.moveId);
           const isSilenceDisabled = isAutoReplacement;
-          const silenceTooltip = isAutoReplacement ? "Cette attaque remplace automatiquement une autre capacit\xE9 (Mode Avanc\xE9) : elle ne peut pas \xEAtre prompt\xE9e pour \xEAtre ignor\xE9e." : isPromptSuppressed ? "Ne plus demander d'ignorer cette attaque en combat (cliquer pour r\xE9activer le prompt)" : "Cliquer pour ne plus \xEAtre interrog\xE9 en combat pour ignorer cette attaque";
+          const silenceTooltip = isAutoReplacement ? isFrench() ? "Cette attaque remplace automatiquement une autre capacit\xE9 (Mode Avanc\xE9) : elle ne peut pas \xEAtre prompt\xE9e pour \xEAtre ignor\xE9e." : "This move automatically replaces another move (Advanced Mode): it cannot be prompted for skip." : isPromptSuppressed ? isFrench() ? "Ne plus demander d'ignorer cette attaque en combat (cliquer pour r\xE9activer le prompt)" : "Do not ask to skip this move in battle (click to re-enable prompt)" : isFrench() ? "Cliquer pour ne plus \xEAtre interrog\xE9 en combat pour ignorer cette attaque" : "Click to no longer be prompted to skip this move in battle";
           const cardEl = document.createElement("div");
           cardEl.className = `pokeskip-move-card ${isSkipped ? "skipped" : ""}`;
           if (isEggMove) {
@@ -10325,21 +10883,23 @@ canvas:focus-visible,
           } else if (isEggMove) {
             lvlStyle = 'style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);"';
           }
-          let lvlLabel = typeof moveItem.level === "number" ? `Niv. ${moveItem.level}` : moveItem.level;
+          let lvlLabel = typeof moveItem.level === "number" ? `${t("team_level_prefix")}${moveItem.level}` : moveItem.level === "\u0152uf" || moveItem.level === "Egg" ? t("team_egg_badge") : moveItem.level;
           if (isEggMove) {
-            lvlLabel = "\u{1F95A} \u0152uf";
+            lvlLabel = t("team_egg_badge");
           }
+          const keptText = isKept ? isFrench() ? "\u2713 Gard\xE9e" : "\u2713 Kept" : isFrench() ? "\u2715 Ignor\xE9e" : "\u2715 Skipped";
+          const silenceText = isAutoReplacement ? isFrench() ? "\u{1F504} Remplacement auto" : "\u{1F504} Auto replace" : isFrench() ? "\u{1F515} Ne plus demander" : "\u{1F515} Never ask";
           cardEl.innerHTML = `
             <div class="pokeskip-move-action">
               ${isEggMove ? `
-                <span class="pokeskip-egg-badge" title="Capacit\xE9 \u0153uf obtenue au d\xE9part : le jeu ne propose jamais de l'apprendre par mont\xE9e de niveau.">\u{1F95A} Capacit\xE9 \u0152uf</span>
+                <span class="pokeskip-egg-badge" title="${t("team_egg_badge")}">${t("team_egg_badge")}</span>
               ` : `
                 <label class="pokeskip-silence-label ${isAutoReplacement ? "disabled" : ""}" title="${silenceTooltip}">
                   <input type="checkbox" class="pokeskip-checkbox pokeskip-silence-checkbox" ${isPromptSuppressed ? "checked" : ""} ${isSilenceDisabled ? "disabled" : ""}>
-                  <span class="pokeskip-silence-badge ${isPromptSuppressed ? "silenced" : ""} ${isAutoReplacement ? "auto" : ""}">${isAutoReplacement ? "\u{1F504} Remplacement auto" : "\u{1F515} Ne plus demander"}</span>
+                  <span class="pokeskip-silence-badge ${isPromptSuppressed ? "silenced" : ""} ${isAutoReplacement ? "auto" : ""}">${silenceText}</span>
                 </label>
-                <div class="pokeskip-keep-action" title="${isKept ? "Attaque gard\xE9e (d\xE9cocher pour ignorer)" : "Attaque ignor\xE9e (cocher pour garder)"}">
-                  <span class="pokeskip-keep-badge ${isKept ? "kept" : "skip"}">${isKept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e"}</span>
+                <div class="pokeskip-keep-action" title="${isKept ? t("team_keep_title") : t("team_skip_title")}">
+                  <span class="pokeskip-keep-badge ${isKept ? "kept" : "skip"}">${keptText}</span>
                   <input type="checkbox" class="pokeskip-checkbox pokeskip-keep-checkbox" ${isKept ? "checked" : ""}>
                 </div>
               `}
@@ -10348,13 +10908,13 @@ canvas:focus-visible,
               <div class="pokeskip-move-left">
                 <span class="pokeskip-move-lvl-pill" ${lvlStyle}>${lvlLabel}</span>
                 <span class="pokeskip-move-name-txt">${moveItem.name}</span>
-                ${moveItem.evolutionSpecies ? `<span class="pokeskip-evo-tag" title="Capacit\xE9 apprise par ${moveItem.evolutionSpecies} dans cette lign\xE9e">\u{1F9EC} ${moveItem.evolutionSpecies}</span>` : ""}
+                ${moveItem.evolutionSpecies ? `<span class="pokeskip-evo-tag" title="${moveItem.evolutionSpecies}">\u{1F9EC} ${moveItem.evolutionSpecies}</span>` : ""}
                 <span class="pokeskip-type-tag" style="background:${moveItem.type.bg}; color:${moveItem.type.color};">${moveItem.type.name}</span>
                 <span class="pokeskip-cat-tag" style="color:${moveItem.category.color};">${moveItem.category.icon} ${moveItem.category.name}</span>
               </div>
               <div class="pokeskip-move-stats">
-                <span class="pokeskip-stat-pill">\u2694\uFE0F Puissance : <b>${moveItem.power}</b></span>
-                <span class="pokeskip-stat-pill" style="border-color: rgba(56, 189, 248, 0.3);">\u{1F3AF} Pr\xE9cision : <b style="color: #38bdf8;">${moveItem.accuracy}</b></span>
+                <span class="pokeskip-stat-pill">\u2694\uFE0F ${t("team_th_power")} : <b>${moveItem.power}</b></span>
+                <span class="pokeskip-stat-pill" style="border-color: rgba(56, 189, 248, 0.3);">\u{1F3AF} ${t("team_th_acc")} : <b style="color: #38bdf8;">${moveItem.accuracy}</b></span>
                 <span class="pokeskip-stat-pill">\u{1F50B} PP : <b>${moveItem.pp}</b></span>
               </div>
             </div>
@@ -10371,10 +10931,10 @@ canvas:focus-visible,
               cardEl.classList.toggle("skipped", !kept);
               if (keepBadge) {
                 keepBadge.className = `pokeskip-keep-badge ${kept ? "kept" : "skip"}`;
-                keepBadge.textContent = kept ? "\u2713 Gard\xE9e" : "\u2715 Ignor\xE9e";
+                keepBadge.textContent = kept ? isFrench() ? "\u2713 Gard\xE9e" : "\u2713 Kept" : isFrench() ? "\u2715 Ignor\xE9e" : "\u2715 Skipped";
               }
               PokeSkip.setMoveSkipped(pokemon, currentName, moveItem.name, moveItem.moveId, !kept);
-              UI.updateHudBadge();
+              UI2.updateHudBadge();
               updateLineageToggle();
             };
             cardEl.addEventListener("click", (e) => {
@@ -10455,15 +11015,14 @@ canvas:focus-visible,
       if (familyKeys.length === 0) {
         container.innerHTML = `
           <div style="text-align: center; padding: 30px; color: #94a3b8; background: #111a2e; border-radius: 12px;">
-            Aucune r\xE8gle m\xE9moris\xE9e pour le moment.<br>
-            D\xE9cochez des attaques dans l'\xE9quipe actuelle pour les ignorer : elles resteront enregistr\xE9es pour toute la lign\xE9e !
+            ${t("saved_empty")}
           </div>
         `;
         return;
       }
       container.innerHTML = `
         <div style="margin-bottom: 12px; color: #94a3b8; font-size: 13px;">
-          Retrouvez ici toutes les lign\xE9es d'esp\xE8ces configur\xE9es. Vos r\xE9glages s'appliquent automatiquement \xE0 tous leurs stades \xE9volutifs et formes, d'une partie \xE0 l'autre.
+          ${t("saved_subtitle")}
         </div>
       `;
       familyKeys.forEach((famKey) => {
@@ -10471,17 +11030,17 @@ canvas:focus-visible,
         const skippedKeys = Object.keys(rule.skippedMoves || {}).filter((k) => !k.startsWith("id_"));
         const memberSprites = LineageManager.getLineageMemberSprites(famKey);
         let cardTitle = rule.lineageName;
-        if (!cardTitle || cardTitle.startsWith("Esp\xE8ce #") || cardTitle.startsWith("Lign\xE9e #")) {
+        if (!cardTitle || cardTitle.startsWith("Esp\xE8ce #") || cardTitle.startsWith("Lign\xE9e #") || cardTitle.startsWith("Lineage #")) {
           const cleanId = String(rule.familyId || famKey).replace("family_", "");
           const resolved = LineageManager.getSpeciesName(cleanId);
           if (resolved) {
             cardTitle = resolved;
-            if (LineageManager.megaFamilies[cleanId] && !cardTitle.includes("(M\xE9ga")) {
+            if (LineageManager.megaFamilies[cleanId] && !cardTitle.includes("(M\xE9ga") && !cardTitle.includes("(Mega")) {
               cardTitle += ` ${LineageManager.megaFamilies[cleanId].suffix}`;
             }
             rule.lineageName = cardTitle;
           } else {
-            cardTitle = rule.lineageName || `Lign\xE9e #${cleanId}`;
+            cardTitle = rule.lineageName || t("saved_lineage_fallback", { id: cleanId });
           }
         }
         const el = document.createElement("div");
@@ -10493,13 +11052,13 @@ canvas:focus-visible,
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <div style="font-size: 16px; font-weight: 700; color: #fff;">${cardTitle}</div>
-              ${rule.enabled === false ? `<span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">\u23F8\uFE0F En pause</span>` : ""}
+              ${rule.enabled === false ? `<span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">${t("saved_paused")}</span>` : ""}
             </div>
             <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
               <button class="pokeskip-btn-edit-lineage" style="background:#0369a1; border:1px solid #38bdf8; color:#fff; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:600; white-space:nowrap;">
-                \u270F\uFE0F Modifier
+                ${t("saved_edit_btn")}
               </button>
-              <button class="pokeskip-btn-del-lineage" style="background:rgba(225,29,72,0.2); border:1px solid rgba(225,29,72,0.4); color:#fda4af; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer; white-space:nowrap;" title="Supprimer la r\xE8gle">
+              <button class="pokeskip-btn-del-lineage" style="background:rgba(225,29,72,0.2); border:1px solid rgba(225,29,72,0.4); color:#fda4af; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer; white-space:nowrap;" title="${t("saved_del_btn")}">
                 \u2715
               </button>
             </div>
@@ -10510,17 +11069,17 @@ canvas:focus-visible,
           </div>
 
           <div style="font-size: 12px; color: ${rule.enabled === false ? "#94a3b8" : "#38bdf8"};">
-            ${skippedKeys.length > 0 ? `Capacit\xE9s ignor\xE9es (${skippedKeys.length}) : <b>${skippedKeys.join(", ")}</b>` : "<i>Aucune capacit\xE9 ignor\xE9e</i>"}
+            ${skippedKeys.length > 0 ? t("saved_skipped_summary", { count: skippedKeys.length, moves: skippedKeys.join(", ") }) : t("saved_none_skipped")}
           </div>
         `;
         el.addEventListener("click", (e) => {
           if (e.target.closest(".pokeskip-btn-del-lineage")) {
             e.stopPropagation();
-            if (confirm(`Supprimer les r\xE8gles enregistr\xE9es pour ${rule.lineageName} ?`)) {
+            if (confirm(t("saved_confirm_del", { name: rule.lineageName }))) {
               PokeSkip.deleteFamilyRule(famKey);
               this.renderSavedSpeciesTab();
               const singleName = LineageManager.getSinglePokemonName(famKey, rule);
-              UI.showToast(`R\xE8gle supprim\xE9e pour <b>${singleName}</b>`, "info");
+              UI2.showToast(t("toast_single_rule_deleted", { name: singleName }), "info");
             }
             return;
           }
@@ -10539,28 +11098,28 @@ canvas:focus-visible,
       const skippedList = Object.keys(rule.skippedMoves || {}).filter((k) => !k.startsWith("id_"));
       const teamIdx = PokeSkip.activeParty.findIndex((p) => LineageManager.getFamilyKey(p) === famKey);
       let editorTitle = rule.lineageName;
-      if (!editorTitle || editorTitle.startsWith("Esp\xE8ce #") || editorTitle.startsWith("Lign\xE9e #")) {
+      if (!editorTitle || editorTitle.startsWith("Esp\xE8ce #") || editorTitle.startsWith("Lign\xE9e #") || editorTitle.startsWith("Lineage #")) {
         const rootId = String(rule.familyId || famKey).replace("family_", "");
         const resolved = LineageManager.getSpeciesName(rootId);
         if (resolved) {
           editorTitle = resolved;
-          if (LineageManager.megaFamilies[rootId] && !editorTitle.includes("(M\xE9ga")) {
+          if (LineageManager.megaFamilies[rootId] && !editorTitle.includes("(M\xE9ga") && !editorTitle.includes("(Mega")) {
             editorTitle += ` ${LineageManager.megaFamilies[rootId].suffix}`;
           }
           rule.lineageName = editorTitle;
         } else {
-          editorTitle = rule.lineageName || `Lign\xE9e #${rootId}`;
+          editorTitle = rule.lineageName || t("saved_lineage_fallback", { id: rootId });
         }
       }
       container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
             <button id="pokeskip-btn-back-saved" style="background: #1e293b; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.12); padding: 7px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-              \u2190 Retour aux esp\xE8ces
+              ${t("saved_back_btn")}
             </button>
             ${teamIdx !== -1 ? `
               <button id="pokeskip-btn-open-in-team" style="background: #0284c7; color: #fff; border: 1px solid #38bdf8; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 600;">
-                \u{1F465} Voir dans l'\xC9quipe Actuelle
+                ${t("saved_view_in_team")}
               </button>
             ` : ""}
           </div>
@@ -10568,11 +11127,11 @@ canvas:focus-visible,
           <div class="pokeskip-lineage-header-box">
             <div class="pokeskip-lineage-title-row">
               <div class="pokeskip-lineage-title">
-                <span>Lign\xE9e : <b>${editorTitle}</b></span>
-                ${rule.enabled === false ? `<span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">\u23F8\uFE0F En pause</span>` : ""}
+                <span>${t("saved_lineage_label", { name: editorTitle })}</span>
+                ${rule.enabled === false ? `<span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">${t("saved_paused")}</span>` : ""}
               </div>
               <div style="font-size: 12px; color: #94a3b8;">
-                Modifiez les capacit\xE9s ignor\xE9es pour toute la lign\xE9e (tous stades et formes).
+                ${t("saved_lineage_desc")}
               </div>
             </div>
 
@@ -10581,9 +11140,9 @@ canvas:focus-visible,
 
           <!-- Section Ajout rapide d'une attaque \xE0 ignorer -->
           <div style="background: #111a2e; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; gap: 10px; align-items: center;">
-            <input type="text" id="pokeskip-input-add-move" placeholder="Ajouter une capacit\xE9 \xE0 ignorer (ex: Tornade, Charge)..." style="flex: 1; background: #090e1a; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 13px; outline: none;">
+            <input type="text" id="pokeskip-input-add-move" placeholder="${t("saved_add_placeholder")}" style="flex: 1; background: #090e1a; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 13px; outline: none;">
             <button id="pokeskip-btn-add-move" style="background: #e11d48; color: #fff; border: 1px solid #fda4af; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; white-space: nowrap;">
-              + Ignorer
+              ${t("saved_add_btn")}
             </button>
           </div>
 
@@ -10591,11 +11150,11 @@ canvas:focus-visible,
           <div style="background: #111a2e; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
               <div style="font-size: 14px; font-weight: 700; color: #f8fafc;">
-                Capacit\xE9s actuellement ignor\xE9es (${skippedList.length}) :
+                ${t("saved_current_ignored_title", { count: skippedList.length })}
               </div>
               ${skippedList.length > 0 ? `
                 <button id="pokeskip-btn-clear-lineage-moves" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;">
-                  Tout r\xE9tablir (Ne rien ignorer)
+                  ${t("saved_restore_all_btn")}
                 </button>
               ` : ""}
             </div>
@@ -10603,18 +11162,18 @@ canvas:focus-visible,
             <div id="pokeskip-family-moves-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto;">
               ${skippedList.length === 0 ? `
                 <div style="color: #64748b; font-size: 13px; text-align: center; padding: 22px;">
-                  Aucune capacit\xE9 n'est ignor\xE9e pour cette lign\xE9e.<br>Toutes les attaques propos\xE9es seront apprises ou pr\xE9sent\xE9es normalement.
+                  ${t("saved_no_moves_ignored")}
                 </div>
               ` : skippedList.map((mvKey) => {
         const displayName = mvKey.charAt(0).toUpperCase() + mvKey.slice(1);
         return `
                   <div style="background: #090e1a; border: 1px solid rgba(244,63,94,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                      <span style="color: #f43f5e; font-weight: 700; font-size: 13px;">\u2715 Ignor\xE9e</span>
+                      <span style="color: #f43f5e; font-weight: 700; font-size: 13px;">${t("saved_badge_ignored")}</span>
                       <span style="color: #fff; font-weight: 600; font-size: 14px;">${displayName}</span>
                     </div>
                     <button class="pokeskip-btn-unskip-move" data-move="${mvKey}" style="background: #10b981; color: #fff; border: 1px solid #34d399; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600;">
-                      \u2713 Garder \xE0 nouveau
+                      ${t("saved_keep_again")}
                     </button>
                   </div>
                 `;
@@ -10641,7 +11200,7 @@ canvas:focus-visible,
         const val = inputAdd.value.trim();
         if (!val) return;
         PokeSkip.setMoveSkipped(famKey, rule.lineageName, val, null, true);
-        UI.showToast(`Capacit\xE9 <b>${val}</b> ignor\xE9e pour <b>${singleName}</b>`, "warning");
+        UI2.showToast(t("toast_single_move_skipped", { move: val, name: singleName }), "warning");
         this.renderFamilyRuleEditor(container, famKey);
       };
       btnAdd.addEventListener("click", handleAdd);
@@ -10663,7 +11222,7 @@ canvas:focus-visible,
           rule.skippedMoves = {};
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          UI.showToast(`Toutes les capacit\xE9s sont r\xE9tablies pour <b>${singleName}</b>`, "info");
+          UI2.showToast(t("toast_all_moves_restored", { name: singleName }), "info");
           this.renderFamilyRuleEditor(container, famKey);
         });
       }
@@ -10673,7 +11232,7 @@ canvas:focus-visible,
           delete rule.skippedMoves[moveKey];
           rule.updatedAt = Date.now();
           PokeSkip.saveRules();
-          UI.showToast(`Capacit\xE9 <b>${moveKey}</b> r\xE9tablie pour <b>${singleName}</b>`, "success");
+          UI2.showToast(t("toast_single_move_restored", { move: moveKey, name: singleName }), "success");
           this.renderFamilyRuleEditor(container, famKey);
         });
       });
@@ -10720,10 +11279,10 @@ canvas:focus-visible,
         }
         if (typeof lvl === "string") {
           const s = lvl.trim().toLowerCase();
-          if (s.includes("d\xE9part") || s.includes("depart")) return 0;
+          if (s.includes("d\xE9part") || s.includes("depart") || s.includes("start")) return 0;
           if (s.includes("\u0153uf") || s.includes("oeuf") || s.includes("egg")) return 0.2;
           if (s.includes("\xE9vol") || s.includes("evol")) return 0.5;
-          if (s.includes("actuelle")) return 0.1;
+          if (s.includes("actuelle") || s.includes("current")) return 0.1;
           const match = s.match(/\d+/);
           if (match) return parseInt(match[0], 10);
         }
@@ -10792,29 +11351,30 @@ canvas:focus-visible,
         if (a.weight !== b.weight) {
           return a.weight - b.weight;
         }
-        return a.name.localeCompare(b.name, "fr");
+        return a.name.localeCompare(b.name, getCurrentLang());
       });
       const formatOptionText = (m, showCurrentBadge = true) => {
         let prefix = "";
         if (m.level !== void 0 && m.level !== null && m.level !== "") {
           if (typeof m.level === "number") {
-            if (m.level < 0) prefix = "[D\xE9part] ";
-            else if (m.level === 0) prefix = "[\xC9volution] ";
-            else prefix = `[Niv. ${m.level}] `;
+            if (m.level < 0) prefix = t("rep_opt_start");
+            else if (m.level === 0) prefix = t("rep_opt_evol");
+            else prefix = t("rep_opt_level", { level: m.level });
           } else {
             const s = String(m.level).trim();
-            if (/^\d+$/.test(s)) prefix = `[Niv. ${s}] `;
-            else if (/œuf|oeuf|egg/i.test(s)) prefix = "[\u{1F95A} \u0152uf] ";
-            else if (/évol/i.test(s)) prefix = "[\xC9volution] ";
-            else if (/départ|depart/i.test(s)) prefix = "[D\xE9part] ";
-            else if (/actuelle/i.test(s)) prefix = "[Actuelle] ";
+            if (/^\d+$/.test(s)) prefix = t("rep_opt_level", { level: s });
+            else if (/œuf|oeuf|egg/i.test(s)) prefix = t("rep_opt_egg");
+            else if (/évol/i.test(s)) prefix = t("rep_opt_evol");
+            else if (/départ|depart|start/i.test(s)) prefix = t("rep_opt_start");
+            else if (/actuelle|current/i.test(s)) prefix = t("rep_opt_current");
             else prefix = `[${s}] `;
           }
         } else if (m.isCurrent && showCurrentBadge) {
-          prefix = "[Actuelle] ";
+          prefix = t("rep_opt_current");
         }
         const evoSuffix = m.evolutionSpecies ? ` (${m.evolutionSpecies})` : "";
-        const suffix = m.isCurrent && showCurrentBadge && prefix !== "[Actuelle] " ? " (Actuelle)" : "";
+        const currentPrefix = t("rep_opt_current");
+        const suffix = m.isCurrent && showCurrentBadge && prefix !== currentPrefix ? t("rep_opt_suffix_current") : "";
         return `${prefix}${m.name}${evoSuffix}${suffix}`;
       };
       const uniqueRand = Math.random().toString(36).substring(2, 6);
@@ -10828,42 +11388,42 @@ canvas:focus-visible,
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 15px;">\u26A1</span>
             <span style="font-size: 13px; font-weight: 700; color: #c084fc;">
-              Mode Avanc\xE9 : Remplacement Automatique de Capacit\xE9s
+              ${t("rep_header")}
             </span>
             <span style="font-size: 11px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; padding: 2px 7px; border-radius: 10px; font-weight: 600;">
-              ${activeCount}/${replacements.length} active(s)
+              ${t("rep_active_count", { active: activeCount, total: replacements.length })}
             </span>
           </div>
           ${replacements.length > 0 ? `
             <button class="pokeskip-btn-clear-rep" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;">
-              \u{1F5D1}\uFE0F Tout supprimer (${replacements.length})
+              ${t("rep_clear_all", { count: replacements.length })}
             </button>
           ` : ""}
         </div>
 
         <div style="font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.4;">
-          D\xE9finit les attaques \xE0 remplacer automatiquement : d\xE8s que la nouvelle capacit\xE9 est d\xE9bloqu\xE9e et que le Pok\xE9mon poss\xE8de 4 attaques, l'ancienne est remplac\xE9e sans interrompre le jeu.
+          ${t("rep_desc")}
         </div>
 
         <!-- Formulaire d'ajout : Ancienne attaque d'abord, puis Nouvelle attaque -->
         <div style="background: #111a2e; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;">
           <div style="font-size: 12px; font-weight: 600; color: #f8fafc; margin-bottom: 8px;">
-            \u2795 Ajouter une r\xE8gle de remplacement :
+            ${t("rep_add_title")}
           </div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 170px;">
-              <div style="font-size: 11px; color: #f43f5e; font-weight: 600; margin-bottom: 3px;">Toujours remplacer :</div>
-              <input type="text" class="pokeskip-rep-input-old" list="${oldDatalistId}" placeholder="Ancienne capacit\xE9..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <div style="font-size: 11px; color: #f43f5e; font-weight: 600; margin-bottom: 3px;">${t("rep_label_old")}</div>
+              <input type="text" class="pokeskip-rep-input-old" list="${oldDatalistId}" placeholder="${t("rep_placeholder_old")}" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
               <datalist id="${oldDatalistId}">
                 ${sortedMoves.map((m) => `<option value="${formatOptionText(m, true)}" label="${formatOptionText(m, true)}">`).join("")}
               </datalist>
             </div>
 
-            <div style="color: #c084fc; font-weight: bold; font-size: 14px; padding-top: 16px; white-space: nowrap;">\u2794 par \u2794</div>
+            <div style="color: #c084fc; font-weight: bold; font-size: 14px; padding-top: 16px; white-space: nowrap;">${t("rep_arrow")}</div>
 
             <div style="flex: 1; min-width: 170px;">
-              <div style="font-size: 11px; color: #38bdf8; font-weight: 600; margin-bottom: 3px;">Par la nouvelle :</div>
-              <input type="text" class="pokeskip-rep-input-new" list="${newDatalistId}" placeholder="Nouvelle capacit\xE9..." style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
+              <div style="font-size: 11px; color: #38bdf8; font-weight: 600; margin-bottom: 3px;">${t("rep_label_new")}</div>
+              <input type="text" class="pokeskip-rep-input-new" list="${newDatalistId}" placeholder="${t("rep_placeholder_new")}" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none;">
               <datalist id="${newDatalistId}">
                 ${sortedMoves.map((m) => `<option value="${formatOptionText(m, false)}" label="${formatOptionText(m, false)}">`).join("")}
               </datalist>
@@ -10871,7 +11431,7 @@ canvas:focus-visible,
 
             <div style="padding-top: 16px;">
               <button class="pokeskip-btn-add-rep" style="background: #7e22ce; color: #fff; border: 1px solid #c084fc; padding: 7px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; white-space: nowrap;">
-                + Enregistrer
+                ${t("rep_save_btn")}
               </button>
             </div>
           </div>
@@ -10881,25 +11441,24 @@ canvas:focus-visible,
         <div class="pokeskip-rep-list-container" style="display: flex; flex-direction: column; gap: 6px;">
           ${replacements.length === 0 ? `
             <div style="color: #64748b; font-size: 12px; text-align: center; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px;">
-              Aucune r\xE8gle de remplacement pour <b>${familyInfo.lineageName}</b>.<br>
-              Cr\xE9ez une r\xE8gle ci-dessus pour remplacer automatiquement une ancienne attaque d\xE8s le d\xE9blocage d'une nouvelle.
+              ${t("rep_empty", { name: familyInfo.lineageName })}
             </div>
           ` : replacements.map((r) => `
             <div style="background: #111a2e; border: 1px solid ${r.enabled ? "rgba(168, 85, 247, 0.35)" : "rgba(255, 255, 255, 0.08)"}; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; opacity: ${r.enabled ? "1" : "0.6"};">
               <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 12px; color: #94a3b8;">Toujours remplacer</span>
+                <span style="font-size: 12px; color: #94a3b8;">${t("rep_label_old").replace(" :", "").replace(":", "")}</span>
                 <span style="font-weight: 700; color: #f43f5e; font-size: 13px;">${r.oldMoveName}</span>
-                <span style="color: #a855f7; font-size: 12px; font-weight: bold;">\u2794 par \u2794</span>
+                <span style="color: #a855f7; font-size: 12px; font-weight: bold;">${t("rep_arrow")}</span>
                 <span style="font-weight: 700; color: #38bdf8; font-size: 13px;">${r.newMoveName}</span>
                 <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: ${r.enabled ? "rgba(168,85,247,0.2)" : "rgba(255,255,255,0.06)"}; color: ${r.enabled ? "#c084fc" : "#94a3b8"};">
-                  ${r.enabled ? "Active" : "D\xE9sactiv\xE9e"}
+                  ${r.enabled ? t("rep_status_active") : t("rep_status_disabled")}
                 </span>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
                 <button class="pokeskip-btn-toggle-single-rep" data-id="${r.id}" style="background: ${r.enabled ? "#334155" : "#7e22ce"}; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">
-                  ${r.enabled ? "D\xE9sactiver" : "Activer"}
+                  ${r.enabled ? t("rep_toggle_disable") : t("rep_toggle_enable")}
                 </button>
-                <button class="pokeskip-btn-delete-single-rep" data-id="${r.id}" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;" title="Supprimer cette r\xE8gle">
+                <button class="pokeskip-btn-delete-single-rep" data-id="${r.id}" style="background: rgba(225,29,72,0.15); color: #fda4af; border: 1px solid rgba(225,29,72,0.3); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;" title="${t("saved_del_btn")}">
                   \u{1F5D1}\uFE0F
                 </button>
               </div>
@@ -10921,11 +11480,11 @@ canvas:focus-visible,
         const oldM = cleanMoveName(rawOld);
         const newM = cleanMoveName(rawNew);
         if (!oldM || !newM) {
-          UI.showToast("Veuillez renseigner l'ancienne capacit\xE9 \xE0 remplacer et la nouvelle capacit\xE9.", "warning");
+          UI2.showToast(t("toast_rep_missing_inputs"), "warning");
           return;
         }
         if (newM.toLowerCase() === oldM.toLowerCase()) {
-          UI.showToast("La nouvelle capacit\xE9 et l'ancienne doivent \xEAtre diff\xE9rentes.", "warning");
+          UI2.showToast(t("toast_rep_identical_inputs"), "warning");
           return;
         }
         const findMoveId = (mName) => {
@@ -10976,7 +11535,7 @@ canvas:focus-visible,
         };
         const oldMoveDetails = resolveMoveInfo(oldM);
         const newMoveDetails = resolveMoveInfo(newM);
-        const getMoveTypeColor = (m) => m && m.type && m.type.bg ? m.type.name === "Combat" ? "#ea580c" : m.type.name === "T\xE9n\xE8bres" ? "#c4a482" : m.type.name === "Poison" ? "#a855f7" : m.type.bg : "#38bdf8";
+        const getMoveTypeColor = (m) => m && m.type && m.type.bg ? m.type.name === "Combat" || m.type.name === "Fighting" ? "#ea580c" : m.type.name === "T\xE9n\xE8bres" || m.type.name === "Dark" ? "#c4a482" : m.type.name === "Poison" ? "#a855f7" : m.type.bg : "#38bdf8";
         const oldTypeColor = getMoveTypeColor(oldMoveDetails);
         const newTypeColor = getMoveTypeColor(newMoveDetails);
         const oldCatIcon = oldMoveDetails?.category?.icon || "\u{1F300}";
@@ -10984,8 +11543,11 @@ canvas:focus-visible,
         const oldTooltip = [oldMoveDetails?.type?.name, oldMoveDetails?.category?.name].filter(Boolean).join(" \u2022 ");
         const newTooltip = [newMoveDetails?.type?.name, newMoveDetails?.category?.name].filter(Boolean).join(" \u2022 ");
         const pokemonName = LineageManager.getSinglePokemonName(target);
-        UI.showToast(
-          `\u26A1 R\xE8gle enregistr\xE9e : remplacer <span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${oldMoveDetails.name || oldM}</b></span> par <span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name || newM}</b></span> sur <b style="color: #38bdf8 !important;">${pokemonName}</b> !`,
+        const oldHtml = `<span title="${oldTooltip}">${oldCatIcon} <b style="color: ${oldTypeColor} !important;">${oldMoveDetails.name || oldM}</b></span>`;
+        const newHtml = `<span title="${newTooltip}">${newCatIcon} <b style="color: ${newTypeColor} !important;">${newMoveDetails.name || newM}</b></span>`;
+        const pokeHtml = `<b style="color: #38bdf8 !important;">${pokemonName}</b>`;
+        UI2.showToast(
+          t("rep_toast_success", { oldHtml, newHtml, pokeHtml }),
           "advanced",
           PokeSkip.settings.toastDuration || 2800
         );
@@ -11044,17 +11606,17 @@ canvas:focus-visible,
         btn.addEventListener("click", () => {
           const ruleId = btn.getAttribute("data-id");
           PokeSkip.deleteReplacementRule(target, ruleId);
-          UI.showToast("R\xE8gle de remplacement supprim\xE9e.", "info");
+          UI2.showToast(t("toast_rep_deleted"), "info");
           if (typeof onUpdate === "function") onUpdate();
         });
       });
       const btnClear = secEl.querySelector(".pokeskip-btn-clear-rep");
       if (btnClear) {
         btnClear.addEventListener("click", () => {
-          if (confirm(`Supprimer toutes les r\xE8gles de remplacement pour ${familyInfo.lineageName} ?`)) {
+          if (confirm(t("rep_confirm_clear", { name: familyInfo.lineageName }))) {
             PokeSkip.clearAllReplacements(target);
             const targetName = LineageManager.getSinglePokemonName(target);
-            UI.showToast(`Toutes les r\xE8gles de remplacement supprim\xE9es pour <b>${targetName}</b>.`, "info");
+            UI2.showToast(t("toast_rep_all_deleted", { name: targetName }), "info");
             if (typeof onUpdate === "function") onUpdate();
           }
         });
@@ -11074,8 +11636,8 @@ canvas:focus-visible,
           if (el && el.parentNode) el.remove();
         }, 200);
       }
-      if (typeof UI?.enableGameKeyboard === "function" && !UI.isModalOpen()) {
-        UI.enableGameKeyboard();
+      if (typeof UI2?.enableGameKeyboard === "function" && !UI2.isModalOpen()) {
+        UI2.enableGameKeyboard();
       }
     },
     showQuickSkipPrompt(arg1, arg2, arg3) {
@@ -11115,11 +11677,12 @@ canvas:focus-visible,
       const tooltip = [typeName, catName].filter(Boolean).join(" \u2022 ");
       const el = document.createElement("div");
       el.id = "pokeskip-quick-prompt";
+      const moveFormatted = `<span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span>`;
       el.innerHTML = `
-        <span class="pokeskip-quick-text">\u26A1 Ignorer <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> sur <b>${pokemonName}</b> ?</span>
-        <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">Toujours ignorer</button>
-        <button class="pokeskip-quick-btn pokeskip-quick-btn-secondary" id="pokeskip-quick-never-ask" title="Ne plus proposer d'ignorer cette attaque pour ce Pok\xE9mon">Ne plus demander</button>
-        <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="Fermer">&times;</button>
+        <span class="pokeskip-quick-text">${t("qp_prompt_text", { move: moveFormatted, pokemon: pokemonName })}</span>
+        <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">${t("qp_skip_always")}</button>
+        <button class="pokeskip-quick-btn pokeskip-quick-btn-secondary" id="pokeskip-quick-never-ask" title="${t("qp_never_ask_title")}">${t("qp_never_ask")}</button>
+        <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="${t("close_btn_title")}">&times;</button>
       `;
       document.body.appendChild(el);
       const dismiss = () => {
@@ -11132,12 +11695,12 @@ canvas:focus-visible,
       el.querySelector("#pokeskip-quick-never-ask").addEventListener("click", (e) => {
         e.stopPropagation();
         PokeSkip.setMovePromptSuppressed(pokemon, pokemon?.species?.name, moveName, finalMoveId, true);
-        UI.showToast(`\u2139\uFE0F Vous ne serez plus interrog\xE9 pour <b>${moveName}</b> sur <b>${pokemonName}</b>.`, "info");
+        UI2.showToast(t("toast_never_ask_ack", { move: moveName, pokemon: pokemonName }), "info");
         dismiss();
-        if (UI.isModalOpen()) {
+        if (UI2.isModalOpen()) {
           const teamBody = document.getElementById("pokeskip-body-team");
-          if (teamBody && teamBody.style.display !== "none" && typeof UI.renderTeamTab === "function") {
-            UI.renderTeamTab();
+          if (teamBody && teamBody.style.display !== "none" && typeof UI2.renderTeamTab === "function") {
+            UI2.renderTeamTab();
           }
         }
       });
@@ -11145,7 +11708,7 @@ canvas:focus-visible,
         e.stopPropagation();
         PokeSkip.setMoveSkipped(pokemon, pokemon?.species?.name, moveName, finalMoveId, true);
         PokeSkip.recordSkip();
-        UI.showToast(`\u2705 R\xE8gle enregistr\xE9e : <b>${pokemonName}</b> ignorera <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> !`, "success");
+        UI2.showToast(t("toast_rule_saved", { pokemon: pokemonName, move: moveFormatted }), "success");
         dismiss();
         if (phaseInstance) {
           phaseInstance._pokeskipIgnored = true;
@@ -11215,7 +11778,7 @@ canvas:focus-visible,
   };
 
   // src/ui/index.js
-  var UI = {
+  var UI2 = {
     hudContainer: null,
     modalContainer: null,
     toastContainer: null,
@@ -11271,7 +11834,7 @@ canvas:focus-visible,
     }
     window.__POKESKIP_INJECTED__ = true;
     window.PokeSkip = PokeSkip;
-    window.PokeSkipUI = UI;
+    window.PokeSkipUI = UI2;
     AssetLoader.init();
     LineageManager.init();
     function isPokerogueEnvironment() {
@@ -11308,7 +11871,7 @@ canvas:focus-visible,
     function startPokeSkip() {
       if (pokeSkipStarted) return;
       pokeSkipStarted = true;
-      UI.init();
+      UI2.init();
       initGameHook();
     }
     function setupAutoDetection() {

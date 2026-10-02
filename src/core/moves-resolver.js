@@ -1,7 +1,7 @@
-// Résolution complète des capacités futures et actuelles de la lignée
 import { PokeSkip } from './state.js';
 import { LineageManager } from './lineage-manager.js';
 import { POKEMON_TYPES, MOVE_CATEGORIES } from '../constants/types.js';
+import { t } from './i18n.js';
 
 export   function getPokemonFullLearnset(pokemon) {
     const moves = [];
@@ -28,7 +28,7 @@ export   function getPokemonFullLearnset(pokemon) {
         } catch (e) {}
       }
 
-      const name = moveObj?.name || PokeSkip.knownMovesCache[moveId] || `Capacité #${moveId}`;
+      const name = moveObj?.name || PokeSkip.knownMovesCache[moveId] || t('move_default_name', { id: moveId });
       const typeIdx = (moveObj && moveObj.type !== undefined) ? moveObj.type : 0;
       const catIdx = (moveObj && moveObj.category !== undefined) ? moveObj.category : 2;
       const power = (moveObj && moveObj.power > 0) ? moveObj.power : '—';
@@ -37,14 +37,14 @@ export   function getPokemonFullLearnset(pokemon) {
         if (moveObj.accuracy > 0) {
           accuracyText = `${moveObj.accuracy}%`;
         } else if (moveObj.accuracy < 0) {
-          accuracyText = 'Infaillible';
+          accuracyText = t('move_infallible');
         } else {
           accuracyText = '—';
         }
       }
 
       const pp = (moveObj && moveObj.pp !== undefined && moveObj.pp > 0) ? moveObj.pp : ((moveObj && moveObj.maxPp) ? moveObj.maxPp : '—');
-      const desc = moveObj?.effect || 'Inflige des dégâts ou applique un effet.';
+      const desc = moveObj?.effect || t('move_default_desc');
 
       return {
         moveId,
@@ -57,7 +57,7 @@ export   function getPokemonFullLearnset(pokemon) {
         pp,
         desc,
         evolutionSpecies: evolutionSpecies || null,
-        isEgg: level === 'Œuf'
+        isEgg: level === 'Œuf' || level === 'Egg'
       };
     }
 

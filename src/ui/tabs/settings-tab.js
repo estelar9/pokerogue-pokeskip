@@ -1,89 +1,108 @@
-// Onglet Paramètres : options, import/export, reset
+// Onglet Paramètres : options, langue, import/export, reset
 import { PokeSkip } from '../../core/state.js';
+import { t } from '../../core/i18n.js';
 
 export const SettingsTab = {
   getSettingsTabHtml() {
+    const lang = PokeSkip.settings.language || 'auto';
     return `
       <div style="max-width: 500px; display: flex; flex-direction: column; gap: 16px;">
+        <!-- Choix de la langue -->
+        <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px;">
+          <h4 style="margin: 0; font-size: 14px; color: #38bdf8;">🌐 ${t('settings_lang_title')}</h4>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">${t('settings_lang_desc')}</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <select id="pokeskip-opt-language" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #f8fafc; padding: 6px 12px; font-size: 13px; cursor: pointer; outline: none;">
+              <option value="auto" ${lang === 'auto' ? 'selected' : ''}>🌐 ${t('settings_lang_auto')}</option>
+              <option value="fr" ${lang === 'fr' ? 'selected' : ''}>🇫🇷 ${t('settings_lang_fr')}</option>
+              <option value="en" ${lang === 'en' ? 'selected' : ''}>🇬🇧 ${t('settings_lang_en')}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Notifications & Alertes -->
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 12px;">
-          <h4 style="margin: 0 0 2px 0; font-size: 14px; color: #38bdf8;">Notifications & Alertes</h4>
+          <h4 style="margin: 0 0 2px 0; font-size: 14px; color: #38bdf8;">${t('settings_notif_title')}</h4>
           
           <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
             <input type="checkbox" id="pokeskip-opt-toasts" ${PokeSkip.settings.showToasts ? 'checked' : ''} style="accent-color: #38bdf8;">
-            Afficher les notifications toast lors d'un auto-skip
+            ${t('settings_toasts_label')}
           </label>
 
           <div id="pokeskip-opt-toast-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.showToasts ? '1' : '0.4'};">
-            <span>Durée d'affichage des notifications :</span>
+            <span>${t('settings_toast_duration')}</span>
             <div style="display: flex; align-items: center; gap: 6px;">
               <input type="number" id="pokeskip-opt-toast-duration" min="1" max="15" step="0.5" value="${((PokeSkip.settings.toastDuration || 2800) / 1000)}" ${!PokeSkip.settings.showToasts ? 'disabled' : ''} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
-              <span>secondes</span>
+              <span>${t('settings_seconds')}</span>
             </div>
           </div>
 
           <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
             <input type="checkbox" id="pokeskip-opt-hud-count" ${PokeSkip.settings.showHudCount !== false ? 'checked' : ''} style="accent-color: #38bdf8;">
-            Afficher le compteur de capacités passées sur la pastille
+            ${t('settings_hud_count_label')}
           </label>
 
           <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 10px;">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
               <input type="checkbox" id="pokeskip-opt-quick-prompt" ${PokeSkip.settings.showQuickPrompt !== false ? 'checked' : ''} style="accent-color: #38bdf8;">
-              Proposer d'ignorer pour toujours une nouvelle attaque en combat
+              ${t('settings_quick_prompt_label')}
             </label>
             
             <div id="pokeskip-opt-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.showQuickPrompt !== false ? '1' : '0.4'};">
-              <span>Durée d'affichage du message rapide :</span>
+              <span>${t('settings_quick_prompt_duration')}</span>
               <div style="display: flex; align-items: center; gap: 6px;">
                 <input type="number" id="pokeskip-opt-quick-duration" min="3" max="60" value="${PokeSkip.settings.quickPromptDuration || 15}" ${PokeSkip.settings.showQuickPrompt === false ? 'disabled' : ''} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
-                <span>secondes</span>
+                <span>${t('settings_seconds')}</span>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Mode Avancé : Remplacement d'Attaques -->
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(168, 85, 247, 0.25); display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <h4 style="margin: 0; font-size: 14px; color: #c084fc; display: flex; align-items: center; gap: 6px;">
-              <span>⚡ Mode Avancé : Remplacement d'Attaques</span>
+              <span>${t('settings_advanced_title')}</span>
             </h4>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: #fff; font-weight: 600;">
               <input type="checkbox" id="pokeskip-opt-advanced-mode" ${PokeSkip.settings.advancedMode ? 'checked' : ''} style="accent-color: #a855f7; width: 16px; height: 16px;">
-              Activer
+              ${t('settings_advanced_enable')}
             </label>
           </div>
           <div style="font-size: 12px; color: #94a3b8; line-height: 1.4;">
-            Permet de configurer des remplacements automatiques d'anciennes attaques lorsqu'une nouvelle capacité (non ignorée) est apprise et que le Pokémon possède déjà 4 attaques.
+            ${t('settings_advanced_desc')}
           </div>
           <div id="pokeskip-advanced-status-desc" style="font-size: 11px; color: ${PokeSkip.settings.advancedMode ? '#a855f7' : '#64748b'};">
-            ${PokeSkip.settings.advancedMode ? '✓ Actif : les sections de remplacement sont visibles dans les onglets.' : '✕ Désactivé : les règles sont conservées mais non exécutées.'}
+            ${PokeSkip.settings.advancedMode ? t('settings_advanced_status_on') : t('settings_advanced_status_off')}
           </div>
 
           <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; opacity: ${PokeSkip.settings.advancedMode ? '1' : '0.4'};">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
               <input type="checkbox" id="pokeskip-opt-prompt-auto-replacement" ${PokeSkip.settings.promptAutoReplacement !== false ? 'checked' : ''} ${!PokeSkip.settings.advancedMode ? 'disabled' : ''} style="accent-color: #a855f7;">
-              Proposer d'enregistrer les remplacements manuels détectés
+              ${t('settings_prompt_auto_rep')}
             </label>
             <div style="font-size: 11px; color: #94a3b8; padding-left: 24px; line-height: 1.3;">
-              Affiche un toast interactif lorsqu'un remplacement est effectué manuellement en jeu pour l'enregistrer dans les règles de remplacement automatique.
+              ${t('settings_prompt_auto_rep_desc')}
             </div>
           </div>
         </div>
 
+        <!-- Exportation / Importation -->
         <div style="background: #111a2e; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-          <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #38bdf8;">Exportation / Importation</h4>
-          <p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8;">Transférez vos règles de skip et vos paramètres d'options vers un autre navigateur ou ordinateur.</p>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button id="pokeskip-btn-export" style="background:#0284c7; color:#fff; border:1px solid #38bdf8; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">📤 Exporter (JSON)</button>
-            <button id="pokeskip-btn-import" style="background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">📥 Importer (JSON)</button>
+          <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #38bdf8;">${t('settings_io_title')}</h4>
+          <p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8;">${t('settings_io_desc')}</p>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button id="pokeskip-btn-export" style="background:#0284c7; color:#fff; border:1px solid #38bdf8; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">${t('settings_export_btn')}</button>
+            <button id="pokeskip-btn-import" style="background:#1e293b; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">${t('settings_import_btn')}</button>
             <input type="file" id="pokeskip-file-import" accept=".json,application/json" style="display: none;" />
           </div>
         </div>
 
+        <!-- Réinitialisation -->
         <div style="background: rgba(225,29,72,0.1); padding: 14px; border-radius: 10px; border: 1px solid rgba(225,29,72,0.25);">
-          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: #f43f5e;">Réinitialisation</h4>
+          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: #f43f5e;">${t('settings_reset_title')}</h4>
           <button id="pokeskip-btn-reset-rules" style="background:#be123c; border:1px solid #f43f5e; color:#fff; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">
-            Supprimer toutes mes règles enregistrées
+            ${t('settings_reset_rules_btn')}
           </button>
         </div>
       </div>
@@ -91,6 +110,22 @@ export const SettingsTab = {
   },
 
   bindSettingsTabEvents(container, ui) {
+    const optLang = container.querySelector('#pokeskip-opt-language');
+    if (optLang) {
+      optLang.addEventListener('change', (e) => {
+        PokeSkip.settings.language = e.target.value;
+        PokeSkip.saveSettings();
+        if (typeof ui?.rebuildModal === 'function') {
+          ui.rebuildModal();
+        } else if (typeof UI?.rebuildModal === 'function') {
+          UI.rebuildModal();
+        } else {
+          SettingsTab.renderSettingsTab();
+          if (typeof ui?.updateHudBadge === 'function') ui.updateHudBadge();
+        }
+      });
+    }
+
     const optToasts = container.querySelector('#pokeskip-opt-toasts');
     if (optToasts) {
       optToasts.addEventListener('change', (e) => {
@@ -146,8 +181,8 @@ export const SettingsTab = {
         const statusDesc = container.querySelector('#pokeskip-advanced-status-desc');
         if (statusDesc) {
           statusDesc.textContent = e.target.checked
-            ? '✓ Actif : les sections de remplacement sont visibles dans les onglets.'
-            : '✕ Désactivé : les règles sont conservées mais non exécutées.';
+            ? t('settings_advanced_status_on')
+            : t('settings_advanced_status_off');
           statusDesc.style.color = e.target.checked ? '#a855f7' : '#64748b';
         }
         if (optPromptAutoReplacement) {
@@ -157,7 +192,7 @@ export const SettingsTab = {
           promptAutoRepContainer.style.opacity = e.target.checked ? '1' : '0.4';
         }
         ui.showToast(
-          e.target.checked ? '⚡ Mode Avancé activé' : 'Mode Avancé désactivé (règles conservées)',
+          e.target.checked ? '⚡ ' + t('settings_advanced_status_on') : t('settings_advanced_status_off'),
           e.target.checked ? 'success' : 'info'
         );
       });
@@ -221,7 +256,7 @@ export const SettingsTab = {
         document.body.appendChild(a);
         a.click();
         a.remove();
-        ui.showToast('Règles et paramètres exportés en fichier JSON', 'success');
+        ui.showToast(t('toast_export_success'), 'success');
       });
     }
 
@@ -242,7 +277,7 @@ export const SettingsTab = {
           try {
             const parsed = JSON.parse(event.target.result);
             if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-              ui.showToast('Erreur : le fichier JSON est invalide ou vide.', 'error');
+              ui.showToast(t('toast_import_invalid'), 'error');
               return;
             }
 
@@ -280,16 +315,16 @@ export const SettingsTab = {
             if (importedSettingsCount > 0) details.push(`${importedSettingsCount} paramètre(s)`);
 
             if (details.length > 0) {
-              ui.showToast(`Succès : ${details.join(' et ')} importé(s) !`, 'success');
+              ui.showToast(t('toast_import_success', { details: details.join(' & ') }), 'success');
             } else {
-              ui.showToast('Aucune règle ou paramètre trouvé dans ce fichier.', 'warning');
+              ui.showToast(t('toast_import_empty'), 'warning');
             }
           } catch (err) {
-            ui.showToast('Erreur : impossible de lire ou parser ce fichier JSON.', 'error');
+            ui.showToast(t('toast_import_error'), 'error');
           }
         };
         reader.onerror = () => {
-          ui.showToast('Erreur lors de la lecture du fichier.', 'error');
+          ui.showToast(t('toast_read_error'), 'error');
         };
         reader.readAsText(file);
       });
@@ -298,10 +333,10 @@ export const SettingsTab = {
     const btnReset = container.querySelector('#pokeskip-btn-reset-rules');
     if (btnReset) {
       btnReset.addEventListener('click', () => {
-        if (confirm('Voulez-vous vraiment effacer TOUTES les règles enregistrées ? Rien ne sera plus skip.')) {
+        if (confirm(t('settings_reset_desc') + '?')) {
           PokeSkip.rules = {};
           PokeSkip.saveRules();
-          ui.showToast('Toutes les règles ont été effacées.', 'warning');
+          ui.showToast(t('toast_rules_cleared'), 'warning');
           ui.renderTeamTab();
         }
       });

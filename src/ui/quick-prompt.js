@@ -1,7 +1,7 @@
-// Widget de confirmation rapide in-game (Quick Prompt)
 import { PokeSkip } from '../core/state.js';
 import { LineageManager } from '../core/lineage-manager.js';
 import { UI } from './index.js';
+import { t } from '../core/i18n.js';
 
 export const QuickPrompt = {
     dismissQuickSkipPrompt() {
@@ -68,11 +68,12 @@ export const QuickPrompt = {
 
       const el = document.createElement('div');
       el.id = 'pokeskip-quick-prompt';
+      const moveFormatted = `<span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span>`;
       el.innerHTML = `
-        <span class="pokeskip-quick-text">⚡ Ignorer <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> sur <b>${pokemonName}</b> ?</span>
-        <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">Toujours ignorer</button>
-        <button class="pokeskip-quick-btn pokeskip-quick-btn-secondary" id="pokeskip-quick-never-ask" title="Ne plus proposer d'ignorer cette attaque pour ce Pokémon">Ne plus demander</button>
-        <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="Fermer">&times;</button>
+        <span class="pokeskip-quick-text">${t('qp_prompt_text', { move: moveFormatted, pokemon: pokemonName })}</span>
+        <button class="pokeskip-quick-btn" id="pokeskip-quick-skip-always">${t('qp_skip_always')}</button>
+        <button class="pokeskip-quick-btn pokeskip-quick-btn-secondary" id="pokeskip-quick-never-ask" title="${t('qp_never_ask_title')}">${t('qp_never_ask')}</button>
+        <button class="pokeskip-quick-close" id="pokeskip-quick-close" title="${t('close_btn_title')}">&times;</button>
       `;
 
       document.body.appendChild(el);
@@ -89,7 +90,7 @@ export const QuickPrompt = {
       el.querySelector('#pokeskip-quick-never-ask').addEventListener('click', (e) => {
         e.stopPropagation();
         PokeSkip.setMovePromptSuppressed(pokemon, pokemon?.species?.name, moveName, finalMoveId, true);
-        UI.showToast(`ℹ️ Vous ne serez plus interrogé pour <b>${moveName}</b> sur <b>${pokemonName}</b>.`, 'info');
+        UI.showToast(t('toast_never_ask_ack', { move: moveName, pokemon: pokemonName }), 'info');
         dismiss();
         if (UI.isModalOpen()) {
           const teamBody = document.getElementById('pokeskip-body-team');
@@ -104,7 +105,7 @@ export const QuickPrompt = {
         PokeSkip.setMoveSkipped(pokemon, pokemon?.species?.name, moveName, finalMoveId, true);
         PokeSkip.recordSkip();
 
-        UI.showToast(`✅ Règle enregistrée : <b>${pokemonName}</b> ignorera <span title="${tooltip}">${catIcon} <b style="color: ${typeColor} !important;">${moveName}</b></span> !`, 'success');
+        UI.showToast(t('toast_rule_saved', { pokemon: pokemonName, move: moveFormatted }), 'success');
         dismiss();
 
         // 1. Marquer la phase comme ignorée par PokéSkip
