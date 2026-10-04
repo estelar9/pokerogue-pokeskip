@@ -1,0 +1,38 @@
+{
+  "appName": {
+    "message": "PokéSkip — Auto-Skip PokéRogue Moves",
+    "description": "Name of the extension displayed in the browser and stores"
+  },
+  "appDesc": {
+    "message": "Selective move auto-skip for PokéRogue. Automatically skip obsolete moves and view the type chart.",
+    "description": "Extension description"
+  },
+  "actionTitle": {
+    "message": "PokéSkip",
+    "description": "Action button title in the toolbar"
+  },
+  "popupStatusReady": {
+    "message": "Ready for PokéRogue",
+    "description": "Active status text in popup"
+  },
+  "popupStatusSub": {
+    "message": "Nothing skipped by default",
+    "description": "Status subtitle in popup"
+  },
+  "popupLabelSkipped": {
+    "message": "Moves skipped",
+    "description": "Label for skipped moves count"
+  },
+  "popupLabelRules": {
+    "message": "Configured species",
+    "description": "Label for configured species count"
+  },
+  "popupBtnLaunch": {
+    "message": "🚀 Launch PokéRogue",
+    "description": "Button to launch the game"
+  },
+  "popupHint": {
+    "message": "💡 In-game, click the <b>PokéSkip</b> capsule or press <b>P</b> to manage your team's moves!",
+    "description": "Usage hint in popup"
+  }
+}

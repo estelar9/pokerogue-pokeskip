@@ -3,6 +3,23 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.16.1] - 2026-10-04
+
+### 🌐 Internationalisation WebExtensions & Multi-Stores (Chrome & Edge)
+- **Localisation Complète WebExtensions (`_locales`)** :
+  - Intégration des dictionnaires officiels `_locales/fr/messages.json` et `_locales/en/messages.json`.
+  - Prise en charge des variables `__MSG_appName__`, `__MSG_appDesc__` et `__MSG_actionTitle__` dans le manifeste.
+- **Résolution du Conflit de Langue Microsoft Edge Add-ons** :
+  - Déclaration explicite du Français (`fr`) comme `default_locale` du package avec l'Anglais (`en`) en langue additionnelle.
+  - Permet la reconnaissance immédiate des deux langues sur le Partner Center Edge sans blocage linguistique.
+- **Activation de l'Internationalisation Chrome Web Store** :
+  - Reconnaissance automatique du support multilingue par le Chrome Web Store Developer Dashboard.
+- **Améliorations de la Popup d'Extension** :
+  - Traduction bidirectionnelle automatique (FR/EN) et synchronisation dynamique du numéro de version depuis le manifeste.
+  - Validation automatique de la syntaxe JSON des dictionnaires lors de `npm run lint`.
+
+---
+
 ## [v1.16.0] - 2026-10-02
 
 ### 🌐 Améliorations Directes Universelles d'Attaques (Règles Globales)

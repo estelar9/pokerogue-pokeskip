@@ -1,0 +1,38 @@
+{
+  "appName": {
+    "message": "PokéSkip — Auto-Skip Capacités PokéRogue",
+    "description": "Nom de l'extension affiché dans le navigateur et les stores"
+  },
+  "appDesc": {
+    "message": "Auto-skip sélectif de capacités pour PokéRogue. Ignorez automatiquement les attaques obsolètes et affichez la table des types.",
+    "description": "Description de l'extension"
+  },
+  "actionTitle": {
+    "message": "PokéSkip",
+    "description": "Titre du bouton d'action dans la barre d'outils"
+  },
+  "popupStatusReady": {
+    "message": "Prêt pour PokéRogue",
+    "description": "Statut actif dans la popup"
+  },
+  "popupStatusSub": {
+    "message": "Rien n'est passé par défaut",
+    "description": "Sous-titre de statut dans la popup"
+  },
+  "popupLabelSkipped": {
+    "message": "Attaques évitées",
+    "description": "Libellé de statistique attaques passées"
+  },
+  "popupLabelRules": {
+    "message": "Espèces configurées",
+    "description": "Libellé de statistique règles configurées"
+  },
+  "popupBtnLaunch": {
+    "message": "🚀 Lancer PokéRogue",
+    "description": "Bouton d'accès direct au jeu"
+  },
+  "popupHint": {
+    "message": "💡 En jeu, cliquez sur la capsule <b>PokéSkip</b> ou appuyez sur <b>P</b> pour gérer les attaques de votre équipe !",
+    "description": "Astuce d'utilisation dans la popup"
+  }
+}

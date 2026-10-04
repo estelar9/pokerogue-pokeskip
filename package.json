@@ -1,12 +1,12 @@
 {
   "name": "pokeskip",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "description": "L'Auto-Skip intelligent et sélectif de capacités pour PokéRogue.",
   "main": "pokeskip.user.js",
   "scripts": {
     "build": "node build.js",
     "dev": "node build.js --watch",
-    "lint": "npm run build && node -c extension/inject.js pokeskip.user.js pokeskip.roguetop.js extension/content.js extension/popup.js",
+    "lint": "npm run build && node -c extension/inject.js pokeskip.user.js pokeskip.roguetop.js extension/content.js extension/popup.js && node -e \"JSON.parse(fs.readFileSync('extension/manifest.json')); JSON.parse(fs.readFileSync('extension/_locales/fr/messages.json')); JSON.parse(fs.readFileSync('extension/_locales/en/messages.json'));\"",
     "build:zip": "npm run build && pwsh -File ./scripts/pack-extension.ps1"
   },
   "keywords": [

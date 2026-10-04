@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const api = (typeof browser !== 'undefined' && browser.runtime) ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+
   const applyTranslations = (isEn) => {
-    if (!isEn) return;
     const statusText = document.getElementById('status-text');
     const statusSub = document.getElementById('status-sub');
     const labelSkipped = document.getElementById('label-skipped');
@@ -8,26 +9,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLaunch = document.getElementById('btn-launch');
     const popupHint = document.getElementById('popup-hint');
 
-    if (statusText) statusText.textContent = 'Ready for PokéRogue';
-    if (statusSub) statusSub.textContent = 'Nothing skipped by default';
-    if (labelSkipped) labelSkipped.textContent = 'Moves skipped';
-    if (labelRules) labelRules.textContent = 'Configured species';
-    if (btnLaunch) btnLaunch.innerHTML = '🚀 Launch PokéRogue';
-    if (popupHint) popupHint.innerHTML = '💡 In-game, click the <b>PokéSkip</b> capsule or press <b>P</b> to manage your team\'s moves!';
+    if (isEn) {
+      if (statusText) statusText.textContent = 'Ready for PokéRogue';
+      if (statusSub) statusSub.textContent = 'Nothing skipped by default';
+      if (labelSkipped) labelSkipped.textContent = 'Moves skipped';
+      if (labelRules) labelRules.textContent = 'Configured species';
+      if (btnLaunch) btnLaunch.innerHTML = '🚀 Launch PokéRogue';
+      if (popupHint) popupHint.innerHTML = '💡 In-game, click the <b>PokéSkip</b> capsule or press <b>P</b> to manage your team\'s moves!';
+    } else {
+      if (statusText) statusText.textContent = 'Prêt pour PokéRogue';
+      if (statusSub) statusSub.textContent = "Rien n'est passé par défaut";
+      if (labelSkipped) labelSkipped.textContent = 'Attaques évitées';
+      if (labelRules) labelRules.textContent = 'Espèces configurées';
+      if (btnLaunch) btnLaunch.innerHTML = '🚀 Lancer PokéRogue';
+      if (popupHint) popupHint.innerHTML = '💡 En jeu, cliquez sur la capsule <b>PokéSkip</b> ou appuyez sur <b>P</b> pour gérer les attaques de votre équipe !';
+    }
   };
+
+  // Sync version from manifest dynamically if available
+  try {
+    const versionEl = document.querySelector('.version');
+    if (versionEl && api?.runtime?.getManifest) {
+      const v = api.runtime.getManifest().version;
+      if (v) versionEl.textContent = 'v' + v;
+    }
+  } catch (_) {}
 
   // Initial check based on browser UI language
   try {
-    const uiLang = (typeof chrome !== 'undefined' && chrome.i18n && chrome.i18n.getUILanguage)
-      ? chrome.i18n.getUILanguage()
-      : (navigator.language || 'en');
+    const uiLang = (api?.i18n?.getUILanguage)
+      ? api.i18n.getUILanguage()
+      : (navigator.language || 'fr');
     if (!uiLang.toLowerCase().startsWith('fr')) {
       applyTranslations(true);
     }
   } catch (_) {}
 
   try {
-    const api = typeof chrome !== 'undefined' ? chrome : (typeof browser !== 'undefined' ? browser : null);
     if (!api || !api.tabs) return;
 
     api.tabs.query({ active: true, currentWindow: true }, (tabs) => {

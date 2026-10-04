@@ -1,8 +1,8 @@
 // ==PokéSkip RogueTop Plugin==
-// Auto-updating plugin loader for RogueTop Desktop Client v1.16.0
+// Auto-updating plugin loader for RogueTop Desktop Client v1.16.1
 (function () {
   'use strict';
-  const EMBEDDED_VERSION = '1.16.0';
+  const EMBEDDED_VERSION = '1.16.1';
   const CACHE_KEY = 'pokeskip_roguetop_cached_code';
   const CACHE_VER_KEY = 'pokeskip_roguetop_cached_version';
 
@@ -39,7 +39,7 @@
 
   if (!executed) {
     console.log('[PokéSkip RogueTop] Lancement de la version intégrée v' + EMBEDDED_VERSION);
-    // PokéSkip RogueTop Bundle v1.16.0
+    // PokéSkip RogueTop Bundle v1.16.1
 
 (() => {
   // src/data/megas.js
