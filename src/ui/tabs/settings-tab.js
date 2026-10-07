@@ -76,13 +76,21 @@ export const SettingsTab = {
             ${PokeSkip.settings.advancedMode ? t('settings_advanced_status_on') : t('settings_advanced_status_off')}
           </div>
 
-          <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; opacity: ${PokeSkip.settings.advancedMode ? '1' : '0.4'};">
+          <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; opacity: ${PokeSkip.settings.advancedMode ? '1' : '0.4'};">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
               <input type="checkbox" id="pokeskip-opt-prompt-auto-replacement" ${PokeSkip.settings.promptAutoReplacement !== false ? 'checked' : ''} ${!PokeSkip.settings.advancedMode ? 'disabled' : ''} style="accent-color: #a855f7;">
               ${t('settings_prompt_auto_rep')}
             </label>
             <div style="font-size: 11px; color: #94a3b8; padding-left: 24px; line-height: 1.3;">
               ${t('settings_prompt_auto_rep_desc')}
+            </div>
+
+            <div id="pokeskip-opt-replacement-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.advancedMode && PokeSkip.settings.promptAutoReplacement !== false ? '1' : '0.4'};">
+              <span>${t('settings_replacement_prompt_duration')}</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <input type="number" id="pokeskip-opt-replacement-duration" min="3" max="60" value="${PokeSkip.settings.autoReplacementPromptDuration || 10}" ${!PokeSkip.settings.advancedMode || PokeSkip.settings.promptAutoReplacement === false ? 'disabled' : ''} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
+                <span>${t('settings_seconds')}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -173,6 +181,8 @@ export const SettingsTab = {
     const optAdvancedMode = container.querySelector('#pokeskip-opt-advanced-mode');
     const optPromptAutoReplacement = container.querySelector('#pokeskip-opt-prompt-auto-replacement');
     const promptAutoRepContainer = container.querySelector('#pokeskip-opt-prompt-auto-replacement-container');
+    const optReplacementDuration = container.querySelector('#pokeskip-opt-replacement-duration');
+    const optReplacementDurationContainer = container.querySelector('#pokeskip-opt-replacement-duration-container');
 
     if (optAdvancedMode) {
       optAdvancedMode.addEventListener('change', (e) => {
@@ -194,6 +204,30 @@ export const SettingsTab = {
     if (optPromptAutoReplacement) {
       optPromptAutoReplacement.addEventListener('change', (e) => {
         PokeSkip.settings.promptAutoReplacement = e.target.checked;
+        PokeSkip.saveSettings();
+        if (optReplacementDurationContainer) {
+          optReplacementDurationContainer.style.opacity = (PokeSkip.settings.advancedMode && e.target.checked) ? '1' : '0.4';
+        }
+        if (optReplacementDuration) {
+          optReplacementDuration.disabled = !PokeSkip.settings.advancedMode || !e.target.checked;
+        }
+      });
+    }
+
+    if (optReplacementDuration) {
+      optReplacementDuration.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val) && val >= 3 && val <= 120) {
+          PokeSkip.settings.autoReplacementPromptDuration = val;
+          PokeSkip.saveSettings();
+        }
+      });
+      optReplacementDuration.addEventListener('change', (e) => {
+        let val = parseInt(e.target.value, 10);
+        if (isNaN(val) || val < 3) val = 3;
+        if (val > 120) val = 120;
+        e.target.value = val;
+        PokeSkip.settings.autoReplacementPromptDuration = val;
         PokeSkip.saveSettings();
       });
     }

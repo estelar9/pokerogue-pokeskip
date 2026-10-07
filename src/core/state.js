@@ -19,6 +19,7 @@ export const PokeSkip = {
         showHudCount: true,
         advancedMode: false,
         promptAutoReplacement: true,
+        autoReplacementPromptDuration: 10,
         universalUpgradesEnabled: false,
         universalUpgradesManual: false,
         disabledUniversalChains: {},

@@ -3,6 +3,17 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.16.2] - 2026-10-07
+
+### ⏱️ Personnalisation & Automatisation CI/CD (Firefox AMO)
+- **Durée d'affichage paramétrable des Toasts de remplacement (Mode Avancé)** :
+  - Ajout d'une option dans l'onglet Paramètres permettant de régler le temps d'affichage du toast interactif (de 3 à 120 secondes, 10s par défaut).
+- **Correctif Déploiement Firefox AMO (Action web-ext)** :
+  - Résolution de l'erreur `You must pass the zip/xpi add-on file to the sign command` en fournissant directement le fichier `pokeskip-extension.zip` à l'action de signature AMO.
+  - Inclusion du journal des modifications (`CHANGELOG.md`) dans le paquet de révision des sources pour Mozilla.
+
+---
+
 ## [v1.16.1] - 2026-10-04
 
 ### 🌐 Internationalisation WebExtensions & Multi-Stores (Chrome & Edge)

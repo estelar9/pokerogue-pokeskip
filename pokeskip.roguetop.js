@@ -1,8 +1,8 @@
 // ==PokéSkip RogueTop Plugin==
-// Auto-updating plugin loader for RogueTop Desktop Client v1.16.1
+// Auto-updating plugin loader for RogueTop Desktop Client v1.16.2
 (function () {
   'use strict';
-  const EMBEDDED_VERSION = '1.16.1';
+  const EMBEDDED_VERSION = '1.16.2';
   const CACHE_KEY = 'pokeskip_roguetop_cached_code';
   const CACHE_VER_KEY = 'pokeskip_roguetop_cached_version';
 
@@ -39,7 +39,7 @@
 
   if (!executed) {
     console.log('[PokéSkip RogueTop] Lancement de la version intégrée v' + EMBEDDED_VERSION);
-    // PokéSkip RogueTop Bundle v1.16.1
+    // PokéSkip RogueTop Bundle v1.16.2
 
 (() => {
   // src/data/megas.js
@@ -4573,6 +4573,7 @@
       settings_advanced_status_off: "\u2715 D\xE9sactiv\xE9 : les r\xE8gles sont conserv\xE9es mais non ex\xE9cut\xE9es.",
       settings_prompt_auto_rep: "Proposer d'enregistrer les remplacements manuels d\xE9tect\xE9s",
       settings_prompt_auto_rep_desc: "Affiche un toast interactif lorsqu'un remplacement est effectu\xE9 manuellement en jeu pour l'enregistrer dans les r\xE8gles de remplacement automatique.",
+      settings_replacement_prompt_duration: "Dur\xE9e d'affichage du toast de remplacement :",
       settings_io_title: "Exportation / Importation",
       settings_io_desc: "Transf\xE9rez vos r\xE8gles de skip et vos param\xE8tres d'options vers un autre navigateur ou ordinateur.",
       settings_export_btn: "\u{1F4E4} Exporter (JSON)",
@@ -4782,6 +4783,7 @@
       settings_advanced_status_off: "\u2715 Disabled: rules are preserved but not executed.",
       settings_prompt_auto_rep: "Prompt to save manual replacements detected in-game",
       settings_prompt_auto_rep_desc: "Displays an interactive toast when a replacement is performed manually in-game to save it as an auto-replacement rule.",
+      settings_replacement_prompt_duration: "Replacement toast duration:",
       settings_io_title: "Export / Import",
       settings_io_desc: "Transfer your skip rules and settings to another browser or computer.",
       settings_export_btn: "\u{1F4E4} Export (JSON)",
@@ -6371,6 +6373,7 @@
         showHudCount: true,
         advancedMode: false,
         promptAutoReplacement: true,
+        autoReplacementPromptDuration: 10,
         universalUpgradesEnabled: false,
         universalUpgradesManual: false,
         disabledUniversalChains: {},
@@ -10099,7 +10102,7 @@ canvas:focus-visible,
               }
             }
           },
-          1e4,
+          Math.max(3, PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1e3,
           "advanced"
         );
       } catch (err) {
@@ -10439,7 +10442,7 @@ canvas:focus-visible,
         }, 250);
       }, duration);
     },
-    showActionToast(message, actionLabel, onAction, duration = 1e4, type = "advanced") {
+    showActionToast(message, actionLabel, onAction, duration = (PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1e3, type = "advanced") {
       if (!document.body) {
         document.addEventListener("DOMContentLoaded", () => this.showActionToast(message, actionLabel, onAction, duration, type), { once: true });
         return;
@@ -10799,13 +10802,21 @@ canvas:focus-visible,
             ${PokeSkip.settings.advancedMode ? t("settings_advanced_status_on") : t("settings_advanced_status_off")}
           </div>
 
-          <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; opacity: ${PokeSkip.settings.advancedMode ? "1" : "0.4"};">
+          <div id="pokeskip-opt-prompt-auto-replacement-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; opacity: ${PokeSkip.settings.advancedMode ? "1" : "0.4"};">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
               <input type="checkbox" id="pokeskip-opt-prompt-auto-replacement" ${PokeSkip.settings.promptAutoReplacement !== false ? "checked" : ""} ${!PokeSkip.settings.advancedMode ? "disabled" : ""} style="accent-color: #a855f7;">
               ${t("settings_prompt_auto_rep")}
             </label>
             <div style="font-size: 11px; color: #94a3b8; padding-left: 24px; line-height: 1.3;">
               ${t("settings_prompt_auto_rep_desc")}
+            </div>
+
+            <div id="pokeskip-opt-replacement-duration-container" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; padding-left: 24px; opacity: ${PokeSkip.settings.advancedMode && PokeSkip.settings.promptAutoReplacement !== false ? "1" : "0.4"};">
+              <span>${t("settings_replacement_prompt_duration")}</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <input type="number" id="pokeskip-opt-replacement-duration" min="3" max="60" value="${PokeSkip.settings.autoReplacementPromptDuration || 10}" ${!PokeSkip.settings.advancedMode || PokeSkip.settings.promptAutoReplacement === false ? "disabled" : ""} style="width: 50px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #f8fafc; padding: 4px 6px; text-align: center; font-size: 12px;">
+                <span>${t("settings_seconds")}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -10891,6 +10902,8 @@ canvas:focus-visible,
       const optAdvancedMode = container.querySelector("#pokeskip-opt-advanced-mode");
       const optPromptAutoReplacement = container.querySelector("#pokeskip-opt-prompt-auto-replacement");
       const promptAutoRepContainer = container.querySelector("#pokeskip-opt-prompt-auto-replacement-container");
+      const optReplacementDuration = container.querySelector("#pokeskip-opt-replacement-duration");
+      const optReplacementDurationContainer = container.querySelector("#pokeskip-opt-replacement-duration-container");
       if (optAdvancedMode) {
         optAdvancedMode.addEventListener("change", (e) => {
           PokeSkip.settings.advancedMode = e.target.checked;
@@ -10910,6 +10923,29 @@ canvas:focus-visible,
       if (optPromptAutoReplacement) {
         optPromptAutoReplacement.addEventListener("change", (e) => {
           PokeSkip.settings.promptAutoReplacement = e.target.checked;
+          PokeSkip.saveSettings();
+          if (optReplacementDurationContainer) {
+            optReplacementDurationContainer.style.opacity = PokeSkip.settings.advancedMode && e.target.checked ? "1" : "0.4";
+          }
+          if (optReplacementDuration) {
+            optReplacementDuration.disabled = !PokeSkip.settings.advancedMode || !e.target.checked;
+          }
+        });
+      }
+      if (optReplacementDuration) {
+        optReplacementDuration.addEventListener("input", (e) => {
+          const val = parseInt(e.target.value, 10);
+          if (!isNaN(val) && val >= 3 && val <= 120) {
+            PokeSkip.settings.autoReplacementPromptDuration = val;
+            PokeSkip.saveSettings();
+          }
+        });
+        optReplacementDuration.addEventListener("change", (e) => {
+          let val = parseInt(e.target.value, 10);
+          if (isNaN(val) || val < 3) val = 3;
+          if (val > 120) val = 120;
+          e.target.value = val;
+          PokeSkip.settings.autoReplacementPromptDuration = val;
           PokeSkip.saveSettings();
         });
       }

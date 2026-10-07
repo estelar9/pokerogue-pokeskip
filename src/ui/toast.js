@@ -46,7 +46,7 @@ export const Toast = {
       }, duration);
     },
 
-    showActionToast(message, actionLabel, onAction, duration = 10000, type = 'advanced') {
+    showActionToast(message, actionLabel, onAction, duration = ((PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1000), type = 'advanced') {
       if (!document.body) {
         document.addEventListener('DOMContentLoaded', () => this.showActionToast(message, actionLabel, onAction, duration, type), { once: true });
         return;

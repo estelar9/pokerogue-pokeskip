@@ -283,7 +283,7 @@ function checkManualMoveReplacement(phase) {
             }
           }
         },
-        10000,
+        Math.max(3, PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1000,
         'advanced'
       );
     } catch (err) {
