@@ -46,6 +46,7 @@ jobs:
 
       - name: Package source code for Mozilla review
         run: |
+          mkdir -p web-ext-artifacts
           zip -r source-code.zip src/ package.json package-lock.json build.js README.md CHANGELOG.md LICENSE -x "node_modules/*"
 
       - name: Deploy to Firefox Add-ons (AMO)
