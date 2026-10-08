@@ -43,6 +43,7 @@ export const TeamTab = {
         const level = pkmn.level || 1;
         const shinyInfo = LineageManager.getPokemonShinyInfo(pkmn);
         const isMega = LineageManager.isPokemonMega(pkmn);
+        const isGmax = LineageManager.isPokemonGigantamax(pkmn);
         const spriteUrl = LineageManager.getPokemonSpriteUrl(pkmn);
 
         const card = document.createElement('div');
@@ -60,6 +61,7 @@ export const TeamTab = {
           <div class="pokeskip-member-name">${name}</div>
           <div style="font-size: 11px; color: #94a3b8;">${t('team_level_prefix')}${level}</div>
           ${isMega ? '<div class="pokeskip-mega-badge">🧬 MÉGA</div>' : ''}
+          ${isGmax ? '<div class="pokeskip-gmax-badge">💥 GMAX</div>' : ''}
         `;
         card.addEventListener('click', () => {
           this.selectedTeamIndex = idx;

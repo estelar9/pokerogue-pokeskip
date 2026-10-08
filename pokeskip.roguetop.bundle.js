@@ -3358,10 +3358,12 @@
     },
     // 422: Sancoki (Shellos)
     422: {
+      0: { fr: "Mer Occident", en: "West Sea" },
       1: { fr: "Mer Orient", en: "East Sea" }
     },
     // 423: Tritosor (Gastrodon)
     423: {
+      0: { fr: "Mer Occident", en: "West Sea" },
       1: { fr: "Mer Orient", en: "East Sea" }
     },
     // 479: Motisma (Rotom)
@@ -3390,6 +3392,7 @@
     },
     // 550: Bargantua (Basculin)
     550: {
+      0: { fr: "Motif Rouge", en: "Red-Striped" },
       1: { fr: "Motif Bleu", en: "Blue-Striped" },
       2: { fr: "Motif Blanc", en: "White-Striped" }
     },
@@ -3398,6 +3401,20 @@
       1: { fr: "Transe", en: "Zen Mode" },
       2: { fr: "Galar", en: "Galarian" },
       3: { fr: "Galar (Transe)", en: "Galarian Zen Mode" }
+    },
+    // 585: Vivaldaim (Deerling)
+    585: {
+      0: { fr: "Printemps", en: "Spring" },
+      1: { fr: "\xC9t\xE9", en: "Summer" },
+      2: { fr: "Automne", en: "Autumn" },
+      3: { fr: "Hiver", en: "Winter" }
+    },
+    // 586: Haydaim (Sawsbuck)
+    586: {
+      0: { fr: "Printemps", en: "Spring" },
+      1: { fr: "\xC9t\xE9", en: "Summer" },
+      2: { fr: "Automne", en: "Autumn" },
+      3: { fr: "Hiver", en: "Winter" }
     },
     // 641: Boréas (Tornadus)
     641: {
@@ -3425,9 +3442,61 @@
       0: { fr: "Chant", en: "Aria" },
       1: { fr: "Danse", en: "Pirouette" }
     },
+    // 669: Flabébé
+    669: {
+      0: { fr: "Fleur Rouge", en: "Red Flower" },
+      1: { fr: "Fleur Jaune", en: "Yellow Flower" },
+      2: { fr: "Fleur Orange", en: "Orange Flower" },
+      3: { fr: "Fleur Bleue", en: "Blue Flower" },
+      4: { fr: "Fleur Blanche", en: "White Flower" }
+    },
+    // 670: Floette
+    670: {
+      0: { fr: "Fleur Rouge", en: "Red Flower" },
+      1: { fr: "Fleur Jaune", en: "Yellow Flower" },
+      2: { fr: "Fleur Orange", en: "Orange Flower" },
+      3: { fr: "Fleur Bleue", en: "Blue Flower" },
+      4: { fr: "Fleur Blanche", en: "White Flower" },
+      5: { fr: "Fleur \xC9ternelle", en: "Eternal Flower" }
+    },
+    // 671: Florges
+    671: {
+      0: { fr: "Fleur Rouge", en: "Red Flower" },
+      1: { fr: "Fleur Jaune", en: "Yellow Flower" },
+      2: { fr: "Fleur Orange", en: "Orange Flower" },
+      3: { fr: "Fleur Bleue", en: "Blue Flower" },
+      4: { fr: "Fleur Blanche", en: "White Flower" }
+    },
+    // 676: Couafarel (Furfrou)
+    676: {
+      0: { fr: "Sauvage", en: "Natural" },
+      1: { fr: "C\u0153ur", en: "Heart" },
+      2: { fr: "\xC9toile", en: "Star" },
+      3: { fr: "Diamant", en: "Diamond" },
+      4: { fr: "Demoiselle", en: "Debutante" },
+      5: { fr: "Madame", en: "Matron" },
+      6: { fr: "Monsieur", en: "Dandy" },
+      7: { fr: "Reine", en: "La Reine" },
+      8: { fr: "Kabuki", en: "Kabuki" },
+      9: { fr: "Pharaon", en: "Pharaoh" }
+    },
     // 681: Exagide (Aegislash)
     681: {
       1: { fr: "Assaut", en: "Blade" }
+    },
+    // 710: Pitrouille (Pumpkaboo) - Formes de taille
+    710: {
+      0: { fr: "Taille Normale", en: "Average Size" },
+      1: { fr: "Taille Mini", en: "Small Size" },
+      2: { fr: "Taille Maxi", en: "Large Size" },
+      3: { fr: "Taille Ultra", en: "Super Size" }
+    },
+    // 711: Banshitrouille (Gourgeist) - Formes de taille
+    711: {
+      0: { fr: "Taille Normale", en: "Average Size" },
+      1: { fr: "Taille Mini", en: "Small Size" },
+      2: { fr: "Taille Maxi", en: "Large Size" },
+      3: { fr: "Taille Ultra", en: "Super Size" }
     },
     // 718: Zygarde
     718: {
@@ -3474,6 +3543,21 @@
     801: {
       1: { fr: "Couleur Pass\xE9e", en: "Original Color" }
     },
+    // 849: Salarsen (Toxtricity)
+    849: {
+      0: { fr: "Aig\xFCe", en: "Amped" },
+      1: { fr: "Grave", en: "Low Key" }
+    },
+    // 854: Théffroi (Sinistea)
+    854: {
+      0: { fr: "Imitation", en: "Phony" },
+      1: { fr: "Authentique", en: "Antique" }
+    },
+    // 855: Polthégéist (Polteageist)
+    855: {
+      0: { fr: "Imitation", en: "Phony" },
+      1: { fr: "Authentique", en: "Antique" }
+    },
     // 877: Morpeko
     877: {
       1: { fr: "Affam\xE9", en: "Hangry" }
@@ -3508,9 +3592,42 @@
     905: {
       1: { fr: "Tot\xE9mique", en: "Therian" }
     },
+    // 925: Famignol (Maushold)
+    925: {
+      0: { fr: "Famille de 4", en: "Family of 4" },
+      1: { fr: "Famille de 3", en: "Family of 3" }
+    },
+    // 931: Tapatoès (Squawkabilly)
+    931: {
+      0: { fr: "Vert", en: "Green" },
+      1: { fr: "Bleu", en: "Blue" },
+      2: { fr: "Jaune", en: "Yellow" },
+      3: { fr: "Blanc", en: "White" }
+    },
     // 964: Superdofin (Palafin)
     964: {
       1: { fr: "H\xE9ros", en: "Hero" }
+    },
+    // 978: Nigirigon (Tatsugiri)
+    978: {
+      0: { fr: "Courb\xE9e", en: "Curly" },
+      1: { fr: "Affal\xE9e", en: "Droopy" },
+      2: { fr: "Raide", en: "Stretchy" }
+    },
+    // 982: Deusolourdo (Dudunsparce)
+    982: {
+      0: { fr: "Double", en: "Two-Segment" },
+      1: { fr: "Triple", en: "Three-Segment" }
+    },
+    // 1012: Poltchageist
+    1012: {
+      0: { fr: "Imitation", en: "Counterfeit" },
+      1: { fr: "Exceptionnel", en: "Masterpiece" }
+    },
+    // 1013: Théffroyable (Sinistcha)
+    1013: {
+      0: { fr: "Imitation", en: "Counterfeit" },
+      1: { fr: "Exceptionnel", en: "Masterpiece" }
     },
     // 1017: Ogerpon
     1017: {
@@ -3573,7 +3690,34 @@
     TERASTAL: { fr: "T\xE9racristal", en: "Terastal" },
     STELLAR: { fr: "Stellaire", en: "Stellar" },
     ZEN: { fr: "Transe", en: "Zen Mode" },
-    ZEN_MODE: { fr: "Transe", en: "Zen Mode" }
+    ZEN_MODE: { fr: "Transe", en: "Zen Mode" },
+    AVERAGE: { fr: "Taille Normale", en: "Average Size" },
+    AVERAGE_SIZE: { fr: "Taille Normale", en: "Average Size" },
+    SMALL: { fr: "Taille Mini", en: "Small Size" },
+    SMALL_SIZE: { fr: "Taille Mini", en: "Small Size" },
+    LARGE: { fr: "Taille Maxi", en: "Large Size" },
+    LARGE_SIZE: { fr: "Taille Maxi", en: "Large Size" },
+    SUPER: { fr: "Taille Ultra", en: "Super Size" },
+    SUPER_SIZE: { fr: "Taille Ultra", en: "Super Size" },
+    AMPED: { fr: "Aig\xFCe", en: "Amped" },
+    LOW_KEY: { fr: "Grave", en: "Low Key" },
+    RED: { fr: "Fleur Rouge", en: "Red Flower" },
+    YELLOW: { fr: "Fleur Jaune", en: "Yellow Flower" },
+    ORANGE: { fr: "Fleur Orange", en: "Orange Flower" },
+    BLUE: { fr: "Fleur Bleue", en: "Blue Flower" },
+    WHITE_FLOWER: { fr: "Fleur Blanche", en: "White Flower" },
+    ETERNAL: { fr: "Fleur \xC9ternelle", en: "Eternal Flower" },
+    CURLY: { fr: "Courb\xE9e", en: "Curly" },
+    DROOPY: { fr: "Affal\xE9e", en: "Droopy" },
+    STRETCHY: { fr: "Raide", en: "Stretchy" },
+    SPRING: { fr: "Printemps", en: "Spring" },
+    SUMMER: { fr: "\xC9t\xE9", en: "Summer" },
+    AUTUMN: { fr: "Automne", en: "Autumn" },
+    WINTER: { fr: "Hiver", en: "Winter" },
+    TWO_SEGMENT: { fr: "Double", en: "Two-Segment" },
+    THREE_SEGMENT: { fr: "Triple", en: "Three-Segment" },
+    FAMILY_OF_FOUR: { fr: "Famille de 4", en: "Family of 4" },
+    FAMILY_OF_THREE: { fr: "Famille de 3", en: "Family of 3" }
   };
   function getAlternateFormLabel(speciesId, formIndex, formKey = "", isFr = true) {
     const sid = Number(speciesId);
@@ -12802,6 +12946,7 @@ canvas:focus-visible,
         const level = pkmn.level || 1;
         const shinyInfo = LineageManager.getPokemonShinyInfo(pkmn);
         const isMega = LineageManager.isPokemonMega(pkmn);
+        const isGmax = LineageManager.isPokemonGigantamax(pkmn);
         const spriteUrl = LineageManager.getPokemonSpriteUrl(pkmn);
         const card = document.createElement("div");
         card.className = `pokeskip-member-card ${idx === this.selectedTeamIndex ? "active" : ""}`;
@@ -12818,6 +12963,7 @@ canvas:focus-visible,
           <div class="pokeskip-member-name">${name}</div>
           <div style="font-size: 11px; color: #94a3b8;">${t("team_level_prefix")}${level}</div>
           ${isMega ? '<div class="pokeskip-mega-badge">\u{1F9EC} M\xC9GA</div>' : ""}
+          ${isGmax ? '<div class="pokeskip-gmax-badge">\u{1F4A5} GMAX</div>' : ""}
         `;
         card.addEventListener("click", () => {
           this.selectedTeamIndex = idx;

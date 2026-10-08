@@ -12,7 +12,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
   - Protection stricte contre les faux positifs nominaux pour les espèces contenant la sous-chaîne *mega* ou *méga* (Méganium #154, Yanmega #469, Mégapagos #565).
   - Vérification obligatoire d'appartenance au registre officiel des méga-évolutions (`megaFamilies` ou Primo-Résurgences Kyogre/Groudon) avant toute qualification de Méga.
 - **Référentiel Officiel des Formes Alternatives (`src/data/alternate-forms.js`)** :
-  - Intégration d'un dictionnaire statique complet pour les formes alternatives spécifiques (Meloetta Danse/Pirouette, Motisma Chaleur/Lavage/Froid/Hélice/Tonte, Deoxys Attaque/Défense/Vitesse, Giratina Origine, Shaymin Céleste, Kyurem Blanc/Noir, Darumacho Transe, etc.).
+  - Intégration d'un dictionnaire statique complet pour les formes alternatives spécifiques (Meloetta Danse/Pirouette, Motisma Chaleur/Lavage/Froid/Hélice/Tonte, Banshitrouye & Pitrouille Tailles Mini/Normale/Maxi/Ultra, Flabébé/Floette/Florges, Salarsen Aigüe/Grave, Deoxys Attaque/Défense/Vitesse, Giratina Origine, Shaymin Céleste, Kyurem Blanc/Noir, Darumacho Transe, etc.).
   - Nommage complet et soigné en français et en anglais avec résolution unifiée dans `getSpeciesName` et `getPokemonDisplayName`.
 - **Prise en Charge Dédiée des Formes Gigamax (G-Max)** :
   - Distinction formelle entre Méga-Évolutions et formes Gigamax via `isPokemonGigantamax`.
