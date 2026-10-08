@@ -3,6 +3,32 @@
 Toutes les modifications notables apportées à PokéSkip sont consignées dans ce document.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v1.16.3] - 2026-10-08
+
+### 🧬 Résilience Multi-Formes (Mégas, Gigamax & Formes Alternatives)
+- **Correction Majeure de la Détection des Formes (Cas Meloetta Danse)** :
+  - Résolution de l'incohérence où Meloetta forme Danse (`formIndex: 1`) était faussement identifiée comme Méga-Meloetta avec un badge `🧬 MÉGA`.
+  - Élimination de la condition trop permissive qui classait tout Pokémon ayant un `formIndex > 0` comme une Méga-Évolution.
+  - Protection stricte contre les faux positifs nominaux pour les espèces contenant la sous-chaîne *mega* ou *méga* (Méganium #154, Yanmega #469, Mégapagos #565).
+  - Vérification obligatoire d'appartenance au registre officiel des méga-évolutions (`megaFamilies` ou Primo-Résurgences Kyogre/Groudon) avant toute qualification de Méga.
+- **Référentiel Officiel des Formes Alternatives (`src/data/alternate-forms.js`)** :
+  - Intégration d'un dictionnaire statique complet pour les formes alternatives spécifiques (Meloetta Danse/Pirouette, Motisma Chaleur/Lavage/Froid/Hélice/Tonte, Deoxys Attaque/Défense/Vitesse, Giratina Origine, Shaymin Céleste, Kyurem Blanc/Noir, Darumacho Transe, etc.).
+  - Nommage complet et soigné en français et en anglais avec résolution unifiée dans `getSpeciesName` et `getPokemonDisplayName`.
+- **Prise en Charge Dédiée des Formes Gigamax (G-Max)** :
+  - Distinction formelle entre Méga-Évolutions et formes Gigamax via `isPokemonGigantamax`.
+  - Ajout du badge stylisé `💥 GMAX` dans l'onglet équipe et affichage suffixé `(Gigamax)`.
+
+### ⚡ Règles Globales Personnalisées & Toasts Interactifs
+- **Création de Règles Globales Personnalisées (Chaînes à Longueur Variable)** :
+  - Ajout d'un encart dédié en haut de l'onglet Règles Globales permettant de composer ses propres chaînes d'évolution d'attaques à partir de deux attaques, puis d'en rajouter à volonté (`+ Ajouter une attaque en bout de chaîne`).
+  - Suppression possible de n'importe quel maillon ou de la règle personnalisée entière.
+- **Option "Ne plus demander" sur les Propositions de Remplacement** :
+  - Ajout d'un bouton d'action directe "Ne plus demander" sur les notifications toast lors de l'apprentissage d'une capacité, permettant de désactiver instantanément les propositions automatiques si le joueur préfère décider manuellement.
+- **Séparation Stricte des Capacités par Langue** :
+  - Autocomplétion et suggestions strictement cloisonnées dans la langue de jeu active (FR ou EN) pour éviter tout mélange bilingue.
+
+---
+
 ## [v1.16.2] - 2026-10-07
 
 ### ⏱️ Personnalisation & Automatisation CI/CD (Firefox AMO)

@@ -46,9 +46,9 @@ export const Toast = {
       }, duration);
     },
 
-    showActionToast(message, actionLabel, onAction, duration = ((PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1000), type = 'advanced') {
+    showActionToast(message, actionLabel, onAction, duration = ((PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1000), type = 'advanced', secondaryActionLabel = null, onSecondaryAction = null) {
       if (!document.body) {
-        document.addEventListener('DOMContentLoaded', () => this.showActionToast(message, actionLabel, onAction, duration, type), { once: true });
+        document.addEventListener('DOMContentLoaded', () => this.showActionToast(message, actionLabel, onAction, duration, type, secondaryActionLabel, onSecondaryAction), { once: true });
         return;
       }
 
@@ -77,15 +77,24 @@ export const Toast = {
       actionBtn.type = 'button';
       actionBtn.className = 'pokeskip-toast-btn-action';
       actionBtn.innerHTML = actionLabel || 'Enregistrer';
+      contentWrap.appendChild(actionBtn);
+
+      let secondaryBtn = null;
+      if (secondaryActionLabel) {
+        secondaryBtn = document.createElement('button');
+        secondaryBtn.type = 'button';
+        secondaryBtn.className = 'pokeskip-toast-btn-secondary';
+        secondaryBtn.textContent = secondaryActionLabel;
+        contentWrap.appendChild(secondaryBtn);
+      }
 
       const closeBtn = document.createElement('button');
       closeBtn.type = 'button';
       closeBtn.className = 'pokeskip-toast-btn-close';
       closeBtn.innerHTML = '✕';
       closeBtn.title = 'Fermer';
-
-      contentWrap.appendChild(actionBtn);
       contentWrap.appendChild(closeBtn);
+
       toast.appendChild(contentWrap);
       container.appendChild(toast);
 
@@ -125,6 +134,20 @@ export const Toast = {
           }
         }
       });
+
+      if (secondaryBtn) {
+        secondaryBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dismiss();
+          if (typeof onSecondaryAction === 'function') {
+            try {
+              onSecondaryAction();
+            } catch (err) {
+              console.error('[PokéSkip] Erreur callback action secondaire toast :', err);
+            }
+          }
+        });
+      }
 
       closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();

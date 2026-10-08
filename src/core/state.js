@@ -23,7 +23,8 @@ export const PokeSkip = {
         universalUpgradesEnabled: false,
         universalUpgradesManual: false,
         disabledUniversalChains: {},
-        disabledUniversalMoves: {}
+        disabledUniversalMoves: {},
+        customGlobalChains: []
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4000) s.toastDuration = 2800;
       if (!s.universalUpgradesManual) {
@@ -34,6 +35,9 @@ export const PokeSkip = {
       }
       if (!s.disabledUniversalMoves || typeof s.disabledUniversalMoves !== 'object') {
         s.disabledUniversalMoves = {};
+      }
+      if (!Array.isArray(s.customGlobalChains)) {
+        s.customGlobalChains = [];
       }
       return s;
     })(),
@@ -443,8 +447,100 @@ export const PokeSkip = {
         if (found) return found;
       }
 
-      // 2. Règle globale universelle d'amélioration directe (priorité #2)
+      // 2. Chaînes globales personnalisées créées par l'utilisateur (priorité #2)
+      const customReplacement = this.findCustomGlobalChainReplacement(target, incomingMoveName, incomingMoveId);
+      if (customReplacement) return customReplacement;
+
+      // 3. Règle globale universelle d'amélioration directe prédéfinie (priorité #3)
       return this.findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId);
+    },
+
+    findCustomGlobalChainReplacement(target, incomingMoveName, incomingMoveId) {
+      if (!this.settings.enabled) return null;
+      if (!this.settings.advancedMode) return null;
+      if (!this.settings.universalUpgradesEnabled) return null;
+
+      const chains = this.settings.customGlobalChains;
+      if (!Array.isArray(chains) || chains.length === 0) return null;
+
+      const normalize = s => (s || '').toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, '');
+      const incNorm = normalize(incomingMoveName);
+      const incId = (incomingMoveId !== undefined && incomingMoveId !== null) ? Number(incomingMoveId) : null;
+
+      const currentMoveset = (target && typeof target.getMoveset === 'function')
+        ? target.getMoveset()
+        : (target?.moveset || []);
+
+      for (const chain of chains) {
+        if (!chain || !chain.enabled) continue;
+        if (!Array.isArray(chain.moves) || chain.moves.length < 2) continue;
+
+        // Trouver la position de l'attaque entrante dans la chaîne
+        const incomingIndex = chain.moves.findIndex(m => {
+          if (!m) return false;
+          if (incId && m.id && Number(m.id) === incId) return true;
+          if (incNorm && normalize(m.name) === incNorm) return true;
+          return false;
+        });
+
+        if (incomingIndex <= 0) continue;
+
+        // Chercher s'il possède une attaque de rang inférieur dans la chaîne
+        for (let i = incomingIndex - 1; i >= 0; i--) {
+          const lowerMove = chain.moves[i];
+          if (!lowerMove) continue;
+          const lowerNorm = normalize(lowerMove.name);
+          const lowerId = lowerMove.id ? Number(lowerMove.id) : null;
+
+          const hasLowerMove = currentMoveset.some(m => {
+            if (!m) return false;
+            const mId = m.moveId ?? m.id ?? (typeof m === 'number' ? m : null);
+            if (lowerId && mId && Number(mId) === lowerId) return true;
+
+            const names = [];
+            if (typeof m.getName === 'function') {
+              try { names.push(m.getName()); } catch (_) {}
+            }
+            if (m.name) names.push(m.name);
+            if (typeof m.getMove === 'function') {
+              try { const mv = m.getMove(); if (mv?.name) names.push(mv.name); } catch (_) {}
+            }
+            for (const n of names) {
+              if (n && normalize(n) === lowerNorm) return true;
+            }
+            return false;
+          });
+
+          if (hasLowerMove) {
+            // Conflit éventuel avec une règle d'espèce
+            const familyRule = this.getFamilyRule(target);
+            if (familyRule && Array.isArray(familyRule.replacements)) {
+              const conflict = familyRule.replacements.some(r => {
+                if (!r.enabled) return false;
+                const rOldNorm = normalize(r.oldMoveName);
+                const rOldId = r.oldMoveId ? Number(r.oldMoveId) : null;
+                return (lowerId && rOldId && rOldId === lowerId) || (rOldNorm && rOldNorm === lowerNorm);
+              });
+              if (conflict) {
+                continue;
+              }
+            }
+
+            return {
+              id: `cgc_${chain.id}_${lowerId || lowerNorm}_${incId || incNorm}`,
+              oldMoveName: lowerMove.name,
+              oldMoveId: lowerId,
+              newMoveName: chain.moves[incomingIndex].name,
+              newMoveId: chain.moves[incomingIndex].id || incId,
+              isUniversalUpgrade: true,
+              isCustomGlobalChain: true,
+              chainName: chain.name || chain.moves.map(m => m.name).join(' ➔ ')
+            };
+          }
+        }
+      }
+
+      return null;
     },
 
     findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId) {
@@ -596,5 +692,57 @@ export const PokeSkip = {
         }
       }
       this.saveSettings();
+    },
+
+    getCustomGlobalChains() {
+      if (!Array.isArray(this.settings.customGlobalChains)) {
+        this.settings.customGlobalChains = [];
+      }
+      return this.settings.customGlobalChains;
+    },
+
+    addCustomGlobalChain(movesList) {
+      if (!Array.isArray(movesList) || movesList.length < 2) return null;
+      if (!Array.isArray(this.settings.customGlobalChains)) {
+        this.settings.customGlobalChains = [];
+      }
+
+      const chainId = 'cgc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+      const chainObj = {
+        id: chainId,
+        name: movesList.map(m => m.name.trim()).join(' ➔ '),
+        moves: movesList.map(m => ({
+          name: m.name.trim(),
+          id: (m.id !== undefined && m.id !== null) ? Number(m.id) : null
+        })),
+        enabled: true,
+        createdAt: Date.now()
+      };
+
+      this.settings.customGlobalChains.push(chainObj);
+      this.saveSettings();
+      return chainObj;
+    },
+
+    toggleCustomGlobalChain(chainId, enabled = null) {
+      const chains = this.getCustomGlobalChains();
+      const c = chains.find(item => item.id === chainId);
+      if (c) {
+        c.enabled = (enabled !== null) ? Boolean(enabled) : !c.enabled;
+        this.saveSettings();
+        return c.enabled;
+      }
+      return false;
+    },
+
+    deleteCustomGlobalChain(chainId) {
+      const chains = this.getCustomGlobalChains();
+      const initialLen = chains.length;
+      this.settings.customGlobalChains = chains.filter(item => item.id !== chainId);
+      if (this.settings.customGlobalChains.length !== initialLen) {
+        this.saveSettings();
+        return true;
+      }
+      return false;
     }
 };

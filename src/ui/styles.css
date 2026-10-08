@@ -524,6 +524,18 @@
   margin-top: 2px;
   display: inline-block;
 }
+.pokeskip-gmax-badge {
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  display: inline-block;
+}
 .pokeskip-saved-species-card {
   background: #111a2e;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1359,6 +1371,26 @@
   background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
   transform: translateY(-1px) scale(1.02);
   box-shadow: 0 4px 14px rgba(168, 85, 247, 0.65);
+}
+.pokeskip-toast-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+}
+.pokeskip-toast-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
 }
 .pokeskip-toast-btn-close {
   background: rgba(255, 255, 255, 0.08);

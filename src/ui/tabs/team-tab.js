@@ -100,6 +100,7 @@ export const TeamTab = {
       const currentName = LineageManager.getPokemonDisplayName(pokemon);
       const shinyInfo = LineageManager.getPokemonShinyInfo(pokemon);
       const isMega = LineageManager.isPokemonMega(pokemon);
+      const isGmax = LineageManager.isPokemonGigantamax(pokemon);
       const currentSpeciesId = pokemon.species?.speciesId ?? pokemon.speciesId ?? LineageManager.getRootId(pokemon);
       const memberSprites = LineageManager.getLineageMemberSprites(familyInfo.familyKey, shinyInfo.isShiny, pokemon);
       const rule = PokeSkip.getFamilyRule(familyInfo.familyKey) || { skippedMoves: {}, skipAll: false };
@@ -119,6 +120,7 @@ export const TeamTab = {
               <span class="pokeskip-lineage-lvl">${t('team_level_prefix')}${pokemon.level || 1}</span>
               ${shinyInfo.isShiny ? `<span class="pokeskip-shiny-badge ${shinyInfo.className}" style="position:static;" title="${shinyInfo.title}">${shinyInfo.stars}</span>` : ''}
               ${isMega ? '<span class="pokeskip-mega-badge">🧬 MÉGA</span>' : ''}
+              ${isGmax ? '<span class="pokeskip-gmax-badge">💥 GMAX</span>' : ''}
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">

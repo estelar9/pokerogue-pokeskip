@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PokéSkip — Auto-Skip Sélectif des Capacités pour PokéRogue
 // @namespace    https://github.com/estelar9/pokerogue-pokeskip
-// @version      1.16.2
+// @version      1.16.3
 // @description  Choisis pour chaque Pokémon de ton équipe quelles futures capacités ignorer automatiquement lors des montées de niveau. Affiche type, catégorie, puissance, PP et description. Sauvegarde éternelle par espèce !
 // @author       PokéSkip Team
 // @match        https://pokerogue.net/*
@@ -3347,6 +3347,266 @@
     937: 935
   };
 
+  // src/data/alternate-forms.js
+  var alternateForms = {
+    // 351: Morphéo (Castform)
+    351: {
+      1: { fr: "Solaire", en: "Sunny" },
+      2: { fr: "Eau de Pluie", en: "Rainy" },
+      3: { fr: "Blizzard", en: "Snowy" }
+    },
+    // 386: Deoxys
+    386: {
+      1: { fr: "Attaque", en: "Attack" },
+      2: { fr: "D\xE9fense", en: "Defense" },
+      3: { fr: "Vitesse", en: "Speed" }
+    },
+    // 413: Cheniselle (Wormadam)
+    413: {
+      0: { fr: "Plante", en: "Plant Cloak" },
+      1: { fr: "Sable", en: "Sandy Cloak" },
+      2: { fr: "D\xE9chet", en: "Trash Cloak" }
+    },
+    // 421: Ceriflor (Cherrim)
+    421: {
+      1: { fr: "Ensoleill\xE9", en: "Sunshine" }
+    },
+    // 422: Sancoki (Shellos)
+    422: {
+      1: { fr: "Mer Orient", en: "East Sea" }
+    },
+    // 423: Tritosor (Gastrodon)
+    423: {
+      1: { fr: "Mer Orient", en: "East Sea" }
+    },
+    // 479: Motisma (Rotom)
+    479: {
+      1: { fr: "Chaleur", en: "Heat" },
+      2: { fr: "Lavage", en: "Wash" },
+      3: { fr: "Froid", en: "Frost" },
+      4: { fr: "H\xE9lice", en: "Fan" },
+      5: { fr: "Tonte", en: "Mow" }
+    },
+    // 483: Dialga
+    483: {
+      1: { fr: "Origine", en: "Origin" }
+    },
+    // 484: Palkia
+    484: {
+      1: { fr: "Origine", en: "Origin" }
+    },
+    // 487: Giratina
+    487: {
+      1: { fr: "Origine", en: "Origin" }
+    },
+    // 492: Shaymin
+    492: {
+      1: { fr: "C\xE9leste", en: "Sky" }
+    },
+    // 550: Bargantua (Basculin)
+    550: {
+      1: { fr: "Motif Bleu", en: "Blue-Striped" },
+      2: { fr: "Motif Blanc", en: "White-Striped" }
+    },
+    // 555: Darumacho (Darmanitan)
+    555: {
+      1: { fr: "Transe", en: "Zen Mode" },
+      2: { fr: "Galar", en: "Galarian" },
+      3: { fr: "Galar (Transe)", en: "Galarian Zen Mode" }
+    },
+    // 641: Boréas (Tornadus)
+    641: {
+      1: { fr: "Tot\xE9mique", en: "Therian" }
+    },
+    // 642: Fulguris (Thundurus)
+    642: {
+      1: { fr: "Tot\xE9mique", en: "Therian" }
+    },
+    // 645: Démétéros (Landorus)
+    645: {
+      1: { fr: "Tot\xE9mique", en: "Therian" }
+    },
+    // 646: Kyurem
+    646: {
+      1: { fr: "Blanc", en: "White" },
+      2: { fr: "Noir", en: "Black" }
+    },
+    // 647: Keldeo
+    647: {
+      1: { fr: "D\xE9cid\xE9", en: "Resolute" }
+    },
+    // 648: Meloetta
+    648: {
+      0: { fr: "Chant", en: "Aria" },
+      1: { fr: "Danse", en: "Pirouette" }
+    },
+    // 681: Exagide (Aegislash)
+    681: {
+      1: { fr: "Assaut", en: "Blade" }
+    },
+    // 718: Zygarde
+    718: {
+      0: { fr: "50%", en: "50%" },
+      1: { fr: "10%", en: "10%" },
+      2: { fr: "Parfait", en: "Complete" }
+    },
+    // 720: Hoopa
+    720: {
+      1: { fr: "D\xE9cha\xEEn\xE9", en: "Unbound" }
+    },
+    // 741: Plumeline (Oricorio)
+    741: {
+      0: { fr: "Flamenco", en: "Baile" },
+      1: { fr: "Pom-pom", en: "Pom-Pom" },
+      2: { fr: "Hula", en: "Pa'u" },
+      3: { fr: "Buy\u014D", en: "Sensu" }
+    },
+    // 745: Lougaroc (Lycanroc)
+    745: {
+      0: { fr: "Diurne", en: "Midday" },
+      1: { fr: "Nocturne", en: "Midnight" },
+      2: { fr: "Cr\xE9pusculaire", en: "Dusk" }
+    },
+    // 746: Froussardine (Wishiwashi)
+    746: {
+      1: { fr: "Banc", en: "School" }
+    },
+    // 774: Météno (Minior)
+    774: {
+      1: { fr: "Noyau", en: "Core" }
+    },
+    // 778: Mimiqui (Mimikyu)
+    778: {
+      1: { fr: "D\xE9masqu\xE9e", en: "Busted" }
+    },
+    // 800: Necrozma
+    800: {
+      1: { fr: "Crini\xE8re du Couchant", en: "Dusk Mane" },
+      2: { fr: "Ailes de l'Aurore", en: "Dawn Wings" },
+      3: { fr: "Ultra", en: "Ultra" }
+    },
+    // 801: Magearna
+    801: {
+      1: { fr: "Couleur Pass\xE9e", en: "Original Color" }
+    },
+    // 877: Morpeko
+    877: {
+      1: { fr: "Affam\xE9", en: "Hangry" }
+    },
+    // 888: Zacian
+    888: {
+      1: { fr: "\xC9p\xE9e Supr\xEAme", en: "Crowned Sword" }
+    },
+    // 889: Zamazenta
+    889: {
+      1: { fr: "Bouclier Supr\xEAme", en: "Crowned Shield" }
+    },
+    // 890: Éthernatos (Eternatus)
+    890: {
+      1: { fr: "Infinimax", en: "Eternamax" }
+    },
+    // 892: Shifours (Urshifu)
+    892: {
+      0: { fr: "Poing Final", en: "Single Strike" },
+      1: { fr: "Mille Poings", en: "Rapid Strike" }
+    },
+    // 898: Sylveroy (Calyrex)
+    898: {
+      1: { fr: "Cavalier du Froid", en: "Ice Rider" },
+      2: { fr: "Cavalier d'Effroi", en: "Shadow Rider" }
+    },
+    // 901: Ursaking (Ursaluna)
+    901: {
+      1: { fr: "Lune Vermeille", en: "Bloodmoon" }
+    },
+    // 905: Amovénus (Enamorus)
+    905: {
+      1: { fr: "Tot\xE9mique", en: "Therian" }
+    },
+    // 964: Superdofin (Palafin)
+    964: {
+      1: { fr: "H\xE9ros", en: "Hero" }
+    },
+    // 1017: Ogerpon
+    1017: {
+      0: { fr: "Masque Turquoise", en: "Teal Mask" },
+      1: { fr: "Masque du Puits", en: "Wellspring Mask" },
+      2: { fr: "Masque du Fourneau", en: "Hearthflame Mask" },
+      3: { fr: "Masque de la Pierre", en: "Cornerstone Mask" }
+    },
+    // 1024: Terapagos
+    1024: {
+      0: { fr: "Normal", en: "Normal" },
+      1: { fr: "T\xE9racristal", en: "Terastal" },
+      2: { fr: "Stellaire", en: "Stellar" }
+    }
+  };
+  var formKeyNames = {
+    PIROUETTE: { fr: "Danse", en: "Pirouette" },
+    ARIA: { fr: "Chant", en: "Aria" },
+    HEAT: { fr: "Chaleur", en: "Heat" },
+    WASH: { fr: "Lavage", en: "Wash" },
+    FROST: { fr: "Froid", en: "Frost" },
+    FAN: { fr: "H\xE9lice", en: "Fan" },
+    MOW: { fr: "Tonte", en: "Mow" },
+    ATTACK: { fr: "Attaque", en: "Attack" },
+    DEFENSE: { fr: "D\xE9fense", en: "Defense" },
+    SPEED: { fr: "Vitesse", en: "Speed" },
+    ORIGIN: { fr: "Origine", en: "Origin" },
+    SKY: { fr: "C\xE9leste", en: "Sky" },
+    LAND: { fr: "Terrestre", en: "Land" },
+    THERIAN: { fr: "Tot\xE9mique", en: "Therian" },
+    INCARNATE: { fr: "Avatar", en: "Incarnate" },
+    BLACK: { fr: "Noir", en: "Black" },
+    WHITE: { fr: "Blanc", en: "White" },
+    RESOLUTE: { fr: "D\xE9cid\xE9", en: "Resolute" },
+    BLADE: { fr: "Assaut", en: "Blade" },
+    SHIELD: { fr: "Parade", en: "Shield" },
+    COMPLETE: { fr: "Parfait", en: "Complete" },
+    UNBOUND: { fr: "D\xE9cha\xEEn\xE9", en: "Unbound" },
+    CONFINED: { fr: "Encha\xEEn\xE9", en: "Confined" },
+    MIDDAY: { fr: "Diurne", en: "Midday" },
+    MIDNIGHT: { fr: "Nocturne", en: "Midnight" },
+    DUSK: { fr: "Cr\xE9pusculaire", en: "Dusk" },
+    SCHOOL: { fr: "Banc", en: "School" },
+    SOLO: { fr: "Solitaire", en: "Solo" },
+    DUSK_MANE: { fr: "Crini\xE8re du Couchant", en: "Dusk Mane" },
+    DAWN_WINGS: { fr: "Ailes de l'Aurore", en: "Dawn Wings" },
+    ULTRA: { fr: "Ultra", en: "Ultra" },
+    CROWNED_SWORD: { fr: "\xC9p\xE9e Supr\xEAme", en: "Crowned Sword" },
+    CROWNED_SHIELD: { fr: "Bouclier Supr\xEAme", en: "Crowned Shield" },
+    ETERNAMAX: { fr: "Infinimax", en: "Eternamax" },
+    SINGLE_STRIKE: { fr: "Poing Final", en: "Single Strike" },
+    RAPID_STRIKE: { fr: "Mille Poings", en: "Rapid Strike" },
+    ICE_RIDER: { fr: "Cavalier du Froid", en: "Ice Rider" },
+    SHADOW_RIDER: { fr: "Cavalier d'Effroi", en: "Shadow Rider" },
+    BLOODMOON: { fr: "Lune Vermeille", en: "Bloodmoon" },
+    HERO: { fr: "H\xE9ros", en: "Hero" },
+    WELLSPRING: { fr: "Masque du Puits", en: "Wellspring" },
+    HEARTHFLAME: { fr: "Masque du Fourneau", en: "Hearthflame" },
+    CORNERSTONE: { fr: "Masque de la Pierre", en: "Cornerstone" },
+    TERASTAL: { fr: "T\xE9racristal", en: "Terastal" },
+    STELLAR: { fr: "Stellaire", en: "Stellar" },
+    ZEN: { fr: "Transe", en: "Zen Mode" },
+    ZEN_MODE: { fr: "Transe", en: "Zen Mode" }
+  };
+  function getAlternateFormLabel(speciesId, formIndex, formKey = "", isFr = true) {
+    const sid = Number(speciesId);
+    const fIdx = Number(formIndex);
+    if (sid && !isNaN(fIdx) && alternateForms[sid] && alternateForms[sid][fIdx]) {
+      const entry = alternateForms[sid][fIdx];
+      return isFr ? entry.fr || entry.en : entry.en || entry.fr;
+    }
+    if (formKey && typeof formKey === "string") {
+      const cleanKey = formKey.toUpperCase().trim().replace(/^SPECIESFORMKEY\./, "");
+      if (formKeyNames[cleanKey]) {
+        const entry = formKeyNames[cleanKey];
+        return isFr ? entry.fr || entry.en : entry.en || entry.fr;
+      }
+    }
+    return null;
+  }
+
   // src/data/species-names.js
   var staticSpeciesNames = {
     1: "Bulbizarre",
@@ -4458,6 +4718,25 @@
       global_move_tooltip_click_disable: "Cliquer pour exclure",
       global_move_tooltip_click_enable: "Cliquer pour r\xE9activer",
       global_move_excluded_badge: "Exclue",
+      // Custom Global Chains
+      global_custom_title: "Cr\xE9er une Cha\xEEne d'Attaques Globale Personnalis\xE9e",
+      global_custom_subtitle: "D\xE9finissez une s\xE9quence progressive de capacit\xE9s qui s'am\xE9liorent pour toute votre \xE9quipe (ex: Mimi-Queue \u2794 Groz'Yeux \u2794 Grincement).",
+      global_custom_step: "Rang {step}",
+      global_custom_origin_tag: "(Origine)",
+      global_custom_replacement_tag: "(Remplacement)",
+      global_custom_placeholder: "Nom de la capacit\xE9 (ex: Charge, Surf)...",
+      global_custom_add_step: "+ Ajouter une \xE9tape en bout de cha\xEEne",
+      global_custom_remove_step: "Supprimer cette \xE9tape",
+      global_custom_save_btn: "\u2713 Enregistrer la cha\xEEne",
+      global_custom_my_chains: "Mes Cha\xEEnes Personnalis\xE9es ({count})",
+      global_custom_no_chains: "Aucune cha\xEEne personnalis\xE9e pour l'instant. Cr\xE9ez-en une ci-dessus !",
+      global_custom_error_min_moves: "Une cha\xEEne doit comporter au moins 2 capacit\xE9s distinctes.",
+      global_custom_error_empty_move: "Veuillez renseigner un nom pour chaque capacit\xE9 de la cha\xEEne.",
+      global_custom_error_duplicate_move: "Une capacit\xE9 ne peut pas appara\xEEtre plusieurs fois dans la m\xEAme cha\xEEne.",
+      global_custom_saved_toast: "Cha\xEEne personnalis\xE9e enregistr\xE9e : <b>{name}</b> !",
+      global_custom_deleted_toast: "Cha\xEEne personnalis\xE9e supprim\xE9e.",
+      global_custom_toggle_toast: "Cha\xEEne personnalis\xE9e <b>{name}</b> : {status}",
+      global_custom_delete_confirm: 'Supprimer d\xE9finitivement la cha\xEEne "{name}" ?',
       // Team Tab
       team_empty_msg: `\u26A0\uFE0F Aucune partie en cours d\xE9tect\xE9e ou \xE9quipe vide.<br>Lancez une partie dans Pok\xE9Rogue pour voir votre \xE9quipe active, ou utilisez l'onglet <b>"Esp\xE8ces M\xE9moris\xE9es"</b> !`,
       team_pause_rules: "Mettre en pause les r\xE8gles de ce Pok\xE9mon",
@@ -4589,6 +4868,8 @@
       toast_auto_replaced: "\u{1F504} <b>{newMove}</b> a automatiquement remplac\xE9 <b>{oldMove}</b> sur <b>{pokemon}</b> !",
       toast_save_manual_rep: "\u{1F4BE} Remplacement manuel : Enregistrer {oldMove} \u2794 {newMove} sur {pokemon} ?",
       toast_save_btn: "Enregistrer",
+      toast_dont_ask_again: "Ne plus demander",
+      toast_prompt_auto_rep_disabled: "Suggestions de remplacement d\xE9sactiv\xE9es (r\xE9activables dans les Param\xE8tres).",
       toast_export_success: "R\xE8gles et param\xE8tres export\xE9s en fichier JSON",
       toast_import_invalid: "Erreur : le fichier JSON est invalide ou vide.",
       toast_import_success: "Succ\xE8s : {details} import\xE9(s) !",
@@ -4668,6 +4949,25 @@
       global_move_tooltip_click_disable: "Click to exclude",
       global_move_tooltip_click_enable: "Click to re-enable",
       global_move_excluded_badge: "Excluded",
+      // Custom Global Chains
+      global_custom_title: "Create a Custom Global Move Chain",
+      global_custom_subtitle: "Define a progressive sequence of moves that automatically upgrade across your entire party (e.g. Tackle \u2794 Take Down \u2794 Double-Edge).",
+      global_custom_step: "Rank {step}",
+      global_custom_origin_tag: "(Origin)",
+      global_custom_replacement_tag: "(Replacement)",
+      global_custom_placeholder: "Move name (e.g. Tackle, Surf)...",
+      global_custom_add_step: "+ Add next step to chain",
+      global_custom_remove_step: "Remove this step",
+      global_custom_save_btn: "\u2713 Save chain",
+      global_custom_my_chains: "My Custom Chains ({count})",
+      global_custom_no_chains: "No custom chains yet. Create one above!",
+      global_custom_error_min_moves: "A chain must have at least 2 distinct moves.",
+      global_custom_error_empty_move: "Please enter a name for every move in the chain.",
+      global_custom_error_duplicate_move: "A move cannot appear multiple times in the same chain.",
+      global_custom_saved_toast: "Custom chain saved: <b>{name}</b>!",
+      global_custom_deleted_toast: "Custom chain deleted.",
+      global_custom_toggle_toast: "Custom chain <b>{name}</b>: {status}",
+      global_custom_delete_confirm: 'Permanently delete chain "{name}"?',
       // Team Tab
       team_empty_msg: '\u26A0\uFE0F No active game detected or party is empty.<br>Start a game in Pok\xE9Rogue to view your party, or check the <b>"Rules & Species"</b> tab!',
       team_pause_rules: "Pause rules for this Pok\xE9mon",
@@ -4799,6 +5099,8 @@
       toast_auto_replaced: "\u{1F504} <b>{newMove}</b> automatically replaced <b>{oldMove}</b> on <b>{pokemon}</b>!",
       toast_save_manual_rep: "\u{1F4BE} Manual replacement: Save {oldMove} \u2794 {newMove} on {pokemon}?",
       toast_save_btn: "Save",
+      toast_dont_ask_again: "Don't ask again",
+      toast_prompt_auto_rep_disabled: "Automatic replacement suggestions disabled (can be re-enabled in Settings).",
       toast_export_success: "Rules and settings exported to JSON file",
       toast_import_invalid: "Error: JSON file is invalid or empty.",
       toast_import_success: "Success: {details} imported!",
@@ -6351,7 +6653,8 @@
         universalUpgradesEnabled: false,
         universalUpgradesManual: false,
         disabledUniversalChains: {},
-        disabledUniversalMoves: {}
+        disabledUniversalMoves: {},
+        customGlobalChains: []
       }, PokeStorage.get(SETTINGS_KEY, {}));
       if (s.toastDuration === 4e3) s.toastDuration = 2800;
       if (!s.universalUpgradesManual) {
@@ -6362,6 +6665,9 @@
       }
       if (!s.disabledUniversalMoves || typeof s.disabledUniversalMoves !== "object") {
         s.disabledUniversalMoves = {};
+      }
+      if (!Array.isArray(s.customGlobalChains)) {
+        s.customGlobalChains = [];
       }
       return s;
     })(),
@@ -6717,7 +7023,86 @@
         });
         if (found) return found;
       }
+      const customReplacement = this.findCustomGlobalChainReplacement(target, incomingMoveName, incomingMoveId);
+      if (customReplacement) return customReplacement;
       return this.findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId);
+    },
+    findCustomGlobalChainReplacement(target, incomingMoveName, incomingMoveId) {
+      if (!this.settings.enabled) return null;
+      if (!this.settings.advancedMode) return null;
+      if (!this.settings.universalUpgradesEnabled) return null;
+      const chains = this.settings.customGlobalChains;
+      if (!Array.isArray(chains) || chains.length === 0) return null;
+      const normalize = (s) => (s || "").toString().toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, "");
+      const incNorm = normalize(incomingMoveName);
+      const incId = incomingMoveId !== void 0 && incomingMoveId !== null ? Number(incomingMoveId) : null;
+      const currentMoveset = target && typeof target.getMoveset === "function" ? target.getMoveset() : target?.moveset || [];
+      for (const chain of chains) {
+        if (!chain || !chain.enabled) continue;
+        if (!Array.isArray(chain.moves) || chain.moves.length < 2) continue;
+        const incomingIndex = chain.moves.findIndex((m) => {
+          if (!m) return false;
+          if (incId && m.id && Number(m.id) === incId) return true;
+          if (incNorm && normalize(m.name) === incNorm) return true;
+          return false;
+        });
+        if (incomingIndex <= 0) continue;
+        for (let i = incomingIndex - 1; i >= 0; i--) {
+          const lowerMove = chain.moves[i];
+          if (!lowerMove) continue;
+          const lowerNorm = normalize(lowerMove.name);
+          const lowerId = lowerMove.id ? Number(lowerMove.id) : null;
+          const hasLowerMove = currentMoveset.some((m) => {
+            if (!m) return false;
+            const mId = m.moveId ?? m.id ?? (typeof m === "number" ? m : null);
+            if (lowerId && mId && Number(mId) === lowerId) return true;
+            const names = [];
+            if (typeof m.getName === "function") {
+              try {
+                names.push(m.getName());
+              } catch (_) {
+              }
+            }
+            if (m.name) names.push(m.name);
+            if (typeof m.getMove === "function") {
+              try {
+                const mv = m.getMove();
+                if (mv?.name) names.push(mv.name);
+              } catch (_) {
+              }
+            }
+            for (const n of names) {
+              if (n && normalize(n) === lowerNorm) return true;
+            }
+            return false;
+          });
+          if (hasLowerMove) {
+            const familyRule = this.getFamilyRule(target);
+            if (familyRule && Array.isArray(familyRule.replacements)) {
+              const conflict = familyRule.replacements.some((r) => {
+                if (!r.enabled) return false;
+                const rOldNorm = normalize(r.oldMoveName);
+                const rOldId = r.oldMoveId ? Number(r.oldMoveId) : null;
+                return lowerId && rOldId && rOldId === lowerId || rOldNorm && rOldNorm === lowerNorm;
+              });
+              if (conflict) {
+                continue;
+              }
+            }
+            return {
+              id: `cgc_${chain.id}_${lowerId || lowerNorm}_${incId || incNorm}`,
+              oldMoveName: lowerMove.name,
+              oldMoveId: lowerId,
+              newMoveName: chain.moves[incomingIndex].name,
+              newMoveId: chain.moves[incomingIndex].id || incId,
+              isUniversalUpgrade: true,
+              isCustomGlobalChain: true,
+              chainName: chain.name || chain.moves.map((m) => m.name).join(" \u2794 ")
+            };
+          }
+        }
+      }
+      return null;
     },
     findUniversalUpgradeReplacement(target, incomingMoveName, incomingMoveId) {
       if (!this.settings.enabled) return null;
@@ -6847,6 +7232,52 @@
         }
       }
       this.saveSettings();
+    },
+    getCustomGlobalChains() {
+      if (!Array.isArray(this.settings.customGlobalChains)) {
+        this.settings.customGlobalChains = [];
+      }
+      return this.settings.customGlobalChains;
+    },
+    addCustomGlobalChain(movesList) {
+      if (!Array.isArray(movesList) || movesList.length < 2) return null;
+      if (!Array.isArray(this.settings.customGlobalChains)) {
+        this.settings.customGlobalChains = [];
+      }
+      const chainId = "cgc_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7);
+      const chainObj = {
+        id: chainId,
+        name: movesList.map((m) => m.name.trim()).join(" \u2794 "),
+        moves: movesList.map((m) => ({
+          name: m.name.trim(),
+          id: m.id !== void 0 && m.id !== null ? Number(m.id) : null
+        })),
+        enabled: true,
+        createdAt: Date.now()
+      };
+      this.settings.customGlobalChains.push(chainObj);
+      this.saveSettings();
+      return chainObj;
+    },
+    toggleCustomGlobalChain(chainId, enabled = null) {
+      const chains = this.getCustomGlobalChains();
+      const c = chains.find((item) => item.id === chainId);
+      if (c) {
+        c.enabled = enabled !== null ? Boolean(enabled) : !c.enabled;
+        this.saveSettings();
+        return c.enabled;
+      }
+      return false;
+    },
+    deleteCustomGlobalChain(chainId) {
+      const chains = this.getCustomGlobalChains();
+      const initialLen = chains.length;
+      this.settings.customGlobalChains = chains.filter((item) => item.id !== chainId);
+      if (this.settings.customGlobalChains.length !== initialLen) {
+        this.saveSettings();
+        return true;
+      }
+      return false;
     }
   };
 
@@ -6855,6 +7286,8 @@
     families,
     branchedPrevolutions,
     megaFamilies,
+    alternateForms,
+    formKeyNames,
     staticSpeciesNames,
     speciesNames: {},
     memberToRoot: {},
@@ -6897,42 +7330,12 @@
     getSpeciesName(speciesId, formIndex = 0, pokemon = null) {
       if (!speciesId) return "";
       const sid = Number(speciesId);
-      if (isNaN(sid)) return "";
+      if (isNaN(sid) || sid <= 0) return "";
+      const fIdx = formIndex !== void 0 && formIndex !== null && !isNaN(formIndex) ? Number(formIndex) : pokemon?.formIndex !== void 0 ? Number(pokemon.formIndex) : pokemon?.formeIndex !== void 0 ? Number(pokemon.formeIndex) : 0;
+      const isFr = isFrench();
       const isMega = pokemon ? this.isPokemonMega(pokemon) : false;
-      if (isEnglish()) {
-        try {
-          if (pokemon?.species && typeof pokemon.species.getName === "function") {
-            const loc = pokemon.species.getName(formIndex);
-            if (loc && typeof loc === "string" && loc.trim()) {
-              return isMega && !loc.toLowerCase().includes("mega") ? `Mega ${loc.trim()}` : loc.trim();
-            }
-          }
-          if (pokemon?.species?.name) {
-            const n = pokemon.species.name;
-            return isMega && !n.toLowerCase().includes("mega") ? `Mega ${n}` : n;
-          }
-          const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
-          const scene = PokeSkip.scene || win.globalScene;
-          const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry || scene && scene.speciesDataRegistry || scene && scene.gameData && scene.gameData.speciesDataRegistry;
-          if (sdr) {
-            const sp = sdr.data ? sdr.data[sid] : typeof sdr.get === "function" ? sdr.get(sid) : null;
-            if (sp) {
-              const n = typeof sp.getName === "function" ? sp.getName(formIndex) : sp.name || sp.speciesName;
-              if (n && typeof n === "string" && n.trim()) {
-                return isMega && !n.toLowerCase().includes("mega") ? `Mega ${n.trim()}` : n.trim();
-              }
-            }
-          }
-        } catch (_) {
-        }
-      }
-      if (this.speciesNames[sid] && isFrench()) {
-        let n = this.speciesNames[sid];
-        if (isMega && !n.toLowerCase().includes("m\xE9ga") && !n.toLowerCase().includes("mega")) {
-          n = `M\xE9ga-${n}`;
-        }
-        return n;
-      }
+      const isGmax = pokemon ? this.isPokemonGigantamax(pokemon) : false;
+      const formKey = pokemon ? this.getPokemonFormKey(pokemon) : "";
       if (sid >= 8e3 && sid < 1e4) {
         const base = this.getSpeciesName(sid - 8e3, 0, pokemon);
         if (base) return t("regional_paldea", { base });
@@ -6949,52 +7352,87 @@
         const base = this.getSpeciesName(sid - 2e3, 0, pokemon);
         if (base) return t("regional_alola", { base });
       }
-      const fIdx = formIndex !== void 0 && formIndex !== null && formIndex > 0 ? Number(formIndex) : pokemon?.formIndex ? Number(pokemon.formIndex) : 0;
+      let baseName = "";
+      if (isFr) {
+        baseName = this.speciesNames[sid] || this.staticSpeciesNames && this.staticSpeciesNames[sid] || "";
+      } else {
+        baseName = pokemon?.species?.name || "";
+      }
+      if (!baseName) {
+        try {
+          const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+          const scene = PokeSkip.scene || win.globalScene;
+          const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry || scene && scene.speciesDataRegistry || scene && scene.gameData && scene.gameData.speciesDataRegistry;
+          if (sdr) {
+            const sp = sdr.data ? sdr.data[sid] : typeof sdr.get === "function" ? sdr.get(sid) : null;
+            if (sp) {
+              const n = typeof sp.getName === "function" ? sp.getName(0) : sp.name || sp.speciesName;
+              if (n && typeof n === "string" && n.trim()) {
+                baseName = n.trim();
+              }
+            }
+          }
+        } catch (_) {
+        }
+      }
+      if (!baseName) {
+        baseName = this.speciesNames[sid] || this.staticSpeciesNames && this.staticSpeciesNames[sid] || pokemon?.species?.name || `Pok\xE9mon #${sid}`;
+      }
+      if (isMega) {
+        const isPrimal = sid === 382 || sid === 383 || formKey === "PRIMAL";
+        if (isFr) {
+          if (isPrimal) {
+            return baseName.toLowerCase().includes("primo") ? baseName : `Primo-${baseName}`;
+          }
+          return baseName.toLowerCase().includes("m\xE9ga") || baseName.toLowerCase().includes("mega") ? baseName : `M\xE9ga-${baseName}`;
+        } else {
+          if (isPrimal) {
+            return baseName.toLowerCase().includes("primal") ? baseName : `Primal ${baseName}`;
+          }
+          return baseName.toLowerCase().includes("mega") ? baseName : `Mega ${baseName}`;
+        }
+      }
+      if (isGmax) {
+        if (isFr) {
+          return baseName.toLowerCase().includes("gigamax") ? baseName : `${baseName} (Gigamax)`;
+        } else {
+          return baseName.toLowerCase().includes("gigantamax") ? baseName : `${baseName} (Gigantamax)`;
+        }
+      }
       if (fIdx > 0 && sid > 0 && sid < 1025) {
+        const alolanIds = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
+        const galarianIds = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
+        const hisuianIds = [58, 59, 100, 101, 157, 211, 215, 503, 549, 550, 570, 571, 628, 706, 713, 724];
+        const paldeanIds = [128, 194];
+        if (formKey.includes("ALOLA") || alolanIds.includes(sid) && (fIdx === 1 || sid === 52 && fIdx === 1)) {
+          return t("regional_alola", { base: baseName });
+        }
+        if (formKey.includes("GALAR") || galarianIds.includes(sid) && (fIdx === 1 || sid === 52 && fIdx === 2)) {
+          return t("regional_galar", { base: baseName });
+        }
+        if (formKey.includes("HISUI") || hisuianIds.includes(sid) && fIdx === 1) {
+          return t("regional_hisui", { base: baseName });
+        }
+        if (formKey.includes("PALDEA") || paldeanIds.includes(sid) && fIdx >= 1) {
+          return t("regional_paldea", { base: baseName });
+        }
+        const formLabel = getAlternateFormLabel(sid, fIdx, formKey, isFr);
+        if (formLabel) {
+          return `${baseName} (${formLabel})`;
+        }
         if (pokemon?.species && typeof pokemon.species.getName === "function") {
           try {
             const locName = pokemon.species.getName(fIdx);
-            if (locName && typeof locName === "string" && locName.trim()) {
+            if (locName && typeof locName === "string" && locName.trim() && locName.trim() !== baseName) {
               return locName.trim();
             }
           } catch (_) {
           }
         }
-        const base = (isFrench() ? this.speciesNames[sid] || this.staticSpeciesNames && this.staticSpeciesNames[sid] : "") || pokemon?.species?.name || this.staticSpeciesNames && this.staticSpeciesNames[sid] || "";
-        if (base) {
-          const alolanIds = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
-          const galarianIds = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
-          const hisuianIds = [58, 59, 100, 101, 157, 211, 215, 503, 549, 550, 570, 571, 628, 706, 713, 724];
-          const paldeanIds = [128, 194];
-          if (alolanIds.includes(sid) && fIdx === 1) return t("regional_alola", { base });
-          if (galarianIds.includes(sid) && (fIdx === 1 || sid === 52 && fIdx === 2)) return t("regional_galar", { base });
-          if (hisuianIds.includes(sid) && fIdx === 1) return t("regional_hisui", { base });
-          if (paldeanIds.includes(sid) && fIdx === 1) return t("regional_paldea", { base });
+        const formName = pokemon?.speciesForm?.formName || pokemon?.species?.forms && pokemon.species.forms[fIdx]?.formName || "";
+        if (formName && typeof formName === "string" && formName.trim()) {
+          return `${baseName} (${formName.trim()})`;
         }
-      }
-      if (isFrench() && this.staticSpeciesNames && this.staticSpeciesNames[sid]) {
-        let n = this.staticSpeciesNames[sid];
-        this.speciesNames[sid] = n;
-        if (isMega && !n.toLowerCase().includes("m\xE9ga") && !n.toLowerCase().includes("mega")) {
-          n = `M\xE9ga-${n}`;
-        }
-        return n;
-      }
-      try {
-        const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
-        const scene = PokeSkip.scene || win.globalScene;
-        const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry || scene && scene.speciesDataRegistry || scene && scene.gameData && scene.gameData.speciesDataRegistry;
-        if (sdr) {
-          const sp = sdr.data ? sdr.data[sid] : typeof sdr.get === "function" ? sdr.get(sid) : null;
-          if (sp) {
-            const n = typeof sp.getName === "function" ? sp.getName(fIdx) : sp.name || sp.speciesName;
-            if (n && typeof n === "string") {
-              this.speciesNames[sid] = n;
-              return n;
-            }
-          }
-        }
-      } catch (_) {
       }
       if (typeof PokeSkip !== "undefined" && PokeSkip.rules && PokeSkip.rules[sid] && PokeSkip.rules[sid].lineageName) {
         const ln = PokeSkip.rules[sid].lineageName;
@@ -7003,7 +7441,7 @@
           return ln;
         }
       }
-      return "";
+      return baseName;
     },
     getParentSpeciesId(speciesId) {
       const idNum = Number(speciesId);
@@ -7141,12 +7579,83 @@
         allMembers
       };
     },
+    getPokemonFormKey(pokemon) {
+      if (!pokemon) return "";
+      if (typeof pokemon.getFormKey === "function") {
+        try {
+          const k = pokemon.getFormKey();
+          if (k) return String(k).toUpperCase();
+        } catch (_) {
+        }
+      }
+      if (pokemon.formKey) return String(pokemon.formKey).toUpperCase();
+      if (pokemon.speciesForm?.formKey) return String(pokemon.speciesForm.formKey).toUpperCase();
+      const fIdx = typeof pokemon.formIndex === "number" ? pokemon.formIndex : typeof pokemon.formeIndex === "number" ? pokemon.formeIndex : 0;
+      if (pokemon.species?.forms && Array.isArray(pokemon.species.forms) && pokemon.species.forms[fIdx]?.formKey) {
+        return String(pokemon.species.forms[fIdx].formKey).toUpperCase();
+      }
+      return "";
+    },
+    isPokemonGigantamax(pokemon) {
+      if (!pokemon) return false;
+      if (pokemon.isGigantamax || pokemon.gigantamax || pokemon.isGmax) return true;
+      const formKey = this.getPokemonFormKey(pokemon);
+      if (formKey && (formKey.startsWith("GMAX") || formKey.startsWith("GIGANTAMAX"))) {
+        return true;
+      }
+      const fIdx = typeof pokemon.formIndex === "number" && !isNaN(pokemon.formIndex) ? pokemon.formIndex : typeof pokemon.formeIndex === "number" && !isNaN(pokemon.formeIndex) ? pokemon.formeIndex : 0;
+      const formName = pokemon.speciesForm?.formName || pokemon.species?.forms && pokemon.species.forms[fIdx]?.formName || "";
+      if (typeof formName === "string" && /gigamax|gigantamax|g-max|gmax/i.test(formName)) {
+        return true;
+      }
+      const rawName = (pokemon.name || pokemon.species?.name || "").trim();
+      if (/gigamax|gigantamax|\(g-max\)|\(gmax\)/i.test(rawName)) {
+        return true;
+      }
+      return false;
+    },
     isPokemonMega(pokemon) {
       if (!pokemon) return false;
-      const name = (pokemon.name || pokemon.species?.name || "").toLowerCase();
-      if (name.includes("mega") || name.includes("m\xE9ga")) return true;
-      if (typeof pokemon.formeIndex === "number" && pokemon.formeIndex > 0) return true;
-      if (typeof pokemon.formIndex === "number" && pokemon.formIndex > 0) return true;
+      const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? pokemon?.id);
+      if (sid === 154 || sid === 469 || sid === 565) {
+        return false;
+      }
+      const formKey = this.getPokemonFormKey(pokemon);
+      if (formKey) {
+        if (formKey.startsWith("MEGA") || formKey === "PRIMAL") {
+          return true;
+        }
+        if (formKey.startsWith("GMAX") || formKey.startsWith("GIGANTAMAX") || formKey.includes("ALOLA") || formKey.includes("GALAR") || formKey.includes("HISUI") || formKey.includes("PALDEA") || formKey.includes("PIROUETTE") || formKey.includes("WASH") || formKey.includes("HEAT") || formKey.includes("FROST") || formKey.includes("FAN") || formKey.includes("MOW") || formKey.includes("ORIGIN") || formKey.includes("SKY") || formKey.includes("ATTACK") || formKey.includes("DEFENSE") || formKey.includes("SPEED") || formKey.includes("ZEN")) {
+          return false;
+        }
+      }
+      const fIdx = typeof pokemon.formIndex === "number" && !isNaN(pokemon.formIndex) ? pokemon.formIndex : typeof pokemon.formeIndex === "number" && !isNaN(pokemon.formeIndex) ? pokemon.formeIndex : 0;
+      const formName = pokemon.speciesForm?.formName || pokemon.species?.forms && pokemon.species.forms[fIdx]?.formName || "";
+      if (typeof formName === "string" && formName) {
+        if (/(^|[\s_-])(mega|méga|primal|primo)([\s_-]|$)/i.test(formName)) {
+          return true;
+        }
+        if (/gigamax|gigantamax|g-max|alola|galar|hisui|paldea|pirouette|wash|heat|frost|rotom/i.test(formName)) {
+          return false;
+        }
+      }
+      const isEligibleSpecies = !!(this.megaFamilies && this.megaFamilies[sid]) || sid === 382 || sid === 383;
+      if (!isEligibleSpecies) {
+        return false;
+      }
+      if (this.isPokemonGigantamax(pokemon)) {
+        return false;
+      }
+      if (fIdx > 0) {
+        if (sid === 80 && (formKey.includes("GALAR") || /galar/i.test(formName))) {
+          return false;
+        }
+        return true;
+      }
+      const rawName = (pokemon.name || pokemon.species?.name || "").trim();
+      if (/^(méga|mega|primo|primal)[- ]/i.test(rawName) || /(^|[\s_-])(mega|méga|primal|primo)([\s_-]|$)/i.test(rawName)) {
+        return true;
+      }
       return false;
     },
     _spriteCache: {},
@@ -7437,57 +7946,20 @@
       if (pokemon.nickname && typeof pokemon.nickname === "string" && pokemon.nickname.trim()) {
         return pokemon.nickname.trim();
       }
-      const isFr = isFrench();
       const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? pokemon?.id);
-      const isMega = this.isPokemonMega(pokemon);
-      if (isFr && sid && !isNaN(sid)) {
-        let frName = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-        if (frName) {
-          if (isMega && !frName.toLowerCase().includes("m\xE9ga") && !frName.toLowerCase().includes("mega")) {
-            frName = `M\xE9ga-${frName}`;
-          }
-          return frName;
-        }
+      const fIdx = typeof pokemon.formIndex === "number" && !isNaN(pokemon.formIndex) ? pokemon.formIndex : typeof pokemon.formeIndex === "number" && !isNaN(pokemon.formeIndex) ? pokemon.formeIndex : 0;
+      if (sid && !isNaN(sid) && sid > 0) {
+        const resolved = this.getSpeciesName(sid, fIdx, pokemon);
+        if (resolved) return resolved;
       }
       if (typeof pokemon.getName === "function") {
         try {
           const n = pokemon.getName();
-          if (n && typeof n === "string" && n.trim()) {
-            return n.trim();
-          }
+          if (n && typeof n === "string" && n.trim()) return n.trim();
         } catch (_) {
         }
       }
       if (pokemon?.species?.name) {
-        const n = pokemon.species.name;
-        return isMega && !n.toLowerCase().includes("mega") ? `Mega ${n}` : n;
-      }
-      if (pokemon.species && typeof pokemon.species.getName === "function") {
-        try {
-          const n = pokemon.species.getName(pokemon.formIndex);
-          if (n && typeof n === "string" && n.trim()) {
-            if (isFrench && sid && this.speciesNames[sid]) {
-              let fr = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-              if (isMega && !fr.toLowerCase().includes("m\xE9ga") && !fr.toLowerCase().includes("mega")) {
-                fr = `M\xE9ga-${fr}`;
-              }
-              return fr;
-            }
-            return n.trim();
-          }
-        } catch (_) {
-        }
-      }
-      if (sid && !isNaN(sid)) {
-        let name = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-        if (name) {
-          if (isMega && !name.toLowerCase().includes("m\xE9ga") && !name.toLowerCase().includes("mega")) {
-            name = `M\xE9ga-${name}`;
-          }
-          return name;
-        }
-      }
-      if (pokemon.species?.name && typeof pokemon.species.name === "string") {
         return pokemon.species.name;
       }
       if (pokemon.name && typeof pokemon.name === "string") {
@@ -8270,6 +8742,18 @@
   padding: 1px 6px;
   border-radius: 6px;
   box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  display: inline-block;
+}
+.pokeskip-gmax-badge {
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
   letter-spacing: 0.5px;
   margin-top: 2px;
   display: inline-block;
@@ -9109,6 +9593,26 @@
   background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
   transform: translateY(-1px) scale(1.02);
   box-shadow: 0 4px 14px rgba(168, 85, 247, 0.65);
+}
+.pokeskip-toast-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+}
+.pokeskip-toast-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
 }
 .pokeskip-toast-btn-close {
   background: rgba(255, 255, 255, 0.08);
@@ -10077,7 +10581,18 @@ canvas:focus-visible,
             }
           },
           Math.max(3, PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1e3,
-          "advanced"
+          "advanced",
+          t("toast_dont_ask_again"),
+          () => {
+            PokeSkip.settings.promptAutoReplacement = false;
+            PokeSkip.saveSettings();
+            UI2.showToast(t("toast_prompt_auto_rep_disabled"), "info", 3500);
+            const optCb = document.getElementById("pokeskip-opt-prompt-auto-replacement");
+            if (optCb) {
+              optCb.checked = false;
+              optCb.dispatchEvent(new Event("change"));
+            }
+          }
         );
       } catch (err) {
         console.error("[Pok\xE9Skip] Erreur lors de la d\xE9tection du remplacement manuel :", err);
@@ -10416,9 +10931,9 @@ canvas:focus-visible,
         }, 250);
       }, duration);
     },
-    showActionToast(message, actionLabel, onAction, duration = (PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1e3, type = "advanced") {
+    showActionToast(message, actionLabel, onAction, duration = (PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1e3, type = "advanced", secondaryActionLabel = null, onSecondaryAction = null) {
       if (!document.body) {
-        document.addEventListener("DOMContentLoaded", () => this.showActionToast(message, actionLabel, onAction, duration, type), { once: true });
+        document.addEventListener("DOMContentLoaded", () => this.showActionToast(message, actionLabel, onAction, duration, type, secondaryActionLabel, onSecondaryAction), { once: true });
         return;
       }
       const container = this.createToastContainer() || document.getElementById("pokeskip-toasts");
@@ -10441,12 +10956,20 @@ canvas:focus-visible,
       actionBtn.type = "button";
       actionBtn.className = "pokeskip-toast-btn-action";
       actionBtn.innerHTML = actionLabel || "Enregistrer";
+      contentWrap.appendChild(actionBtn);
+      let secondaryBtn = null;
+      if (secondaryActionLabel) {
+        secondaryBtn = document.createElement("button");
+        secondaryBtn.type = "button";
+        secondaryBtn.className = "pokeskip-toast-btn-secondary";
+        secondaryBtn.textContent = secondaryActionLabel;
+        contentWrap.appendChild(secondaryBtn);
+      }
       const closeBtn = document.createElement("button");
       closeBtn.type = "button";
       closeBtn.className = "pokeskip-toast-btn-close";
       closeBtn.innerHTML = "\u2715";
       closeBtn.title = "Fermer";
-      contentWrap.appendChild(actionBtn);
       contentWrap.appendChild(closeBtn);
       toast.appendChild(contentWrap);
       container.appendChild(toast);
@@ -10482,6 +11005,19 @@ canvas:focus-visible,
           }
         }
       });
+      if (secondaryBtn) {
+        secondaryBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          dismiss();
+          if (typeof onSecondaryAction === "function") {
+            try {
+              onSecondaryAction();
+            } catch (err) {
+              console.error("[Pok\xE9Skip] Erreur callback action secondaire toast :", err);
+            }
+          }
+        });
+      }
       closeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         dismiss();
@@ -12333,6 +12869,7 @@ canvas:focus-visible,
       const currentName = LineageManager.getPokemonDisplayName(pokemon);
       const shinyInfo = LineageManager.getPokemonShinyInfo(pokemon);
       const isMega = LineageManager.isPokemonMega(pokemon);
+      const isGmax = LineageManager.isPokemonGigantamax(pokemon);
       const currentSpeciesId = pokemon.species?.speciesId ?? pokemon.speciesId ?? LineageManager.getRootId(pokemon);
       const memberSprites = LineageManager.getLineageMemberSprites(familyInfo.familyKey, shinyInfo.isShiny, pokemon);
       const rule = PokeSkip.getFamilyRule(familyInfo.familyKey) || { skippedMoves: {}, skipAll: false };
@@ -12348,6 +12885,7 @@ canvas:focus-visible,
               <span class="pokeskip-lineage-lvl">${t("team_level_prefix")}${pokemon.level || 1}</span>
               ${shinyInfo.isShiny ? `<span class="pokeskip-shiny-badge ${shinyInfo.className}" style="position:static;" title="${shinyInfo.title}">${shinyInfo.stars}</span>` : ""}
               ${isMega ? '<span class="pokeskip-mega-badge">\u{1F9EC} M\xC9GA</span>' : ""}
+              ${isGmax ? '<span class="pokeskip-gmax-badge">\u{1F4A5} GMAX</span>' : ""}
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -13176,6 +13714,116 @@ canvas:focus-visible,
   // src/ui/tabs/global-tab.js
   var GlobalTab = {
     globalSearchQuery: "",
+    newChainDraft: ["", ""],
+    getAllKnownMoves() {
+      const moveMap = /* @__PURE__ */ new Map();
+      const en = isEnglish();
+      const idToMoveDef = /* @__PURE__ */ new Map();
+      const enToFr = /* @__PURE__ */ new Map();
+      const frToEn = /* @__PURE__ */ new Map();
+      for (const chain of MOVE_UPGRADE_CHAINS) {
+        if (Array.isArray(chain.moves)) {
+          for (const m of chain.moves) {
+            if (m.id) idToMoveDef.set(Number(m.id), m);
+            if (m.name && m.nameEn) {
+              enToFr.set(m.nameEn.toLowerCase().trim(), m.name);
+              frToEn.set(m.name.toLowerCase().trim(), m.nameEn);
+            }
+          }
+        }
+      }
+      for (const chain of MOVE_UPGRADE_CHAINS) {
+        if (Array.isArray(chain.moves)) {
+          for (const m of chain.moves) {
+            const localizedName = en ? m.nameEn || m.name : m.name || m.nameEn;
+            if (localizedName) {
+              const key = localizedName.toLowerCase().trim();
+              if (!moveMap.has(key)) {
+                moveMap.set(key, { name: localizedName, id: m.id || null });
+              }
+            }
+          }
+        }
+      }
+      const resolveLocalizedMove = (rawName, id) => {
+        if (!rawName && !id) return null;
+        const numId = id !== void 0 && id !== null ? Number(id) : null;
+        if (numId && idToMoveDef.has(numId)) {
+          const def = idToMoveDef.get(numId);
+          return {
+            name: en ? def.nameEn || def.name : def.name || def.nameEn,
+            id: numId
+          };
+        }
+        if (rawName && typeof rawName === "string") {
+          const norm = rawName.toLowerCase().trim();
+          if (en && frToEn.has(norm)) {
+            return { name: frToEn.get(norm), id: numId };
+          }
+          if (!en && enToFr.has(norm)) {
+            return { name: enToFr.get(norm), id: numId };
+          }
+          return { name: rawName.trim(), id: numId };
+        }
+        return null;
+      };
+      if (PokeSkip.knownMovesCache) {
+        for (const [idStr, mName] of Object.entries(PokeSkip.knownMovesCache)) {
+          if (mName && typeof mName === "string") {
+            const res = resolveLocalizedMove(mName, idStr);
+            if (res && res.name) {
+              const key = res.name.toLowerCase().trim();
+              if (!moveMap.has(key)) {
+                moveMap.set(key, res);
+              }
+            }
+          }
+        }
+      }
+      if (Array.isArray(PokeSkip.activeParty)) {
+        for (const p of PokeSkip.activeParty) {
+          if (Array.isArray(p?.moveset)) {
+            for (const m of p.moveset) {
+              const mName = m?.name || (typeof m?.getName === "function" ? m.getName() : null);
+              const mId = m?.id || m?.moveId || null;
+              if (mName || mId) {
+                const res = resolveLocalizedMove(mName, mId);
+                if (res && res.name) {
+                  const key = res.name.toLowerCase().trim();
+                  if (!moveMap.has(key)) {
+                    moveMap.set(key, res);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      try {
+        const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : typeof window !== "undefined" ? window : null;
+        const allMvs = win?.allMoves;
+        if (allMvs) {
+          const addMv = (mv, idx) => {
+            if (mv?.name) {
+              const res = resolveLocalizedMove(mv.name, mv.id ?? idx);
+              if (res && res.name) {
+                const key = res.name.toLowerCase().trim();
+                if (!moveMap.has(key)) {
+                  moveMap.set(key, res);
+                }
+              }
+            }
+          };
+          if (Array.isArray(allMvs)) {
+            allMvs.forEach(addMv);
+          } else if (typeof allMvs === "object") {
+            Object.entries(allMvs).forEach(([k, mv]) => addMv(mv, Number(k)));
+          }
+        }
+      } catch (_) {
+      }
+      return Array.from(moveMap.values()).sort((a, b) => a.name.localeCompare(b.name, en ? "en" : "fr"));
+    },
     _ensureMoveTooltip() {
       let tooltip = document.getElementById("pokeskip-move-rich-tooltip");
       if (!tooltip) {
@@ -13292,6 +13940,11 @@ canvas:focus-visible,
       const disabledChains = PokeSkip.settings.disabledUniversalChains || {};
       const totalCount = MOVE_UPGRADE_CHAINS.length;
       const activeCount = MOVE_UPGRADE_CHAINS.filter((c) => !disabledChains[c.id]).length;
+      if (!Array.isArray(this.newChainDraft) || this.newChainDraft.length < 2) {
+        this.newChainDraft = ["", ""];
+      }
+      const allKnownMoves = this.getAllKnownMoves();
+      const customChains = PokeSkip.getCustomGlobalChains();
       const filteredChains = MOVE_UPGRADE_CHAINS.filter((chain) => {
         if (!this.globalSearchQuery) return true;
         const q = this.globalSearchQuery.toLowerCase().trim();
@@ -13335,13 +13988,136 @@ canvas:focus-visible,
           </div>
         </div>
 
+        <!-- Encart : Cr\xE9ation de Cha\xEEne Globale Personnalis\xE9e (Taille Variable) -->
+        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 16px;">\u26A1</span>
+              <span style="font-size: 13.5px; font-weight: 700; color: #f8fafc;">
+                ${t("global_custom_title")}
+              </span>
+            </div>
+            ${customChains.length > 0 ? `
+              <span style="font-size: 11px; background: rgba(168, 85, 247, 0.2); color: #d8b4fe; padding: 2px 8px; border-radius: 10px; font-weight: 600;">
+                ${t("global_custom_my_chains", { count: customChains.length })}
+              </span>
+            ` : ""}
+          </div>
+
+          <div style="font-size: 11.5px; color: #94a3b8; line-height: 1.4;">
+            ${t("global_custom_subtitle")}
+          </div>
+
+          <!-- Datalist globale pour autocompl\xE9tion -->
+          <datalist id="pokeskip-custom-moves-datalist">
+            ${allKnownMoves.map((m) => `<option value="${m.name}">`).join("")}
+          </datalist>
+
+          <!-- Formulaire dynamique des \xE9tapes de la cha\xEEne -->
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div id="pokeskip-custom-chain-steps-wrap" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              ${this.newChainDraft.map((val, idx) => {
+        const isLast = idx === this.newChainDraft.length - 1;
+        const canRemove = this.newChainDraft.length > 2;
+        const stepLabel = t("global_custom_step", { step: idx + 1 });
+        const isOrigin = idx === 0;
+        const borderStyle = isOrigin ? "border-color: rgba(244, 63, 94, 0.5);" : isLast ? "border-color: rgba(56, 189, 248, 0.5);" : "border-color: rgba(168, 85, 247, 0.4);";
+        return `
+                  <div class="pokeskip-chain-step-row" style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <div style="font-size: 10.5px; font-weight: 600; color: ${isOrigin ? "#fda4af" : isLast ? "#7dd3fc" : "#d8b4fe"};">
+                        ${stepLabel} ${isOrigin ? t("global_custom_origin_tag") : isLast ? t("global_custom_replacement_tag") : ""}
+                      </div>
+                      <div style="position: relative; display: flex; align-items: center;">
+                        <input
+                          type="text"
+                          class="pokeskip-input-chain-step"
+                          data-index="${idx}"
+                          list="pokeskip-custom-moves-datalist"
+                          value="${(val || "").replace(/"/g, "&quot;")}"
+                          placeholder="${t("global_custom_placeholder")}"
+                          style="width: 170px; background: #090e1a; border: 1px solid; ${borderStyle} border-radius: 7px; padding: 6px 10px; ${canRemove ? "padding-right: 26px;" : ""} color: #fff; font-size: 12px; outline: none;"
+                        >
+                        ${canRemove ? `
+                          <button
+                            type="button"
+                            class="pokeskip-btn-remove-chain-step"
+                            data-index="${idx}"
+                            title="${t("global_custom_remove_step")}"
+                            style="position: absolute; right: 6px; background: none; border: none; color: #f43f5e; font-size: 13px; cursor: pointer; padding: 2px 4px; line-height: 1;"
+                          >\u2715</button>
+                        ` : ""}
+                      </div>
+                    </div>
+                    ${!isLast ? `<span style="color: #a855f7; font-size: 15px; font-weight: bold; margin-top: 14px;">\u2794</span>` : ""}
+                  </div>
+                `;
+      }).join("")}
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+              <button
+                type="button"
+                id="pokeskip-btn-add-chain-step"
+                style="background: rgba(168, 85, 247, 0.15); border: 1px dashed rgba(168, 85, 247, 0.45); color: #d8b4fe; padding: 6px 12px; border-radius: 7px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"
+              >
+                ${t("global_custom_add_step")}
+              </button>
+
+              <button
+                type="button"
+                id="pokeskip-btn-save-custom-chain"
+                style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 6px 16px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(168, 85, 247, 0.35);"
+              >
+                ${t("global_custom_save_btn")}
+              </button>
+            </div>
+          </div>
+
+          <!-- Liste des cha\xEEnes personnalis\xE9es existantes -->
+          ${customChains.length > 0 ? `
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+              <div style="font-size: 11.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.3px;">
+                ${t("global_custom_my_chains", { count: customChains.length })} :
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                ${customChains.map((c) => `
+                  <div class="pokeskip-custom-chain-card" data-chain-id="${c.id}" style="background: rgba(15, 23, 42, 0.7); border: 1px solid ${c.enabled ? "rgba(168, 85, 247, 0.3)" : "rgba(255, 255, 255, 0.08)"}; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                      ${c.moves.map((m, mIdx) => `
+                        <span style="background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.4); color: #f1f5f9; padding: 3px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 600;">
+                          ${m.name}
+                        </span>
+                        ${mIdx < c.moves.length - 1 ? '<span style="color: #a855f7; font-weight: bold; font-size: 12px;">\u2794</span>' : ""}
+                      `).join("")}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <label class="pokeskip-switch" title="${c.name}">
+                        <input type="checkbox" class="pokeskip-toggle-custom-chain" data-id="${c.id}" ${c.enabled ? "checked" : ""} ${!isMasterActive ? "disabled" : ""}>
+                        <span class="pokeskip-slider"></span>
+                      </label>
+                      <button type="button" class="pokeskip-btn-delete-custom-chain" data-id="${c.id}" title="${t("global_custom_delete_confirm", { name: c.name })}" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 4px 7px; border-radius: 6px; font-size: 11px; cursor: pointer;">
+                        \u{1F5D1}\uFE0F
+                      </button>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          ` : `
+            <div style="font-size: 11.5px; color: #64748b; font-style: italic; padding: 4px 2px;">
+              ${t("global_custom_no_chains")}
+            </div>
+          `}
+        </div>
+
         <!-- Barre de recherche et actions rapides -->
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 220px; position: relative;">
             <input type="text" id="pokeskip-input-search-global" placeholder="${t("global_search_placeholder")}" value="${this.globalSearchQuery || ""}" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 12.5px; outline: none;">
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <button id="pokeskip-btn-enable-all-global" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600;">
+            <button id="pokeskip-btn-enable-all-global" style="background: rgba(160, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600;">
               \u2713 ${t("global_btn_enable_all")}
             </button>
             <button id="pokeskip-btn-disable-all-global" style="background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3); padding: 6px 12px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600;">
@@ -13350,7 +14126,7 @@ canvas:focus-visible,
           </div>
         </div>
 
-        <!-- Liste des cha\xEEnes d'attaques -->
+        <!-- Liste des cha\xEEnes d'attaques pr\xE9d\xE9finies -->
         <div id="pokeskip-global-chains-list" style="display: flex; flex-direction: column; gap: 10px; opacity: ${isMasterActive ? "1" : "0.45"}; transition: opacity 0.25s ease;">
           ${filteredChains.length === 0 ? `
             <div style="text-align: center; padding: 30px; color: #64748b; background: #090e1a; border-radius: 10px; font-size: 13px;">
@@ -13460,6 +14236,119 @@ ${t("global_move_tooltip_power")}: ${moveInfo.power} | ${t("global_move_tooltip_
           this.renderGlobalTab();
         });
       }
+      container.querySelectorAll(".pokeskip-input-chain-step").forEach((input) => {
+        const idx = Number(input.getAttribute("data-index"));
+        input.addEventListener("input", (e) => {
+          this.newChainDraft[idx] = e.target.value;
+        });
+        ["keydown", "keyup", "keypress"].forEach((type) => {
+          input.addEventListener(type, (e) => e.stopPropagation());
+        });
+      });
+      const btnAddStep = container.querySelector("#pokeskip-btn-add-chain-step");
+      if (btnAddStep) {
+        btnAddStep.addEventListener("click", () => {
+          container.querySelectorAll(".pokeskip-input-chain-step").forEach((input) => {
+            const idx = Number(input.getAttribute("data-index"));
+            this.newChainDraft[idx] = input.value;
+          });
+          this.newChainDraft.push("");
+          this.renderGlobalTab();
+          setTimeout(() => {
+            const inputs = container.querySelectorAll(".pokeskip-input-chain-step");
+            if (inputs.length > 0) {
+              const last = inputs[inputs.length - 1];
+              last.focus();
+            }
+          }, 50);
+        });
+      }
+      container.querySelectorAll(".pokeskip-btn-remove-chain-step").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          container.querySelectorAll(".pokeskip-input-chain-step").forEach((input) => {
+            const idx = Number(input.getAttribute("data-index"));
+            this.newChainDraft[idx] = input.value;
+          });
+          const rmIdx = Number(btn.getAttribute("data-index"));
+          if (this.newChainDraft.length > 2 && rmIdx >= 0 && rmIdx < this.newChainDraft.length) {
+            this.newChainDraft.splice(rmIdx, 1);
+            this.renderGlobalTab();
+          }
+        });
+      });
+      const btnSaveCustomChain = container.querySelector("#pokeskip-btn-save-custom-chain");
+      if (btnSaveCustomChain) {
+        btnSaveCustomChain.addEventListener("click", () => {
+          container.querySelectorAll(".pokeskip-input-chain-step").forEach((input) => {
+            const idx = Number(input.getAttribute("data-index"));
+            this.newChainDraft[idx] = input.value;
+          });
+          const trimmed = this.newChainDraft.map((s) => (s || "").trim());
+          if (trimmed.length < 2) {
+            UI2.showToast(t("global_custom_error_min_moves"), "error");
+            return;
+          }
+          const hasEmpty = trimmed.some((s) => !s);
+          if (hasEmpty) {
+            UI2.showToast(t("global_custom_error_empty_move"), "error");
+            return;
+          }
+          const normalize = (s) => (s || "").toLowerCase().replace(/[^a-z0-9\u00C0-\u017F]/g, "");
+          const normList = trimmed.map(normalize);
+          const set = new Set(normList);
+          if (set.size !== normList.length) {
+            UI2.showToast(t("global_custom_error_duplicate_move"), "error");
+            return;
+          }
+          const allMoves = this.getAllKnownMoves();
+          const movesToSave = trimmed.map((name) => {
+            const n = normalize(name);
+            const found = allMoves.find((m) => normalize(m.name) === n);
+            return {
+              name: found?.name || name,
+              id: found?.id || null
+            };
+          });
+          const created = PokeSkip.addCustomGlobalChain(movesToSave);
+          if (created) {
+            UI2.showToast(t("global_custom_saved_toast", { name: created.name }), "success");
+            this.newChainDraft = ["", ""];
+            this.renderGlobalTab();
+          }
+        });
+      }
+      container.querySelectorAll(".pokeskip-toggle-custom-chain").forEach((toggle) => {
+        toggle.addEventListener("change", (e) => {
+          const chainId = toggle.getAttribute("data-id");
+          const enabled = e.target.checked;
+          const newStatus = PokeSkip.toggleCustomGlobalChain(chainId, enabled);
+          const customChains = PokeSkip.getCustomGlobalChains();
+          const c = customChains.find((item) => item.id === chainId);
+          UI2.showToast(
+            t("global_custom_toggle_toast", {
+              name: c ? c.name : chainId,
+              status: newStatus ? t("global_chain_enabled") : t("global_chain_disabled")
+            }),
+            newStatus ? "success" : "info",
+            1800
+          );
+        });
+      });
+      container.querySelectorAll(".pokeskip-btn-delete-custom-chain").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const chainId = btn.getAttribute("data-id");
+          const customChains = PokeSkip.getCustomGlobalChains();
+          const c = customChains.find((item) => item.id === chainId);
+          const name = c ? c.name : chainId;
+          if (confirm(t("global_custom_delete_confirm", { name }))) {
+            PokeSkip.deleteCustomGlobalChain(chainId);
+            UI2.showToast(t("global_custom_deleted_toast"), "warning");
+            this.renderGlobalTab();
+          }
+        });
+      });
       const searchInput = container.querySelector("#pokeskip-input-search-global");
       if (searchInput) {
         searchInput.addEventListener("input", (e) => {

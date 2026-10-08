@@ -284,7 +284,18 @@ function checkManualMoveReplacement(phase) {
           }
         },
         Math.max(3, PokeSkip.settings?.autoReplacementPromptDuration || 10) * 1000,
-        'advanced'
+        'advanced',
+        t('toast_dont_ask_again'),
+        () => {
+          PokeSkip.settings.promptAutoReplacement = false;
+          PokeSkip.saveSettings();
+          UI.showToast(t('toast_prompt_auto_rep_disabled'), 'info', 3500);
+          const optCb = document.getElementById('pokeskip-opt-prompt-auto-replacement');
+          if (optCb) {
+            optCb.checked = false;
+            optCb.dispatchEvent(new Event('change'));
+          }
+        }
       );
     } catch (err) {
       console.error('[PokéSkip] Erreur lors de la détection du remplacement manuel :', err);

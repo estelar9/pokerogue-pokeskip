@@ -1,6 +1,7 @@
 import { families } from '../data/families.js';
 import { branchedPrevolutions } from '../data/branched-prevolutions.js';
 import { megaFamilies } from '../data/megas.js';
+import { alternateForms, formKeyNames, getAlternateFormLabel } from '../data/alternate-forms.js';
 import { staticSpeciesNames } from '../data/species-names.js';
 import { AssetLoader } from './asset-loader.js';
 import { PokeSkip } from './state.js';
@@ -11,6 +12,8 @@ export const LineageManager = {
   families,
   branchedPrevolutions,
   megaFamilies,
+  alternateForms,
+  formKeyNames,
   staticSpeciesNames,
   speciesNames: {},
   memberToRoot: {},
@@ -57,49 +60,18 @@ export const LineageManager = {
     getSpeciesName(speciesId, formIndex = 0, pokemon = null) {
       if (!speciesId) return '';
       const sid = Number(speciesId);
-      if (isNaN(sid)) return '';
+      if (isNaN(sid) || sid <= 0) return '';
 
-      // Méga vérification
+      const fIdx = (formIndex !== undefined && formIndex !== null && !isNaN(formIndex))
+        ? Number(formIndex)
+        : (pokemon?.formIndex !== undefined ? Number(pokemon.formIndex) : (pokemon?.formeIndex !== undefined ? Number(pokemon.formeIndex) : 0));
+
+      const isFr = isFrench();
       const isMega = pokemon ? this.isPokemonMega(pokemon) : false;
-
-      // En mode anglais, tenter d'abord d'obtenir le nom en anglais depuis le jeu ou pokemon
-      if (isEnglish()) {
-        try {
-          if (pokemon?.species && typeof pokemon.species.getName === 'function') {
-            const loc = pokemon.species.getName(formIndex);
-            if (loc && typeof loc === 'string' && loc.trim()) {
-              return isMega && !loc.toLowerCase().includes('mega') ? `Mega ${loc.trim()}` : loc.trim();
-            }
-          }
-          if (pokemon?.species?.name) {
-            const n = pokemon.species.name;
-            return isMega && !n.toLowerCase().includes('mega') ? `Mega ${n}` : n;
-          }
-          const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-          const scene = PokeSkip.scene || win.globalScene;
-          const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry
-                      || (scene && scene.speciesDataRegistry)
-                      || (scene && scene.gameData && scene.gameData.speciesDataRegistry);
-          if (sdr) {
-            const sp = sdr.data ? sdr.data[sid] : (typeof sdr.get === 'function' ? sdr.get(sid) : null);
-            if (sp) {
-              const n = typeof sp.getName === 'function' ? sp.getName(formIndex) : (sp.name || sp.speciesName);
-              if (n && typeof n === 'string' && n.trim()) {
-                return isMega && !n.toLowerCase().includes('mega') ? `Mega ${n.trim()}` : n.trim();
-              }
-            }
-          }
-        } catch (_) {}
-      }
+      const isGmax = pokemon ? this.isPokemonGigantamax(pokemon) : false;
+      const formKey = pokemon ? this.getPokemonFormKey(pokemon) : '';
 
       // 1. Formes régionales par tranches d'ID PokéRogue (2000+, 4000+, 6000+, 8000+)
-      if (this.speciesNames[sid] && isFrench()) {
-        let n = this.speciesNames[sid];
-        if (isMega && !n.toLowerCase().includes('méga') && !n.toLowerCase().includes('mega')) {
-          n = `Méga-${n}`;
-        }
-        return n;
-      }
       if (sid >= 8000 && sid < 10000) {
         const base = this.getSpeciesName(sid - 8000, 0, pokemon);
         if (base) return t('regional_paldea', { base });
@@ -117,68 +89,110 @@ export const LineageManager = {
         if (base) return t('regional_alola', { base });
       }
 
-      // 2. Formes régionales par formIndex (si sid < 1025 mais formIndex > 0)
-      const fIdx = (formIndex !== undefined && formIndex !== null && formIndex > 0)
-        ? Number(formIndex)
-        : (pokemon?.formIndex ? Number(pokemon.formIndex) : 0);
+      // 2. Récupérer le nom de base officiel de l'espèce
+      let baseName = '';
+      if (isFr) {
+        baseName = this.speciesNames[sid] || (this.staticSpeciesNames && this.staticSpeciesNames[sid]) || '';
+      } else {
+        baseName = pokemon?.species?.name || '';
+      }
 
+      // Si pas encore trouvé (ex: anglais sans pokemon ou nom absent du cache)
+      if (!baseName) {
+        try {
+          const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+          const scene = PokeSkip.scene || win.globalScene;
+          const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry
+                      || (scene && scene.speciesDataRegistry)
+                      || (scene && scene.gameData && scene.gameData.speciesDataRegistry);
+          if (sdr) {
+            const sp = sdr.data ? sdr.data[sid] : (typeof sdr.get === 'function' ? sdr.get(sid) : null);
+            if (sp) {
+              const n = typeof sp.getName === 'function' ? sp.getName(0) : (sp.name || sp.speciesName);
+              if (n && typeof n === 'string' && n.trim()) {
+                baseName = n.trim();
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
+      // Fallback final sur le nom français statique ou propriété
+      if (!baseName) {
+        baseName = this.speciesNames[sid] || (this.staticSpeciesNames && this.staticSpeciesNames[sid]) || pokemon?.species?.name || `Pokémon #${sid}`;
+      }
+
+      // 3. Cas Méga-Évolution authentique
+      if (isMega) {
+        const isPrimal = sid === 382 || sid === 383 || formKey === 'PRIMAL';
+        if (isFr) {
+          if (isPrimal) {
+            return baseName.toLowerCase().includes('primo') ? baseName : `Primo-${baseName}`;
+          }
+          return (baseName.toLowerCase().includes('méga') || baseName.toLowerCase().includes('mega'))
+            ? baseName
+            : `Méga-${baseName}`;
+        } else {
+          if (isPrimal) {
+            return baseName.toLowerCase().includes('primal') ? baseName : `Primal ${baseName}`;
+          }
+          return baseName.toLowerCase().includes('mega') ? baseName : `Mega ${baseName}`;
+        }
+      }
+
+      // 4. Cas Gigamax
+      if (isGmax) {
+        if (isFr) {
+          return baseName.toLowerCase().includes('gigamax') ? baseName : `${baseName} (Gigamax)`;
+        } else {
+          return baseName.toLowerCase().includes('gigantamax') ? baseName : `${baseName} (Gigantamax)`;
+        }
+      }
+
+      // 5. Cas Formes régionales par formIndex / formKey (si sid < 1025 et fIdx > 0)
       if (fIdx > 0 && sid > 0 && sid < 1025) {
+        const alolanIds = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
+        const galarianIds = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
+        const hisuianIds = [58, 59, 100, 101, 157, 211, 215, 503, 549, 550, 570, 571, 628, 706, 713, 724];
+        const paldeanIds = [128, 194];
+
+        if (formKey.includes('ALOLA') || (alolanIds.includes(sid) && (fIdx === 1 || (sid === 52 && fIdx === 1)))) {
+          return t('regional_alola', { base: baseName });
+        }
+        if (formKey.includes('GALAR') || (galarianIds.includes(sid) && (fIdx === 1 || (sid === 52 && fIdx === 2)))) {
+          return t('regional_galar', { base: baseName });
+        }
+        if (formKey.includes('HISUI') || (hisuianIds.includes(sid) && fIdx === 1)) {
+          return t('regional_hisui', { base: baseName });
+        }
+        if (formKey.includes('PALDEA') || (paldeanIds.includes(sid) && fIdx >= 1)) {
+          return t('regional_paldea', { base: baseName });
+        }
+
+        // 6. Formes alternatives spécifiques officielles via alternateForms (ex: Meloetta Danse, Motisma Lavage, Deoxys Attaque...)
+        const formLabel = getAlternateFormLabel(sid, fIdx, formKey, isFr);
+        if (formLabel) {
+          return `${baseName} (${formLabel})`;
+        }
+
+        // 7. Interrogation du nom de forme spécifique fourni par PokéRogue
         if (pokemon?.species && typeof pokemon.species.getName === 'function') {
           try {
             const locName = pokemon.species.getName(fIdx);
-            if (locName && typeof locName === 'string' && locName.trim()) {
+            if (locName && typeof locName === 'string' && locName.trim() && locName.trim() !== baseName) {
               return locName.trim();
             }
           } catch (_) {}
         }
-
-        const base = (isFrench() ? (this.speciesNames[sid] || (this.staticSpeciesNames && this.staticSpeciesNames[sid])) : '')
-                     || (pokemon?.species?.name)
-                     || (this.staticSpeciesNames && this.staticSpeciesNames[sid])
-                     || '';
-        if (base) {
-          const alolanIds = [19, 20, 26, 27, 28, 37, 38, 50, 51, 52, 53, 74, 75, 76, 88, 89, 103, 105];
-          const galarianIds = [52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618];
-          const hisuianIds = [58, 59, 100, 101, 157, 211, 215, 503, 549, 550, 570, 571, 628, 706, 713, 724];
-          const paldeanIds = [128, 194];
-
-          if (alolanIds.includes(sid) && fIdx === 1) return t('regional_alola', { base });
-          if (galarianIds.includes(sid) && (fIdx === 1 || (sid === 52 && fIdx === 2))) return t('regional_galar', { base });
-          if (hisuianIds.includes(sid) && fIdx === 1) return t('regional_hisui', { base });
-          if (paldeanIds.includes(sid) && fIdx === 1) return t('regional_paldea', { base });
+        const formName = pokemon?.speciesForm?.formName
+          || (pokemon?.species?.forms && pokemon.species.forms[fIdx]?.formName)
+          || '';
+        if (formName && typeof formName === 'string' && formName.trim()) {
+          return `${baseName} (${formName.trim()})`;
         }
       }
 
-      // 3. Dictionnaire statique officiel (en français)
-      if (isFrench() && this.staticSpeciesNames && this.staticSpeciesNames[sid]) {
-        let n = this.staticSpeciesNames[sid];
-        this.speciesNames[sid] = n;
-        if (isMega && !n.toLowerCase().includes('méga') && !n.toLowerCase().includes('mega')) {
-          n = `Méga-${n}`;
-        }
-        return n;
-      }
-
-      // 4. Interrogation dynamique du registre du jeu PokéRogue
-      try {
-        const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-        const scene = PokeSkip.scene || win.globalScene;
-        const sdr = win.speciesDataRegistry || win.globalSpeciesDataRegistry
-                    || (scene && scene.speciesDataRegistry)
-                    || (scene && scene.gameData && scene.gameData.speciesDataRegistry);
-        if (sdr) {
-          const sp = sdr.data ? sdr.data[sid] : (typeof sdr.get === 'function' ? sdr.get(sid) : null);
-          if (sp) {
-            const n = typeof sp.getName === 'function' ? sp.getName(fIdx) : (sp.name || sp.speciesName);
-            if (n && typeof n === 'string') {
-              this.speciesNames[sid] = n;
-              return n;
-            }
-          }
-        }
-      } catch (_) {}
-
-      // 5. Vérifier les règles sauvegardées
+      // 8. Vérifier les règles sauvegardées personnalisées si besoin
       if (typeof PokeSkip !== 'undefined' && PokeSkip.rules && PokeSkip.rules[sid] && PokeSkip.rules[sid].lineageName) {
         const ln = PokeSkip.rules[sid].lineageName;
         if (ln && !ln.startsWith('Espèce #') && !ln.startsWith('Lignée #')) {
@@ -187,7 +201,7 @@ export const LineageManager = {
         }
       }
 
-      return '';
+      return baseName;
     },
     getParentSpeciesId(speciesId) {
       const idNum = Number(speciesId);
@@ -337,12 +351,123 @@ export const LineageManager = {
       };
     },
 
+    getPokemonFormKey(pokemon) {
+      if (!pokemon) return '';
+      if (typeof pokemon.getFormKey === 'function') {
+        try {
+          const k = pokemon.getFormKey();
+          if (k) return String(k).toUpperCase();
+        } catch (_) {}
+      }
+      if (pokemon.formKey) return String(pokemon.formKey).toUpperCase();
+      if (pokemon.speciesForm?.formKey) return String(pokemon.speciesForm.formKey).toUpperCase();
+      const fIdx = typeof pokemon.formIndex === 'number' ? pokemon.formIndex : (typeof pokemon.formeIndex === 'number' ? pokemon.formeIndex : 0);
+      if (pokemon.species?.forms && Array.isArray(pokemon.species.forms) && pokemon.species.forms[fIdx]?.formKey) {
+        return String(pokemon.species.forms[fIdx].formKey).toUpperCase();
+      }
+      return '';
+    },
+
+    isPokemonGigantamax(pokemon) {
+      if (!pokemon) return false;
+      if (pokemon.isGigantamax || pokemon.gigantamax || pokemon.isGmax) return true;
+
+      const formKey = this.getPokemonFormKey(pokemon);
+      if (formKey && (formKey.startsWith('GMAX') || formKey.startsWith('GIGANTAMAX'))) {
+        return true;
+      }
+
+      const fIdx = (typeof pokemon.formIndex === 'number' && !isNaN(pokemon.formIndex))
+        ? pokemon.formIndex
+        : (typeof pokemon.formeIndex === 'number' && !isNaN(pokemon.formeIndex) ? pokemon.formeIndex : 0);
+
+      const formName = pokemon.speciesForm?.formName
+        || (pokemon.species?.forms && pokemon.species.forms[fIdx]?.formName)
+        || '';
+      if (typeof formName === 'string' && /gigamax|gigantamax|g-max|gmax/i.test(formName)) {
+        return true;
+      }
+
+      const rawName = (pokemon.name || pokemon.species?.name || '').trim();
+      if (/gigamax|gigantamax|\(g-max\)|\(gmax\)/i.test(rawName)) {
+        return true;
+      }
+
+      return false;
+    },
+
     isPokemonMega(pokemon) {
       if (!pokemon) return false;
-      const name = (pokemon.name || pokemon.species?.name || '').toLowerCase();
-      if (name.includes('mega') || name.includes('méga')) return true;
-      if (typeof pokemon.formeIndex === 'number' && pokemon.formeIndex > 0) return true;
-      if (typeof pokemon.formIndex === 'number' && pokemon.formIndex > 0) return true;
+
+      const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? pokemon?.id);
+
+      // 1. Espèces qui contiennent naturellement 'mega' ou 'méga' dans leur nom mais ne sont PAS des méga-évolutions
+      // 154 = Méganium, 469 = Yanmega, 565 = Mégapagos
+      if (sid === 154 || sid === 469 || sid === 565) {
+        return false;
+      }
+
+      // 2. Vérification par formKey de PokéRogue
+      const formKey = this.getPokemonFormKey(pokemon);
+      if (formKey) {
+        if (formKey.startsWith('MEGA') || formKey === 'PRIMAL') {
+          return true;
+        }
+        // Si la formKey est explicitement une autre forme alternative (non-méga)
+        if (formKey.startsWith('GMAX') || formKey.startsWith('GIGANTAMAX')
+            || formKey.includes('ALOLA') || formKey.includes('GALAR') || formKey.includes('HISUI') || formKey.includes('PALDEA')
+            || formKey.includes('PIROUETTE') || formKey.includes('WASH') || formKey.includes('HEAT') || formKey.includes('FROST')
+            || formKey.includes('FAN') || formKey.includes('MOW') || formKey.includes('ORIGIN') || formKey.includes('SKY')
+            || formKey.includes('ATTACK') || formKey.includes('DEFENSE') || formKey.includes('SPEED') || formKey.includes('ZEN')) {
+          return false;
+        }
+      }
+
+      // 3. Vérification par formName de PokéRogue
+      const fIdx = (typeof pokemon.formIndex === 'number' && !isNaN(pokemon.formIndex))
+        ? pokemon.formIndex
+        : (typeof pokemon.formeIndex === 'number' && !isNaN(pokemon.formeIndex) ? pokemon.formeIndex : 0);
+
+      const formName = pokemon.speciesForm?.formName
+        || (pokemon.species?.forms && pokemon.species.forms[fIdx]?.formName)
+        || '';
+      if (typeof formName === 'string' && formName) {
+        if (/(^|[\s_-])(mega|méga|primal|primo)([\s_-]|$)/i.test(formName)) {
+          return true;
+        }
+        if (/gigamax|gigantamax|g-max|alola|galar|hisui|paldea|pirouette|wash|heat|frost|rotom/i.test(formName)) {
+          return false;
+        }
+      }
+
+      // 4. Si l'espèce n'est PAS dans megaFamilies (et pas Kyogre 382 / Groudon 383)
+      // Seules les espèces répertoriées dans megaFamilies ou Kyogre/Groudon peuvent être des Mégas / Primos
+      const isEligibleSpecies = !!(this.megaFamilies && this.megaFamilies[sid]) || sid === 382 || sid === 383;
+      if (!isEligibleSpecies) {
+        return false;
+      }
+
+      // 5. Pour les espèces éligibles :
+      // S'il s'agit d'un Gigamax, ce n'est pas un Méga
+      if (this.isPokemonGigantamax(pokemon)) {
+        return false;
+      }
+
+      // Si formIndex > 0 pour une espèce de megaFamilies (et pas régional/gmax exclu ci-dessus)
+      if (fIdx > 0) {
+        // Cas particulier : Flagadoss (80) possède une forme de Galar ET une Méga.
+        if (sid === 80 && (formKey.includes('GALAR') || /galar/i.test(formName))) {
+          return false;
+        }
+        return true;
+      }
+
+      // 6. Vérification du nom explicite avec frontières strictes
+      const rawName = (pokemon.name || pokemon.species?.name || '').trim();
+      if (/^(méga|mega|primo|primal)[- ]/i.test(rawName) || /(^|[\s_-])(mega|méga|primal|primo)([\s_-]|$)/i.test(rawName)) {
+        return true;
+      }
+
       return false;
     },
     _spriteCache: {},
@@ -672,68 +797,29 @@ export const LineageManager = {
         return pokemon.nickname.trim();
       }
 
-      // 2. Détection de la langue de jeu
-      const isFr = isFrench();
       const sid = Number(pokemon?.species?.speciesId ?? pokemon?.speciesId ?? pokemon?.id);
-      const isMega = this.isPokemonMega(pokemon);
+      const fIdx = (typeof pokemon.formIndex === 'number' && !isNaN(pokemon.formIndex))
+        ? pokemon.formIndex
+        : (typeof pokemon.formeIndex === 'number' && !isNaN(pokemon.formeIndex) ? pokemon.formeIndex : 0);
 
-      // 3. En français : résolution prioritaire via notre dictionnaire complet et officiel
-      if (isFr && sid && !isNaN(sid)) {
-        let frName = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-        if (frName) {
-          if (isMega && !frName.toLowerCase().includes('méga') && !frName.toLowerCase().includes('mega')) {
-            frName = `Méga-${frName}`;
-          }
-          return frName;
-        }
+      // 2. Résolution unifiée et prioritaire via getSpeciesName (qui gère Méga, Gmax, formes régionales et alternatives)
+      if (sid && !isNaN(sid) && sid > 0) {
+        const resolved = this.getSpeciesName(sid, fIdx, pokemon);
+        if (resolved) return resolved;
       }
 
-      // 4. Si anglais ou autre langue sélectionnée :
+      // 3. Fallbacks directs sur l'objet Pokémon si sid introuvable
       if (typeof pokemon.getName === 'function') {
         try {
           const n = pokemon.getName();
-          if (n && typeof n === 'string' && n.trim()) {
-            return n.trim();
-          }
+          if (n && typeof n === 'string' && n.trim()) return n.trim();
         } catch (_) {}
       }
 
       if (pokemon?.species?.name) {
-        const n = pokemon.species.name;
-        return isMega && !n.toLowerCase().includes('mega') ? `Mega ${n}` : n;
-      }
-
-      if (pokemon.species && typeof pokemon.species.getName === 'function') {
-        try {
-          const n = pokemon.species.getName(pokemon.formIndex);
-          if (n && typeof n === 'string' && n.trim()) {
-            if (isFrench && sid && this.speciesNames[sid]) {
-              let fr = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-              if (isMega && !fr.toLowerCase().includes('méga') && !fr.toLowerCase().includes('mega')) {
-                fr = `Méga-${fr}`;
-              }
-              return fr;
-            }
-            return n.trim();
-          }
-        } catch (_) {}
-      }
-
-      // 5. Fallback dictionnaire français
-      if (sid && !isNaN(sid)) {
-        let name = this.getSpeciesName(sid, pokemon.formIndex, pokemon);
-        if (name) {
-          if (isMega && !name.toLowerCase().includes('méga') && !name.toLowerCase().includes('mega')) {
-            name = `Méga-${name}`;
-          }
-          return name;
-        }
-      }
-
-      // 6. Si rien d'autre n'est trouvé, utiliser le nom de famille ou propriété
-      if (pokemon.species?.name && typeof pokemon.species.name === 'string') {
         return pokemon.species.name;
       }
+
       if (pokemon.name && typeof pokemon.name === 'string') {
         return pokemon.name;
       }
